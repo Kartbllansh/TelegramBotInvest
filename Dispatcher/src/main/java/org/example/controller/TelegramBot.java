@@ -3,7 +3,9 @@ package org.example.controller;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -12,40 +14,42 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.annotation.PostConstruct;
-
-@Component
+import javax.inject.Singleton;
 @Log4j
+@Component
+
 //@NoArgsConstructor
 public class TelegramBot extends TelegramLongPollingBot {
     @Value("${bot.name}")
     private String botName;
-
+@Autowired
     public TelegramBot(@Value("${bot.token}") String botToken){
         super(botToken);
+        log.info("Check");
     }
+    @Autowired
     @Override
     public String getBotUsername() {
         return botName;
     }
 
     private UpdateConroller updateConroller;
-
-    public TelegramBot(UpdateConroller updateConroller){
+    @Autowired
+    public void setUpdateConroller(UpdateConroller updateConroller) {
         this.updateConroller = updateConroller;
     }
+
     @PostConstruct
-    public void init(){
-        updateConroller.registerBot(this);
+    public void afterPropertiesSet() {
+        if (updateConroller != null) {
+            updateConroller.registerBot(this);
+        }
     }
+
 
     @Override
     public void onUpdateReceived(Update update) {
-    var originalMessage = update.getMessage();
-        System.out.println(originalMessage.getText());
-        var sendMessage = new SendMessage();
-        sendMessage.setChatId(originalMessage.getChatId());
-        sendMessage.setText(originalMessage.getText());
-        sendAnswerMessage(sendMessage);
+    updateConroller.processUpdate(update);
     }
 
 

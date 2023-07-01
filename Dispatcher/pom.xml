@@ -27,5 +27,14 @@
         <artifactId>telegrambots-spring-boot-starter</artifactId>
         <version>${telegrambot.starter.version}</version>
     </dependency>
+    <dependency>
+        <groupId>broker.kartbllansh</groupId>
+        <artifactId>RabbitMQ</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-amqp</artifactId>
+    </dependency>
 </dependencies>
 </project>

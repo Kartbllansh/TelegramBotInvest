@@ -11,6 +11,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @Log4j
 public class Main {
     public static void main(String[] args) {
+        System.out.println(1);
+        log.info("Do");
         SpringApplication.run(Main.class);
+        log.error("fhfhhfj");
     }
 }

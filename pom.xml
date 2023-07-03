@@ -11,6 +11,7 @@
     <modules>
         <module>Dispatcher</module>
         <module>RabbitMQ</module>
+        <module>Node</module>
     </modules>
 
     <properties>

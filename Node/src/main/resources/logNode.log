@@ -54,17 +54,16 @@ INFO  2023-07-03 17:58:15 Main:15 Do
 INFO  2023-07-03 17:58:16 TelegramBot:28 Check
 ERROR 2023-07-03 17:58:17 Main:17 fhfhhfj
 INFO  2023-07-03 17:58:23 UpdateProducerImpl:19 UpdateProducer work...Пр
-INFO  2023-07-03 18:39:20 Main:15 Do
-INFO  2023-07-03 18:39:21 TelegramBot:28 Check
-ERROR 2023-07-03 18:39:22 Main:17 fhfhhfj
-INFO  2023-07-03 18:40:06 UpdateProducerImpl:19 UpdateProducer work...Привет бот!
-INFO  2023-07-03 18:45:06 Main:15 Do
-INFO  2023-07-03 18:45:07 TelegramBot:28 Check
-ERROR 2023-07-03 18:45:08 Main:17 fhfhhfj
-INFO  2023-07-03 18:45:08 UpdateProducerImpl:19 UpdateProducer work...О
-INFO  2023-07-03 18:45:20 UpdateProducerImpl:19 UpdateProducer work...М
-INFO  2023-07-03 18:45:28 UpdateProducerImpl:19 UpdateProducer work...П
-INFO  2023-07-03 18:45:28 UpdateProducerImpl:19 UpdateProducer work...А
-INFO  2023-07-03 18:45:30 UpdateProducerImpl:19 UpdateProducer work...С
-INFO  2023-07-03 18:45:31 UpdateProducerImpl:19 UpdateProducer work...М
-INFO  2023-07-03 18:45:31 UpdateProducerImpl:19 UpdateProducer work...С
+INFO  2023-07-03 18:39:09 ConsumerServiceImpl:25 Node ; TEXT MESSAGE is receive
+INFO  2023-07-03 18:39:09 ConsumerServiceImpl:25 Node ; TEXT MESSAGE is receive
+INFO  2023-07-03 18:39:09 ConsumerServiceImpl:25 Node ; TEXT MESSAGE is receive
+INFO  2023-07-03 18:39:09 ConsumerServiceImpl:25 Node ; TEXT MESSAGE is receive
+INFO  2023-07-03 18:39:09 ConsumerServiceImpl:25 Node ; TEXT MESSAGE is receive
+INFO  2023-07-03 18:40:06 ConsumerServiceImpl:25 Node ; TEXT MESSAGE is receive
+INFO  2023-07-03 18:45:08 ConsumerServiceImpl:25 Node ; TEXT MESSAGE is receive
+INFO  2023-07-03 18:45:20 ConsumerServiceImpl:25 Node ; TEXT MESSAGE is receive
+INFO  2023-07-03 18:45:28 ConsumerServiceImpl:25 Node ; TEXT MESSAGE is receive
+INFO  2023-07-03 18:45:28 ConsumerServiceImpl:25 Node ; TEXT MESSAGE is receive
+INFO  2023-07-03 18:45:30 ConsumerServiceImpl:25 Node ; TEXT MESSAGE is receive
+INFO  2023-07-03 18:45:31 ConsumerServiceImpl:25 Node ; TEXT MESSAGE is receive
+INFO  2023-07-03 18:45:31 ConsumerServiceImpl:25 Node ; TEXT MESSAGE is receive

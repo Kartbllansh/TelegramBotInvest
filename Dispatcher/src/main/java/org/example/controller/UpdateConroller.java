@@ -3,12 +3,11 @@ package org.example.controller;
 import lombok.extern.log4j.Log4j;
 import org.example.service.UpdateProducer;
 import org.example.utils.MessageUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import javax.annotation.PostConstruct;
+
 
 import static broker.kartbllansh.model.RabbitQueue.*;
 
@@ -60,7 +59,7 @@ public class UpdateConroller {
       setView(sendMessage);
     }
 
-    private void setView(SendMessage sendMessage) {
+    public void setView(SendMessage sendMessage) {
         telegramBot.sendAnswerMessage(sendMessage);
     }
     private void setFileIsReceivedView(Update update) {

@@ -12,6 +12,7 @@
         <module>Dispatcher</module>
         <module>RabbitMQ</module>
         <module>Node</module>
+        <module>Common-JPA</module>
     </modules>
 
     <properties>

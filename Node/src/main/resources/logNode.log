@@ -67,3 +67,11 @@ INFO  2023-07-03 18:45:28 ConsumerServiceImpl:25 Node ; TEXT MESSAGE is receive
 INFO  2023-07-03 18:45:30 ConsumerServiceImpl:25 Node ; TEXT MESSAGE is receive
 INFO  2023-07-03 18:45:31 ConsumerServiceImpl:25 Node ; TEXT MESSAGE is receive
 INFO  2023-07-03 18:45:31 ConsumerServiceImpl:25 Node ; TEXT MESSAGE is receive
+INFO  2023-07-05 16:06:05 ConsumerServiceImpl:24 Node ; TEXT MESSAGE is receive
+INFO  2023-07-05 16:12:17 ConsumerServiceImpl:24 Node ; TEXT MESSAGE is receive
+INFO  2023-07-05 16:16:40 ConsumerServiceImpl:24 Node ; TEXT MESSAGE is receive
+INFO  2023-07-05 16:16:40 ConsumerServiceImpl:24 Node ; TEXT MESSAGE is receive
+INFO  2023-07-05 16:16:58 ConsumerServiceImpl:24 Node ; TEXT MESSAGE is receive
+INFO  2023-07-05 16:18:03 ConsumerServiceImpl:24 Node ; TEXT MESSAGE is receive
+INFO  2023-07-05 16:24:49 ConsumerServiceImpl:24 Node ; TEXT MESSAGE is receive
+INFO  2023-07-05 16:25:15 ConsumerServiceImpl:24 Node ; TEXT MESSAGE is receive

@@ -2,7 +2,7 @@ package org.example.service.impl;
 
 import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
-import org.example.entity.UserState;
+import org.example.service.CreateTable;
 import org.example.service.MainService;
 import org.example.service.ProducerService;
 import org.springframework.stereotype.Service;
@@ -14,10 +14,14 @@ import static org.example.entity.UserState.BASIC_STATE;
 
 @Service
 public class MainServiceImpl implements MainService {
+    //private final TelegramUserDAO telegramUserDAO;
+    private final CreateTable createTable;
     private final ProducerService producerService;
     private final AppUserDAO appUserDAO;
 
-    public MainServiceImpl(ProducerService producerService, AppUserDAO appUserDAO) {
+    public MainServiceImpl( CreateTable createTable, ProducerService producerService, AppUserDAO appUserDAO) {
+        this.createTable = createTable;
+        //this.telegramUserDAO = telegramUserDAO;
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
     }
@@ -49,6 +53,7 @@ public class MainServiceImpl implements MainService {
     private AppUser findOrSaveAppUser(User telegramUser){
         AppUser persistentAppUser = appUserDAO.findAppUserByTelegramUserId(telegramUser.getId());
         if(persistentAppUser == null){
+            createTable.createTable("telegramUser_"+telegramUser.getId().toString());
             AppUser transientAppUser = AppUser.builder()
                     .telegramUserId(telegramUser.getId())
                     .userName(telegramUser.getUserName())
@@ -61,5 +66,8 @@ public class MainServiceImpl implements MainService {
             return appUserDAO.save(transientAppUser);
         }
         return persistentAppUser;
+    }
+    private void doNewUniqTable(Long telegramId){
+
     }
 }

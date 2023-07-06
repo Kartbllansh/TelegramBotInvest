@@ -14,14 +14,12 @@ import static org.example.entity.UserState.BASIC_STATE;
 
 @Service
 public class MainServiceImpl implements MainService {
-    //private final TelegramUserDAO telegramUserDAO;
     private final CreateTable createTable;
     private final ProducerService producerService;
     private final AppUserDAO appUserDAO;
 
     public MainServiceImpl( CreateTable createTable, ProducerService producerService, AppUserDAO appUserDAO) {
         this.createTable = createTable;
-        //this.telegramUserDAO = telegramUserDAO;
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
     }

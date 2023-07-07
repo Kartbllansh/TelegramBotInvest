@@ -1,3 +1,11 @@
 INFO  2023-07-07 18:10:33 Main:15 Do
 INFO  2023-07-07 18:10:34 TelegramBot:28 Check
 ERROR 2023-07-07 18:10:48 Main:17 fhfhhfj
+INFO  2023-07-07 21:10:01 TelegramBot:28 Constructor-token work
+INFO  2023-07-07 21:10:02 Main:16 Main.class running...
+INFO  2023-07-07 21:10:52 UpdateProducerImpl:19 UpdateProducer work.../start
+INFO  2023-07-07 21:10:54 UpdateProducerImpl:19 UpdateProducer work.../help
+INFO  2023-07-07 21:10:57 UpdateProducerImpl:19 UpdateProducer work.../registration
+INFO  2023-07-07 21:11:08 UpdateProducerImpl:19 UpdateProducer work...rorece7548@iturchia.com
+INFO  2023-07-07 21:11:19 UpdateProducerImpl:19 UpdateProducer work...rorece7548@iturchia.com
+INFO  2023-07-07 21:11:22 UpdateProducerImpl:19 UpdateProducer work...rorece7548@iturchia.com

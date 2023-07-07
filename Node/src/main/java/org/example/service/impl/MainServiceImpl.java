@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import static org.example.entity.BuyUserState.CHANGE_STONKS;
+import static org.example.entity.BuyUserState.NOT_BUY;
 import static org.example.entity.UserState.BASIC_STATE;
 import static org.example.entity.UserState.WAIT_FOR_EMAIL_STATE;
 import static org.example.enums.CommandService.*;
@@ -34,6 +36,7 @@ public class MainServiceImpl implements MainService {
     @Override
     public void processTextMessage(Update update) {
         var appUser = findOrSaveAppUser(update);
+        var buyUserState = appUser.getBuyUserState();
         var userState = appUser.getState();
         var text = update.getMessage().getText();
         var output = "";
@@ -41,7 +44,12 @@ public class MainServiceImpl implements MainService {
         if (CANCEL.equals(serviceCommand)) {
             output = cancelProcess(appUser);
         } else if (BASIC_STATE.equals(userState)) {
-            output = processServiceCommand(appUser, text);
+            if(NOT_BUY.equals(buyUserState)){
+                output = processServiceCommand(appUser, text);
+            } else {
+                onActionBuy(appUser, text);
+            }
+
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
             output = appUserService.setEmail(appUser, text);
         } else {
@@ -54,6 +62,21 @@ public class MainServiceImpl implements MainService {
 
 
     }
+
+    private void onActionBuy(AppUser appUser, String cmd) {
+    switch (appUser.getBuyUserState()){
+        case CHANGE_COUNT:
+
+            break;
+        case CHANGE_STONKS:
+            //метод проверяющий на адекватность ввод, если все ок делаем запрос и составляем информацию об активе
+            //если нет возвращает, что данной ключ неверный
+            break;
+        case PROOF:
+
+    }
+    }
+
     private String processServiceCommand(AppUser appUser, String cmd) {
         var serviceCommand = CommandService.fromValue(cmd);
         if (REGISTRATION.equals(serviceCommand)) {
@@ -62,9 +85,14 @@ public class MainServiceImpl implements MainService {
         } else if (HELP.equals(serviceCommand)) {
             return help();
         } else if (START.equals(serviceCommand)) {
-            log.info("Новый пользователь с именем "+appUser.getUserName());
+            log.info("Новый пользователь с именем " + appUser.getUserName());
             return "Приветствую! Чтобы посмотреть список доступных команд введите /help";
-        } else {
+
+        } else if(BUY.equals(serviceCommand)){
+            appUser.setBuyUserState(CHANGE_STONKS);
+            return "Введите код акции, которую хотите купить";
+        }
+         else {
             return "Неизвестная команда! Чтобы посмотреть список доступных команд введите /help";
         }
     }
@@ -75,6 +103,9 @@ public class MainServiceImpl implements MainService {
                 + "/registration - регистрация пользователя.";
     }
     private String cancelProcess(AppUser appUser) {
+        if(!appUser.getBuyUserState().equals(NOT_BUY)){
+            appUser.setBuyUserState(NOT_BUY);
+        }
         appUser.setState(BASIC_STATE);
         appUserDAO.save(appUser);
         return "Команда отменена!";

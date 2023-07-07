@@ -16,6 +16,7 @@
         <module>Mail-service</module>
         <module>Utils</module>
         <module>Rest-Service</module>
+        <module>Stonks</module>
     </modules>
 
     <properties>

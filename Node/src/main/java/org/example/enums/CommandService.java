@@ -4,7 +4,9 @@ public enum CommandService {
     HELP("/help"),
     REGISTRATION("/registration"),
     CANCEL("/cancel"),
-    START("/start");
+    START("/start"),
+    BUY("/buy"),
+    SELL("/sell");
 
     private final String value;
 

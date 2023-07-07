@@ -1,0 +1,4 @@
+INFO  2023-07-07 21:10:09 NodeApplication:12 NodeApplication running...
+INFO  2023-07-07 21:10:52 CreateTableImpl:21 Создана индивидувльная таблица с именем telegramUser_534271654
+INFO  2023-07-07 21:10:52 MainServiceImpl:65 Новый пользователь с именем Kartbllansh
+INFO  2023-07-07 21:10:57 MainServiceImpl:60 Регистрация пользователя Kartbllansh с почтой null

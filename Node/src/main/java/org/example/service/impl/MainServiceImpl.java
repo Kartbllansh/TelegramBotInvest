@@ -57,10 +57,12 @@ public class MainServiceImpl implements MainService {
     private String processServiceCommand(AppUser appUser, String cmd) {
         var serviceCommand = CommandService.fromValue(cmd);
         if (REGISTRATION.equals(serviceCommand)) {
+            log.info("Регистрация пользователя "+appUser.getUserName()+" с почтой "+appUser.getEmail());
             return appUserService.registerUser(appUser);
         } else if (HELP.equals(serviceCommand)) {
             return help();
         } else if (START.equals(serviceCommand)) {
+            log.info("Новый пользователь с именем "+appUser.getUserName());
             return "Приветствую! Чтобы посмотреть список доступных команд введите /help";
         } else {
             return "Неизвестная команда! Чтобы посмотреть список доступных команд введите /help";

@@ -1,5 +1,6 @@
 package org.example.service.Impl;
 
+import lombok.extern.log4j.Log4j;
 import org.example.dto.MailParams;
 import org.example.service.MailSenderService;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,6 +9,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
+@Log4j
 public class MailSenderServiceImpl implements MailSenderService {
 
     private final JavaMailSender javaMailSender;
@@ -33,6 +35,7 @@ public class MailSenderServiceImpl implements MailSenderService {
         mailMessage.setText(messageBody);
 
         javaMailSender.send(mailMessage);
+        log.info("Отправлено письмо на почту "+mailParams.getEmailTo());
 
     }
 

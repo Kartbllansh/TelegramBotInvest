@@ -25,7 +25,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 @Autowired
     public TelegramBot(@Value("${bot.token}") String botToken){
         super(botToken);
-        log.info("Check");
+        log.info("Constructor-token work");
     }
     @Autowired
     @Override

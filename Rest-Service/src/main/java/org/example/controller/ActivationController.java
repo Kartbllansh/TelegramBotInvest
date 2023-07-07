@@ -1,14 +1,13 @@
 package org.example.controller;
+import lombok.extern.log4j.Log4j;
 import org.example.service.UserActivationService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-
+@ControllerAdvice
 @RequestMapping("/user")
 @RestController
+@Log4j
 public class ActivationController {
     private final UserActivationService userActivationService;
 
@@ -20,6 +19,7 @@ public class ActivationController {
     public ResponseEntity<?> activation(@RequestParam("id") String id) {
         var res = userActivationService.activation(id);
         if (res) {
+            log.info("Успешная регистрация пользователя");
             return ResponseEntity.ok().body("Регистрация успешно завершена!");
         }
         return ResponseEntity.internalServerError().build();

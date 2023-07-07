@@ -132,3 +132,34 @@ INFO  2023-07-05 19:36:50 UpdateProducerImpl:19 UpdateProducer work...Татьа
 INFO  2023-07-05 19:36:58 UpdateProducerImpl:19 UpdateProducer work...Ппп
 INFO  2023-07-05 19:37:03 UpdateProducerImpl:19 UpdateProducer work...Аппа
 INFO  2023-07-05 19:37:08 UpdateProducerImpl:19 UpdateProducer work...Аппн
+INFO  2023-07-07 13:29:39 Main:15 Do
+INFO  2023-07-07 13:29:41 TelegramBot:28 Check
+ERROR 2023-07-07 13:29:41 Main:17 fhfhhfj
+INFO  2023-07-07 13:30:58 Main:15 Do
+INFO  2023-07-07 13:31:00 TelegramBot:28 Check
+ERROR 2023-07-07 13:31:00 Main:17 fhfhhfj
+INFO  2023-07-07 13:31:31 UpdateProducerImpl:19 UpdateProducer work.../start
+INFO  2023-07-07 13:31:36 UpdateProducerImpl:19 UpdateProducer work.../help
+INFO  2023-07-07 13:31:40 UpdateProducerImpl:19 UpdateProducer work.../registration
+INFO  2023-07-07 13:31:52 UpdateProducerImpl:19 UpdateProducer work...topekih298@lukaat.com
+INFO  2023-07-07 13:31:57 UpdateProducerImpl:19 UpdateProducer work...topekih298@lukaat.com
+INFO  2023-07-07 13:32:00 UpdateProducerImpl:19 UpdateProducer work...topekih298@lukaat.com
+INFO  2023-07-07 13:37:51 UpdateProducerImpl:19 UpdateProducer work.../registration
+INFO  2023-07-07 13:46:19 Main:15 Do
+INFO  2023-07-07 13:46:20 TelegramBot:28 Check
+ERROR 2023-07-07 13:46:23 Main:17 fhfhhfj
+INFO  2023-07-07 13:47:21 UpdateProducerImpl:19 UpdateProducer work.../start
+INFO  2023-07-07 13:47:24 UpdateProducerImpl:19 UpdateProducer work.../help
+INFO  2023-07-07 13:47:26 UpdateProducerImpl:19 UpdateProducer work.../registration
+INFO  2023-07-07 13:47:28 UpdateProducerImpl:19 UpdateProducer work...topekih298@lukaat.com
+INFO  2023-07-07 14:58:09 Main:15 Do
+INFO  2023-07-07 14:58:11 TelegramBot:28 Check
+ERROR 2023-07-07 14:58:11 Main:17 fhfhhfj
+INFO  2023-07-07 14:59:28 UpdateProducerImpl:19 UpdateProducer work.../start
+INFO  2023-07-07 14:59:32 UpdateProducerImpl:19 UpdateProducer work.../help
+INFO  2023-07-07 14:59:33 UpdateProducerImpl:19 UpdateProducer work.../registration
+INFO  2023-07-07 14:59:35 UpdateProducerImpl:19 UpdateProducer work...ribesef357@lukaat.com
+INFO  2023-07-07 15:00:30 UpdateProducerImpl:19 UpdateProducer work.../start
+INFO  2023-07-07 15:00:31 UpdateProducerImpl:19 UpdateProducer work.../help
+INFO  2023-07-07 15:00:32 UpdateProducerImpl:19 UpdateProducer work.../registration
+INFO  2023-07-07 15:00:40 UpdateProducerImpl:19 UpdateProducer work...bofam73307@kameili.com

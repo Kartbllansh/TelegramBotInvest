@@ -1,5 +1,6 @@
 package org.example.configuration;
 
+import org.example.service.StocksInformationService;
 import org.example.utils.CryptoTool;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,4 +15,5 @@ public class NodeConfiguration {
     public CryptoTool getCryptoTool() {
         return new CryptoTool(salt);
     }
+
 }

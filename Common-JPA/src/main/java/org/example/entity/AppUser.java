@@ -30,5 +30,8 @@ public class AppUser {
     private Boolean isActive;
     @Enumerated(EnumType.STRING)
     private BuyUserState buyUserState;
+    @Enumerated(EnumType.STRING)
+    private SellUserState sellUserState;
+    private String activeBuy;
 
 }

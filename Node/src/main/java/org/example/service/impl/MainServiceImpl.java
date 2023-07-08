@@ -4,16 +4,13 @@ import lombok.extern.log4j.Log4j;
 import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
 import org.example.enums.CommandService;
-import org.example.service.AppUserService;
-import org.example.service.CreateTable;
-import org.example.service.MainService;
-import org.example.service.ProducerService;
+import org.example.service.*;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import static org.example.entity.BuyUserState.CHANGE_STONKS;
-import static org.example.entity.BuyUserState.NOT_BUY;
+import static org.example.entity.BuyUserState.*;
+import static org.example.entity.SellUserState.*;
 import static org.example.entity.UserState.BASIC_STATE;
 import static org.example.entity.UserState.WAIT_FOR_EMAIL_STATE;
 import static org.example.enums.CommandService.*;
@@ -21,12 +18,14 @@ import static org.example.enums.CommandService.*;
 @Service
 @Log4j
 public class MainServiceImpl implements MainService {
+    private final StocksInformationService stockInformationService;
     private final CreateTable createTable;
     private final ProducerService producerService;
     private final AppUserDAO appUserDAO;
     private final AppUserService appUserService;
 
-    public MainServiceImpl(CreateTable createTable, ProducerService producerService, AppUserDAO appUserDAO, AppUserService appUserService) {
+    public MainServiceImpl(StocksInformationService stockInformationService, CreateTable createTable, ProducerService producerService, AppUserDAO appUserDAO, AppUserService appUserService) {
+        this.stockInformationService = stockInformationService;
         this.createTable = createTable;
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
@@ -37,17 +36,22 @@ public class MainServiceImpl implements MainService {
     public void processTextMessage(Update update) {
         var appUser = findOrSaveAppUser(update);
         var buyUserState = appUser.getBuyUserState();
+        var sellUserState = appUser.getSellUserState();
         var userState = appUser.getState();
         var text = update.getMessage().getText();
         var output = "";
         var serviceCommand = CommandService.fromValue(text);
+        var chatId = update.getMessage().getChatId();
         if (CANCEL.equals(serviceCommand)) {
             output = cancelProcess(appUser);
         } else if (BASIC_STATE.equals(userState)) {
-            if(NOT_BUY.equals(buyUserState)){
+            if(!NOT_BUY.equals(buyUserState)) {
+                onActionBuy(appUser, text, chatId);
+            } else if (!NOT_SELL.equals(sellUserState)) {
+                onActionSell(appUser, text, chatId);
+            }
+         else {
                 output = processServiceCommand(appUser, text);
-            } else {
-                onActionBuy(appUser, text);
             }
 
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
@@ -56,25 +60,84 @@ public class MainServiceImpl implements MainService {
             log.error("Unknown user state: " + userState);
             output = "Неизвестная ошибка! Введите /cancel и попробуйте снова!";
         }
-        var chatId = update.getMessage().getChatId();
+
         sendAnswer(output, chatId);
 
 
 
     }
 
-    private void onActionBuy(AppUser appUser, String cmd) {
-    switch (appUser.getBuyUserState()){
-        case CHANGE_COUNT:
+    private void onActionSell(AppUser appUser, String text, Long chatId) {
+        String info ="";
+        switch (appUser.getSellUserState()){
+            case SELL_CHANGE_COUNT:
+                if (text.trim().matches("\\d+")){
+                    long count = Long.parseLong(text);
+                    info ="Успешно продано "+count+" акций Сбербанка";
+                } else {
+                    info = "Введено неправильно значение. Бот ожидает число.";
+                }
+                sendAnswer(info, chatId);
+                sendAnswer("Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId);
+                appUser.setBuyUserState(BUY_PROOF);
+                break;
+            case SELL_CHANGE_STOCK:
+                sendAnswer("Выбрана акция "+text, chatId);
+                sendAnswer("Введите также количество акций, которое вы хоите продать. Сейчас у вас - 3", chatId);
+                appUser.setSellUserState(SELL_CHANGE_COUNT);
+                break;
+            case SELL_PROOF:
+                if(text.equalsIgnoreCase("ДА")){
+                    info = "ЕЕЕ. Успешная сделка!";
+                    appUser.setBuyUserState(NOT_BUY);
+                } else if (text.equalsIgnoreCase("НЕТ")) {
+                    info = "Сделка отменена. Если захотите опять что-то купить введите команду /buy";
+                    appUser.setBuyUserState(NOT_BUY);
+                } else {
+                    info = "Введите Да или Нет. Или же команду /cancel";
+                }
+                sendAnswer(info, chatId);
+                break;
+        }
 
+        }
+
+
+    private void onActionBuy(AppUser appUser, String cmd, Long chatId) {
+        String info = "";
+    switch (appUser.getBuyUserState()){
+
+        case CHANGE_COUNT:
+            if (cmd.trim().matches("\\d+")){
+             long count = Long.parseLong(cmd);
+             info ="Успешно куплено "+count+" акций Сбербанка";
+            } else {
+                info = "Введено неправильно значение. Бот ожидает число.";
+            }
+            sendAnswer(info, chatId);
+            sendAnswer("Подтверждение! Если вы подтверждаете покупку введите Да, если отменяете Нет", chatId);
+            appUser.setBuyUserState(BUY_PROOF);
             break;
         case CHANGE_STONKS:
-            //метод проверяющий на адекватность ввод, если все ок делаем запрос и составляем информацию об активе
-            //если нет возвращает, что данной ключ неверный
+            info = stockInformationService.getInfoAboutStocks(cmd);
+            sendAnswer(info, chatId);
+            sendAnswer("Какое количество акций вы хотите приобрести?", chatId);
+            appUser.setBuyUserState(CHANGE_COUNT);
             break;
-        case PROOF:
-
+        case BUY_PROOF:
+        if(cmd.equalsIgnoreCase("ДА")){
+           info = "ЕЕЕ. Успешная сделка!";
+           appUser.setBuyUserState(NOT_BUY);
+        } else if (cmd.equalsIgnoreCase("НЕТ")) {
+           info = "Сделка отменена. Если захотите опять что-то купить введите команду /buy";
+           appUser.setBuyUserState(NOT_BUY);
+        } else {
+            info = "Введите Да или Нет. Или же команду /cancel";
+        }
+        sendAnswer(info, chatId);
+        break;
     }
+
     }
 
     private String processServiceCommand(AppUser appUser, String cmd) {
@@ -91,8 +154,10 @@ public class MainServiceImpl implements MainService {
         } else if(BUY.equals(serviceCommand)){
             appUser.setBuyUserState(CHANGE_STONKS);
             return "Введите код акции, которую хотите купить";
-        }
-         else {
+        } else if (SELL.equals(serviceCommand)) {
+            appUser.setSellUserState(SELL_CHANGE_STOCK);
+            return "Введите стоимость акции, которую хотите продать";
+        } else {
             return "Неизвестная команда! Чтобы посмотреть список доступных команд введите /help";
         }
     }

@@ -4,5 +4,5 @@ public enum BuyUserState {
     NOT_BUY,
     CHANGE_STONKS,
     CHANGE_COUNT,
-    PROOF;
+    BUY_PROOF;
 }

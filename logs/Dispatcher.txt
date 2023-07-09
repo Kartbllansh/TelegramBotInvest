@@ -9,3 +9,49 @@ INFO  2023-07-07 21:10:57 UpdateProducerImpl:19 UpdateProducer work.../registrat
 INFO  2023-07-07 21:11:08 UpdateProducerImpl:19 UpdateProducer work...rorece7548@iturchia.com
 INFO  2023-07-07 21:11:19 UpdateProducerImpl:19 UpdateProducer work...rorece7548@iturchia.com
 INFO  2023-07-07 21:11:22 UpdateProducerImpl:19 UpdateProducer work...rorece7548@iturchia.com
+INFO  2023-07-09 12:51:34 TelegramBot:28 Constructor-token work
+INFO  2023-07-09 12:51:35 Main:16 Main.class running...
+INFO  2023-07-09 12:52:00 UpdateProducerImpl:19 UpdateProducer work.../start
+INFO  2023-07-09 12:52:09 UpdateProducerImpl:19 UpdateProducer work...ом
+INFO  2023-07-09 12:54:51 TelegramBot:28 Constructor-token work
+INFO  2023-07-09 12:54:52 Main:16 Main.class running...
+INFO  2023-07-09 13:01:31 TelegramBot:28 Constructor-token work
+INFO  2023-07-09 13:01:32 Main:16 Main.class running...
+INFO  2023-07-09 13:01:58 UpdateProducerImpl:19 UpdateProducer work.../start
+INFO  2023-07-09 13:02:57 TelegramBot:28 Constructor-token work
+INFO  2023-07-09 13:02:58 Main:16 Main.class running...
+INFO  2023-07-09 13:03:54 TelegramBot:28 Constructor-token work
+INFO  2023-07-09 13:03:55 Main:16 Main.class running...
+INFO  2023-07-09 13:06:36 TelegramBot:28 Constructor-token work
+INFO  2023-07-09 13:06:37 Main:16 Main.class running...
+INFO  2023-07-09 13:06:41 UpdateProducerImpl:19 UpdateProducer work.../start
+INFO  2023-07-09 13:07:16 UpdateProducerImpl:19 UpdateProducer work.../help
+INFO  2023-07-09 13:07:18 UpdateProducerImpl:19 UpdateProducer work.../registration
+INFO  2023-07-09 13:07:49 UpdateProducerImpl:19 UpdateProducer work...tepiwi5843@lukaat.com
+INFO  2023-07-09 13:08:23 UpdateProducerImpl:19 UpdateProducer work.../buy
+INFO  2023-07-09 13:08:28 UpdateProducerImpl:19 UpdateProducer work...AAPL
+INFO  2023-07-09 13:08:42 UpdateProducerImpl:19 UpdateProducer work...MSFT
+INFO  2023-07-09 13:12:42 TelegramBot:28 Constructor-token work
+INFO  2023-07-09 13:12:43 Main:16 Main.class running...
+INFO  2023-07-09 13:12:48 UpdateProducerImpl:19 UpdateProducer work.../buy
+INFO  2023-07-09 13:13:35 UpdateProducerImpl:19 UpdateProducer work...AAPL
+INFO  2023-07-09 13:15:00 TelegramBot:28 Constructor-token work
+INFO  2023-07-09 13:15:01 Main:16 Main.class running...
+INFO  2023-07-09 13:15:13 UpdateProducerImpl:19 UpdateProducer work.../buy
+INFO  2023-07-09 13:15:21 UpdateProducerImpl:19 UpdateProducer work...MSFT
+ERROR 2023-07-09 13:15:22 TelegramBot:63 org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException: Text parameter can't be empty in method: SendMessage(chatId=534271654, messageThreadId=null, text=, parseMode=null, disableWebPagePreview=null, disableNotification=null, replyToMessageId=null, replyMarkup=null, entities=null, allowSendingWithoutReply=null, protectContent=null)
+INFO  2023-07-09 13:15:36 UpdateProducerImpl:19 UpdateProducer work...5
+ERROR 2023-07-09 13:15:37 TelegramBot:63 org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException: Text parameter can't be empty in method: SendMessage(chatId=534271654, messageThreadId=null, text=, parseMode=null, disableWebPagePreview=null, disableNotification=null, replyToMessageId=null, replyMarkup=null, entities=null, allowSendingWithoutReply=null, protectContent=null)
+INFO  2023-07-09 13:20:32 TelegramBot:28 Constructor-token work
+INFO  2023-07-09 13:20:34 Main:16 Main.class running...
+INFO  2023-07-09 13:20:44 UpdateProducerImpl:19 UpdateProducer work.../start
+INFO  2023-07-09 13:20:48 UpdateProducerImpl:19 UpdateProducer work.../help
+INFO  2023-07-09 13:20:50 UpdateProducerImpl:19 UpdateProducer work.../registration
+INFO  2023-07-09 13:20:57 UpdateProducerImpl:19 UpdateProducer work...yiwad37455@iturchia.com
+INFO  2023-07-09 13:21:29 UpdateProducerImpl:19 UpdateProducer work.../buy
+INFO  2023-07-09 13:21:34 UpdateProducerImpl:19 UpdateProducer work...MSFT
+ERROR 2023-07-09 13:21:36 TelegramBot:63 org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException: Text parameter can't be empty in method: SendMessage(chatId=534271654, messageThreadId=null, text=, parseMode=null, disableWebPagePreview=null, disableNotification=null, replyToMessageId=null, replyMarkup=null, entities=null, allowSendingWithoutReply=null, protectContent=null)
+INFO  2023-07-09 13:21:42 UpdateProducerImpl:19 UpdateProducer work...5
+ERROR 2023-07-09 13:21:43 TelegramBot:63 org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException: Text parameter can't be empty in method: SendMessage(chatId=534271654, messageThreadId=null, text=, parseMode=null, disableWebPagePreview=null, disableNotification=null, replyToMessageId=null, replyMarkup=null, entities=null, allowSendingWithoutReply=null, protectContent=null)
+INFO  2023-07-09 13:21:52 UpdateProducerImpl:19 UpdateProducer work...Да
+ERROR 2023-07-09 13:21:53 TelegramBot:63 org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException: Text parameter can't be empty in method: SendMessage(chatId=534271654, messageThreadId=null, text=, parseMode=null, disableWebPagePreview=null, disableNotification=null, replyToMessageId=null, replyMarkup=null, entities=null, allowSendingWithoutReply=null, protectContent=null)

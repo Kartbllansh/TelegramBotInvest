@@ -2,3 +2,5 @@ INFO  2023-07-07 21:11:32 ActivationController:25 Успешная регист�
 ERROR 2023-07-07 21:11:32 MyControllerAdvice:33 Exception java.io.FileNotFoundException: class path resource [resource/back.jpg] cannot be resolved to URL because it does not exist
 INFO  2023-07-07 21:11:45 ActivationController:25 Успешная регистрация пользователя
 ERROR 2023-07-07 21:11:45 MyControllerAdvice:33 Exception java.io.FileNotFoundException: class path resource [resource/back.jpg] cannot be resolved to URL because it does not exist
+INFO  2023-07-09 13:07:58 ActivationController:22 Успешная регистрация пользователя
+INFO  2023-07-09 13:21:10 ActivationController:22 Успешная регистрация пользователя

@@ -117,20 +117,28 @@ public class MainServiceImpl implements MainService {
             sendAnswer(info, chatId);
             sendAnswer("Подтверждение! Если вы подтверждаете покупку введите Да, если отменяете Нет", chatId);
             appUser.setBuyUserState(BUY_PROOF);
+            appUserDAO.save(appUser);
             break;
         case CHANGE_STONKS:
-            info = stockInformationService.getInfoAboutStocks(cmd);
-            sendAnswer(info, chatId);
-            sendAnswer("Какое количество акций вы хотите приобрести?", chatId);
-            appUser.setBuyUserState(CHANGE_COUNT);
+            if(!(stockInformationService.getInfoAboutStocks(cmd)==null)) {
+                info = "Цена ценной бумаги " + cmd + " равняется " + stockInformationService.getInfoAboutStocks(cmd).getPrice() + " это цена на момент " + stockInformationService.getInfoAboutStocks(cmd).getLatestTradingDay();
+                sendAnswer(info, chatId);
+                sendAnswer("Какое количество акций вы хотите приобрести?", chatId);
+                appUser.setBuyUserState(CHANGE_COUNT);
+                appUserDAO.save(appUser);
+            } else {
+                sendAnswer("Ценной бумаги с таким символом нет", chatId);
+            }
             break;
         case BUY_PROOF:
         if(cmd.equalsIgnoreCase("ДА")){
            info = "ЕЕЕ. Успешная сделка!";
            appUser.setBuyUserState(NOT_BUY);
+           appUserDAO.save(appUser);
         } else if (cmd.equalsIgnoreCase("НЕТ")) {
            info = "Сделка отменена. Если захотите опять что-то купить введите команду /buy";
            appUser.setBuyUserState(NOT_BUY);
+           appUserDAO.save(appUser);
         } else {
             info = "Введите Да или Нет. Или же команду /cancel";
         }
@@ -153,6 +161,7 @@ public class MainServiceImpl implements MainService {
 
         } else if(BUY.equals(serviceCommand)){
             appUser.setBuyUserState(CHANGE_STONKS);
+            appUserDAO.save(appUser);
             return "Введите код акции, которую хотите купить";
         } else if (SELL.equals(serviceCommand)) {
             appUser.setSellUserState(SELL_CHANGE_STOCK);
@@ -200,6 +209,8 @@ public class MainServiceImpl implements MainService {
                     .firstName(telegramUser.getFirstName())
                     .isActive(false)
                     .state(BASIC_STATE)
+                    .buyUserState(NOT_BUY)
+                    .sellUserState(NOT_SELL)
                     .build();
             return appUserDAO.save(transientAppUser);
         }

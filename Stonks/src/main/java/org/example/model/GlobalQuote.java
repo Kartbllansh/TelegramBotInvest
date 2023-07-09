@@ -1,6 +1,8 @@
 package org.example.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +11,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-@Builder
+@Builder(builderClassName = "GlobalQuoteBuilder")
+@JsonDeserialize(builder = GlobalQuote.GlobalQuoteBuilder.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GlobalQuote {
     @JsonProperty("01. symbol")
     private String symbol;

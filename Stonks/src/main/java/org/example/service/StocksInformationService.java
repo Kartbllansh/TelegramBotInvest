@@ -1,5 +1,7 @@
 package org.example.service;
 
+import org.example.model.GlobalQuote;
+
 public interface StocksInformationService {
-    String getInfoAboutStocks(String keyStock);
+    GlobalQuote getInfoAboutStocks(String keyStock);
 }

@@ -23,7 +23,7 @@ public class StocksServiceImpl implements StocksInformationService {
 
 
     @Override
-    public String getInfoAboutStocks(String keyStock) {
+    public GlobalQuote getInfoAboutStocks(String keyStock) {
         String url = BASE_URL + keyStock + "&apikey=" + API_KEY;
 
         HttpClient httpClient = HttpClientBuilder.create().build();
@@ -37,21 +37,34 @@ public class StocksServiceImpl implements StocksInformationService {
             // Разбор JSON-ответа и получение стоимости акции
             // Вам нужно вставить соответствующий код для разбора JSON и извлечения нужной информации
 
-            return  responseString;
+            return  parseJson(responseString);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         return null;
     }
-    private void parseJson(String jsonStr){
+    private GlobalQuote parseJson(String jsonStr){
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             QuoteResponse quoteResponse = objectMapper.readValue(jsonStr, QuoteResponse.class);
 
-            //Builder создание объекта
+            return GlobalQuote.builder()
+                    .symbol(quoteResponse.getGlobalQuote().getSymbol())
+                    .price(quoteResponse.getGlobalQuote().getPrice())
+                    .open(quoteResponse.getGlobalQuote().getOpen())
+                    .high(quoteResponse.getGlobalQuote().getHigh())
+                    .low(quoteResponse.getGlobalQuote().getLow())
+                    .volume(quoteResponse.getGlobalQuote().getVolume())
+                    .change(quoteResponse.getGlobalQuote().getChange())
+                    .latestTradingDay(quoteResponse.getGlobalQuote().getLatestTradingDay())
+                    .previousClose(quoteResponse.getGlobalQuote().getPreviousClose())
+                    .change(quoteResponse.getGlobalQuote().getChange())
+                    .changePercent(quoteResponse.getGlobalQuote().getChangePercent())
+                    .build();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return null;
     }
 }

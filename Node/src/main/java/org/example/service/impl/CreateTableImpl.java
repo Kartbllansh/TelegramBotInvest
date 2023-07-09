@@ -5,6 +5,8 @@ import org.example.service.CreateTable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 @Log4j
 public class CreateTableImpl implements CreateTable {
@@ -19,5 +21,15 @@ public class CreateTableImpl implements CreateTable {
         String sql = "CREATE TABLE IF NOT EXISTS "+tableName+ " ( id_deal SERIAL PRIMARY KEY, code_stocks VARCHAR(255), count_stonks INTEGER, time_buy TIMESTAMP, purchase_stonks BIGINT );";
         jdbcTemplate.execute(sql);
         log.info("Создана индивидувльная таблица с именем "+tableName);
+    }
+
+    @Override
+    public void addNoteAboutBuy(String key, Integer count, LocalDateTime localDateTime, Float purchase) {
+
+    }
+
+    @Override
+    public void addNoteAboutSell(String key) {
+
     }
 }

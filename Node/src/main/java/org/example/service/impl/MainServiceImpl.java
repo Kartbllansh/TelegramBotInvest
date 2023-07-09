@@ -80,19 +80,23 @@ public class MainServiceImpl implements MainService {
                 sendAnswer(info, chatId);
                 sendAnswer("Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId);
                 appUser.setBuyUserState(BUY_PROOF);
+                appUserDAO.save(appUser);
                 break;
             case SELL_CHANGE_STOCK:
                 sendAnswer("Выбрана акция "+text, chatId);
                 sendAnswer("Введите также количество акций, которое вы хоите продать. Сейчас у вас - 3", chatId);
                 appUser.setSellUserState(SELL_CHANGE_COUNT);
+                appUserDAO.save(appUser);
                 break;
             case SELL_PROOF:
                 if(text.equalsIgnoreCase("ДА")){
                     info = "ЕЕЕ. Успешная сделка!";
                     appUser.setBuyUserState(NOT_BUY);
+                    appUserDAO.save(appUser);
                 } else if (text.equalsIgnoreCase("НЕТ")) {
                     info = "Сделка отменена. Если захотите опять что-то купить введите команду /buy";
                     appUser.setBuyUserState(NOT_BUY);
+                    appUserDAO.save(appUser);
                 } else {
                     info = "Введите Да или Нет. Или же команду /cancel";
                 }
@@ -121,10 +125,13 @@ public class MainServiceImpl implements MainService {
             break;
         case CHANGE_STONKS:
             if(!(stockInformationService.getInfoAboutStocks(cmd)==null)) {
-                info = "Цена ценной бумаги " + cmd + " равняется " + stockInformationService.getInfoAboutStocks(cmd).getPrice() + " это цена на момент " + stockInformationService.getInfoAboutStocks(cmd).getLatestTradingDay();
+                String cost = stockInformationService.getInfoAboutStocks(cmd).getPrice();
+                String symbol = stockInformationService.getInfoAboutStocks(cmd).getSymbol();
+                info = "Цена ценной бумаги " + cmd + " равняется " + cost + " это цена на момент " + stockInformationService.getInfoAboutStocks(cmd).getLatestTradingDay();
                 sendAnswer(info, chatId);
                 sendAnswer("Какое количество акций вы хотите приобрести?", chatId);
                 appUser.setBuyUserState(CHANGE_COUNT);
+                appUser.setActiveBuy(symbol+":"+cost);
                 appUserDAO.save(appUser);
             } else {
                 sendAnswer("Ценной бумаги с таким символом нет", chatId);
@@ -165,6 +172,7 @@ public class MainServiceImpl implements MainService {
             return "Введите код акции, которую хотите купить";
         } else if (SELL.equals(serviceCommand)) {
             appUser.setSellUserState(SELL_CHANGE_STOCK);
+            appUserDAO.save(appUser);
             return "Введите стоимость акции, которую хотите продать";
         } else {
             return "Неизвестная команда! Чтобы посмотреть список доступных команд введите /help";
@@ -174,7 +182,9 @@ public class MainServiceImpl implements MainService {
     private String help() {
         return "Список доступных команд:\n"
                 + "/cancel - отмена выполнения текущей команды;\n"
-                + "/registration - регистрация пользователя.";
+                + "/registration - регистрация пользователя;\n"
+                + "/buy - покупка ценной бумаги;\n"
+                + "/sell - продажа ценной бумаги";
     }
     private String cancelProcess(AppUser appUser) {
         if(!appUser.getBuyUserState().equals(NOT_BUY)){

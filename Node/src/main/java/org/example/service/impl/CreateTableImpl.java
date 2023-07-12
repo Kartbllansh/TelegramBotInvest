@@ -24,12 +24,17 @@ public class CreateTableImpl implements CreateTable {
     }
 
     @Override
-    public void addNoteAboutBuy(String key, Integer count, LocalDateTime localDateTime, Float purchase) {
-
+    public void addNoteAboutBuy(String tableName, String key, Integer count, LocalDateTime localDateTime, Float purchase) {
+        String sql = "INSERT INTO " + tableName + " (code_stocks, count_stonks, time_buy, purchase_stonks) VALUES (?, ?, ?, ?)";
+        jdbcTemplate.update(sql, key, count, localDateTime, purchase);
+        log.info("Добавлена запись в таблицу " + tableName);
     }
 
     @Override
-    public void addNoteAboutSell(String key) {
+    public void addNoteAboutSell(String tableName, String key, Integer count) {
+        String sql = "DELETE FROM " + tableName + " WHERE code_stocks = ?";
+        jdbcTemplate.update(sql, key);
+        log.info("Удалена запись из таблицы " + tableName);
 
     }
 }

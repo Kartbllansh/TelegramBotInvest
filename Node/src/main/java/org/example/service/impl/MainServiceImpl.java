@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import java.time.LocalDateTime;
+
 import static org.example.entity.BuyUserState.*;
 import static org.example.entity.SellUserState.*;
 import static org.example.entity.UserState.BASIC_STATE;
@@ -91,6 +93,8 @@ public class MainServiceImpl implements MainService {
             case SELL_PROOF:
                 if(text.equalsIgnoreCase("ДА")){
                     info = "ЕЕЕ. Успешная сделка!";
+                    //TODO добавить для продажи работу с API и DB
+                    //createTable.addNoteAboutSell("telegramuser_"+appUser.getId(), );
                     appUser.setBuyUserState(NOT_BUY);
                     appUserDAO.save(appUser);
                 } else if (text.equalsIgnoreCase("НЕТ")) {
@@ -114,7 +118,10 @@ public class MainServiceImpl implements MainService {
         case CHANGE_COUNT:
             if (cmd.trim().matches("\\d+")){
              long count = Long.parseLong(cmd);
-             info ="Успешно куплено "+count+" акций Сбербанка";
+             info ="Успешно куплено "+count+" акций";
+                String temporaryValue = appUser.getActiveBuy();
+                String newValue = temporaryValue+":"+count;
+                appUser.setActiveBuy(newValue);
             } else {
                 info = "Введено неправильно значение. Бот ожидает число.";
             }
@@ -130,6 +137,7 @@ public class MainServiceImpl implements MainService {
                 info = "Цена ценной бумаги " + cmd + " равняется " + cost + " это цена на момент " + stockInformationService.getInfoAboutStocks(cmd).getLatestTradingDay();
                 sendAnswer(info, chatId);
                 sendAnswer("Какое количество акций вы хотите приобрести?", chatId);
+
                 appUser.setBuyUserState(CHANGE_COUNT);
                 appUser.setActiveBuy(symbol+":"+cost);
                 appUserDAO.save(appUser);
@@ -140,6 +148,8 @@ public class MainServiceImpl implements MainService {
         case BUY_PROOF:
         if(cmd.equalsIgnoreCase("ДА")){
            info = "ЕЕЕ. Успешная сделка!";
+           String activeBuy = appUser.getActiveBuy();
+           createTable.addNoteAboutBuy("telegramuser_"+appUser.getId(), parseStringFromBD(activeBuy, 0), Integer.valueOf(parseStringFromBD(activeBuy, 2)), LocalDateTime.now(), Float.valueOf(parseStringFromBD(activeBuy, 1)));
            appUser.setBuyUserState(NOT_BUY);
            appUserDAO.save(appUser);
         } else if (cmd.equalsIgnoreCase("НЕТ")) {
@@ -234,5 +244,17 @@ public class MainServiceImpl implements MainService {
         sendMessage.setChatId(chatId);
         sendMessage.setText(output);
         producerService.producerAnswer(sendMessage);
+    }
+
+    private String parseStringFromBD(String s, int i){
+        String[] parts = s.split(":");
+        if(i==1){
+            return parts[0];
+        } else if (i==2) {
+            return parts[1];
+
+        } else {
+            return parts[2];
+        }
     }
 }

@@ -75,26 +75,37 @@ public class MainServiceImpl implements MainService {
             case SELL_CHANGE_COUNT:
                 if (text.trim().matches("\\d+")){
                     long count = Long.parseLong(text);
-                    info ="Успешно продано "+count+" акций Сбербанка";
+                    String temporaryValue = appUser.getActiveBuy();
+                    info ="Успешно продано "+count+" акций "+parseStringFromBD(temporaryValue, 0);
+                    sendAnswer(info, chatId);
+                    sendAnswer("Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId);
+                    appUser.setBuyUserState(BUY_PROOF);
+                    String newValue = temporaryValue+":"+count;
+                    appUser.setActiveBuy(newValue);
+                    appUserDAO.save(appUser);
                 } else {
                     info = "Введено неправильно значение. Бот ожидает число.";
                 }
-                sendAnswer(info, chatId);
-                sendAnswer("Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId);
-                appUser.setBuyUserState(BUY_PROOF);
-                appUserDAO.save(appUser);
+
                 break;
             case SELL_CHANGE_STOCK:
-                sendAnswer("Выбрана акция "+text, chatId);
-                sendAnswer("Введите также количество акций, которое вы хоите продать. Сейчас у вас - 3", chatId);
-                appUser.setSellUserState(SELL_CHANGE_COUNT);
-                appUserDAO.save(appUser);
+                if(!(stockInformationService.getInfoAboutStocks(text) == null)){
+                    String cost = stockInformationService.getInfoAboutStocks(text).getPrice();
+                    String symbol = stockInformationService.getInfoAboutStocks(text).getSymbol();
+                    sendAnswer("Выбрана акция "+text, chatId);
+                    sendAnswer("Введите также количество акций, которое вы хотите продать. Сейчас у вас 3", chatId);
+                    appUser.setSellUserState(SELL_CHANGE_COUNT);
+                    appUser.setActiveBuy(symbol+":"+cost);
+                    appUserDAO.save(appUser);
+                }
+
                 break;
             case SELL_PROOF:
                 if(text.equalsIgnoreCase("ДА")){
                     info = "ЕЕЕ. Успешная сделка!";
-                    //TODO добавить для продажи работу с API и DB
-                    //createTable.addNoteAboutSell("telegramuser_"+appUser.getId(), );
+                    //TODO на данный момент нельзя продать только половину акций только все
+                    String activeSell = appUser.getActiveBuy();
+                    createTable.addNoteAboutSell("telegramuser_"+appUser.getId(), parseStringFromBD(activeSell, 0), Integer.valueOf(parseStringFromBD(activeSell, 3)));
                     appUser.setBuyUserState(NOT_BUY);
                     appUserDAO.save(appUser);
                 } else if (text.equalsIgnoreCase("НЕТ")) {
@@ -219,6 +230,7 @@ public class MainServiceImpl implements MainService {
 
     private AppUser findOrSaveAppUser(Update update){
         var telegramUser = update.getMessage().getFrom();
+
         var optional = appUserDAO.findByTelegramUserId(telegramUser.getId());
         if(optional.isEmpty()){
             createTable.createTable("telegramUser_"+telegramUser.getId().toString());
@@ -229,6 +241,7 @@ public class MainServiceImpl implements MainService {
                     .firstName(telegramUser.getFirstName())
                     .isActive(false)
                     .state(BASIC_STATE)
+                    .chatId(update.getMessage().getChatId())
                     .buyUserState(NOT_BUY)
                     .sellUserState(NOT_SELL)
                     .build();

@@ -1,6 +1,7 @@
 package org.example.controller;
 import lombok.extern.log4j.Log4j;
 import org.example.service.UserActivationService;
+import org.example.utils.CryptoTool;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,15 +11,19 @@ import org.springframework.web.bind.annotation.*;
 @Log4j
 public class ActivationController {
     private final UserActivationService userActivationService;
+    private  final CryptoTool cryptoTool;
 
-    public ActivationController(UserActivationService userActivationService) {
+    public ActivationController(UserActivationService userActivationService, CryptoTool cryptoTool) {
         this.userActivationService = userActivationService;
+        this.cryptoTool = cryptoTool;
     }
         //TODO доработать различные ошибки
     @RequestMapping(method = RequestMethod.GET, value = "/activation")
     public ResponseEntity<?> activation(@RequestParam("id") String id) {
         var res = userActivationService.activation(id);
         if (res) {
+            long trueId = cryptoTool.idOf(id);
+            userActivationService.getMessageAboutRegist(trueId);
             log.info("Успешная регистрация пользователя");
             return ResponseEntity.ok().body("Регистрация успешно завершена!");
         }

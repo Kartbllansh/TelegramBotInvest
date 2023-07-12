@@ -19,6 +19,7 @@ public class AppUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long telegramUserId;
+    private Long chatId;
     @CreationTimestamp
     private LocalDateTime firstLoginDate;
     private String firstName;

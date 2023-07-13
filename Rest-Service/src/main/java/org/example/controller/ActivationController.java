@@ -11,19 +11,18 @@ import org.springframework.web.bind.annotation.*;
 @Log4j
 public class ActivationController {
     private final UserActivationService userActivationService;
-    private  final CryptoTool cryptoTool;
 
-    public ActivationController(UserActivationService userActivationService, CryptoTool cryptoTool) {
+
+    public ActivationController(UserActivationService userActivationService) {
         this.userActivationService = userActivationService;
-        this.cryptoTool = cryptoTool;
     }
         //TODO доработать различные ошибки
     @RequestMapping(method = RequestMethod.GET, value = "/activation")
     public ResponseEntity<?> activation(@RequestParam("id") String id) {
         var res = userActivationService.activation(id);
         if (res) {
-            long trueId = cryptoTool.idOf(id);
-            userActivationService.getMessageAboutRegist(trueId);
+
+            userActivationService.getMessageAboutRegist(id);
             log.info("Успешная регистрация пользователя");
             return ResponseEntity.ok().body("Регистрация успешно завершена!");
         }

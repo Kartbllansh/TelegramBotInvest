@@ -21,6 +21,7 @@ import static org.example.entity.UserState.WAIT_FOR_EMAIL_STATE;
 public class AppUserServiceImpl implements AppUserService {
     private final AppUserDAO appUserDAO;
     private final CryptoTool cryptoTool;
+
     @Value("${service.mail.uri}")
     private String mailServiceUri;
 

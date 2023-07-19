@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import java.time.LocalDateTime;
-
 import static org.example.entity.BuyUserState.*;
 import static org.example.entity.SellUserState.*;
 import static org.example.entity.UserState.BASIC_STATE;
@@ -20,14 +18,14 @@ import static org.example.enums.CommandService.*;
 @Service
 @Log4j
 public class MainServiceImpl implements MainService {
-    private final StocksInformationService stockInformationService;
+    private final BuyOrSellService buyOrSellService;
     private final CreateTable createTable;
     private final ProducerService producerService;
     private final AppUserDAO appUserDAO;
     private final AppUserService appUserService;
 
-    public MainServiceImpl(StocksInformationService stockInformationService, CreateTable createTable, ProducerService producerService, AppUserDAO appUserDAO, AppUserService appUserService) {
-        this.stockInformationService = stockInformationService;
+    public MainServiceImpl(BuyOrSellService buyOrSellService, CreateTable createTable, ProducerService producerService, AppUserDAO appUserDAO, AppUserService appUserService) {
+        this.buyOrSellService = buyOrSellService;
         this.createTable = createTable;
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
@@ -48,9 +46,9 @@ public class MainServiceImpl implements MainService {
             output = cancelProcess(appUser);
         } else if (BASIC_STATE.equals(userState)) {
             if(!NOT_BUY.equals(buyUserState)) {
-                onActionBuy(appUser, text, chatId);
+                buyOrSellService.onActionBuy(appUser, text, chatId);
             } else if (!NOT_SELL.equals(sellUserState)) {
-                onActionSell(appUser, text, chatId);
+                buyOrSellService.onActionSell(appUser, text, chatId);
             }
          else {
                 output = processServiceCommand(appUser, text);
@@ -69,112 +67,6 @@ public class MainServiceImpl implements MainService {
 
     }
 
-    private void onActionSell(AppUser appUser, String text, Long chatId) {
-        String info ="";
-        switch (appUser.getSellUserState()){
-            case SELL_CHANGE_COUNT:
-                if (text.trim().matches("\\d+")){
-                    long count = Long.parseLong(text);
-                    String temporaryValue = appUser.getActiveBuy();
-                    info ="Успешно продано "+count+" акций "+parseStringFromBD(temporaryValue, 0);
-                    sendAnswer(info, chatId);
-                    sendAnswer("Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId);
-                    appUser.setBuyUserState(BUY_PROOF);
-                    String newValue = temporaryValue+":"+count;
-                    appUser.setActiveBuy(newValue);
-                    appUserDAO.save(appUser);
-                } else {
-                    info = "Введено неправильно значение. Бот ожидает число.";
-                }
-
-                break;
-            case SELL_CHANGE_STOCK:
-                if(!(stockInformationService.getInfoAboutStocks(text) == null)){
-                    String cost = stockInformationService.getInfoAboutStocks(text).getPrice();
-                    String symbol = stockInformationService.getInfoAboutStocks(text).getSymbol();
-                    sendAnswer("Выбрана акция "+text, chatId);
-                    sendAnswer("Введите также количество акций, которое вы хотите продать. Сейчас у вас 3", chatId);
-                    appUser.setSellUserState(SELL_CHANGE_COUNT);
-                    appUser.setActiveBuy(symbol+":"+cost);
-                    appUserDAO.save(appUser);
-                }
-
-                break;
-            case SELL_PROOF:
-                if(text.equalsIgnoreCase("ДА")){
-                    info = "ЕЕЕ. Успешная сделка!";
-                    //TODO на данный момент нельзя продать только половину акций только все
-                    String activeSell = appUser.getActiveBuy();
-                    createTable.addNoteAboutSell("telegramuser_"+appUser.getId(), parseStringFromBD(activeSell, 0), Integer.valueOf(parseStringFromBD(activeSell, 3)));
-                    appUser.setBuyUserState(NOT_BUY);
-                    appUserDAO.save(appUser);
-                } else if (text.equalsIgnoreCase("НЕТ")) {
-                    info = "Сделка отменена. Если захотите опять что-то купить введите команду /buy";
-                    appUser.setBuyUserState(NOT_BUY);
-                    appUserDAO.save(appUser);
-                } else {
-                    info = "Введите Да или Нет. Или же команду /cancel";
-                }
-                sendAnswer(info, chatId);
-                break;
-        }
-
-        }
-
-
-    private void onActionBuy(AppUser appUser, String cmd, Long chatId) {
-        String info = "";
-    switch (appUser.getBuyUserState()){
-
-        case CHANGE_COUNT:
-            if (cmd.trim().matches("\\d+")){
-             long count = Long.parseLong(cmd);
-             info ="Успешно куплено "+count+" акций";
-                String temporaryValue = appUser.getActiveBuy();
-                String newValue = temporaryValue+":"+count;
-                appUser.setActiveBuy(newValue);
-            } else {
-                info = "Введено неправильно значение. Бот ожидает число.";
-            }
-            sendAnswer(info, chatId);
-            sendAnswer("Подтверждение! Если вы подтверждаете покупку введите Да, если отменяете Нет", chatId);
-            appUser.setBuyUserState(BUY_PROOF);
-            appUserDAO.save(appUser);
-            break;
-        case CHANGE_STONKS:
-            if(!(stockInformationService.getInfoAboutStocks(cmd)==null)) {
-                String cost = stockInformationService.getInfoAboutStocks(cmd).getPrice();
-                String symbol = stockInformationService.getInfoAboutStocks(cmd).getSymbol();
-                info = "Цена ценной бумаги " + cmd + " равняется " + cost + " это цена на момент " + stockInformationService.getInfoAboutStocks(cmd).getLatestTradingDay();
-                sendAnswer(info, chatId);
-                sendAnswer("Какое количество акций вы хотите приобрести?", chatId);
-
-                appUser.setBuyUserState(CHANGE_COUNT);
-                appUser.setActiveBuy(symbol+":"+cost);
-                appUserDAO.save(appUser);
-            } else {
-                sendAnswer("Ценной бумаги с таким символом нет", chatId);
-            }
-            break;
-        case BUY_PROOF:
-        if(cmd.equalsIgnoreCase("ДА")){
-           info = "ЕЕЕ. Успешная сделка!";
-           String activeBuy = appUser.getActiveBuy();
-           createTable.addNoteAboutBuy("telegramuser_"+appUser.getId(), parseStringFromBD(activeBuy, 0), Integer.valueOf(parseStringFromBD(activeBuy, 2)), LocalDateTime.now(), Float.valueOf(parseStringFromBD(activeBuy, 1)));
-           appUser.setBuyUserState(NOT_BUY);
-           appUserDAO.save(appUser);
-        } else if (cmd.equalsIgnoreCase("НЕТ")) {
-           info = "Сделка отменена. Если захотите опять что-то купить введите команду /buy";
-           appUser.setBuyUserState(NOT_BUY);
-           appUserDAO.save(appUser);
-        } else {
-            info = "Введите Да или Нет. Или же команду /cancel";
-        }
-        sendAnswer(info, chatId);
-        break;
-    }
-
-    }
 
     private String processServiceCommand(AppUser appUser, String cmd) {
         var serviceCommand = CommandService.fromValue(cmd);
@@ -194,7 +86,7 @@ public class MainServiceImpl implements MainService {
         } else if (SELL.equals(serviceCommand)) {
             appUser.setSellUserState(SELL_CHANGE_STOCK);
             appUserDAO.save(appUser);
-            return "Введите стоимость акции, которую хотите продать";
+            return "Введите ключ акции, которую хотите продать";
         } else {
             return "Неизвестная команда! Чтобы посмотреть список доступных команд введите /help";
         }
@@ -259,15 +151,5 @@ public class MainServiceImpl implements MainService {
         producerService.producerAnswer(sendMessage);
     }
 
-    private String parseStringFromBD(String s, int i){
-        String[] parts = s.split(":");
-        if(i==1){
-            return parts[0];
-        } else if (i==2) {
-            return parts[1];
 
-        } else {
-            return parts[2];
-        }
-    }
 }

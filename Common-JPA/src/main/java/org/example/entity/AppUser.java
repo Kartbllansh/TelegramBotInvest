@@ -19,6 +19,7 @@ public class AppUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long telegramUserId;
+    //TODO убрать chatID так как в нем тоже самое значение как и в telegramUserID
     private Long chatId;
     @CreationTimestamp
     private LocalDateTime firstLoginDate;

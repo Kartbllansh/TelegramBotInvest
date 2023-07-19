@@ -30,6 +30,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Autowired
     @Override
     public String getBotUsername() {
+    log.info("check username");
         return botName;
     }
 

@@ -1,3 +1,4 @@
 INFO  2023-07-07 21:11:12 MailSenderServiceImpl:38 Отправлено письмо на почту rorece7548@iturchia.com
 INFO  2023-07-09 13:07:50 MailSenderServiceImpl:38 Отправлено письмо на почту tepiwi5843@lukaat.com
 INFO  2023-07-09 13:21:02 MailSenderServiceImpl:38 Отправлено письмо на почту yiwad37455@iturchia.com
+INFO  2023-07-19 18:28:19 MailSenderServiceImpl:38 Отправлено письмо на почту cehewag873@sparkroi.com

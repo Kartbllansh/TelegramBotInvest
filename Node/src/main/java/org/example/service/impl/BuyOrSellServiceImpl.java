@@ -10,12 +10,12 @@ import org.example.service.StocksInformationService;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.example.entity.BuyUserState.*;
 import static org.example.entity.BuyUserState.NOT_BUY;
-import static org.example.entity.SellUserState.SELL_CHANGE_COUNT;
-import static org.example.entity.SellUserState.SELL_PROOF;
+import static org.example.entity.SellUserState.*;
 
 @Log4j
 @Service
@@ -73,7 +73,8 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
                 if(cmd.equalsIgnoreCase("ДА")){
                     info = "ЕЕЕ. Успешная сделка!";
                     String activeBuy = appUser.getActiveBuy();
-                    createTable.addNoteAboutBuy("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeBuy, 0), Integer.valueOf(parseStringFromBD(activeBuy, 2)), LocalDateTime.now(), Float.valueOf(parseStringFromBD(activeBuy, 1)));
+                    //TODO проверить тут парсинг BigDecimial
+                    createTable.addNoteAboutBuy("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeBuy, 0), Integer.valueOf(parseStringFromBD(activeBuy, 2)), LocalDateTime.now(), BigDecimal.valueOf(Integer.parseInt(parseStringFromBD(activeBuy, 1))));
                     appUser.setBuyUserState(NOT_BUY);
                     appUserDAO.save(appUser);
                 } else if (cmd.equalsIgnoreCase("НЕТ")) {
@@ -122,7 +123,6 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
                     if (!(stockInformationService.getInfoAboutStocks(cmd) == null)) {
                         String cost = stockInformationService.getInfoAboutStocks(cmd).getPrice();
                         String symbol = stockInformationService.getInfoAboutStocks(cmd).getSymbol();
-                        //TODO проверка на то, какие акции есть у пользователя(ПРОВЕРКА)
                         sendAnswer("Выбрана акция " + cmd, chatId);
                         sendAnswer("Введите также количество акций, которое вы хотите продать. Сейчас у вас 3", chatId);
                         appUser.setSellUserState(SELL_CHANGE_COUNT);
@@ -141,11 +141,11 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
                     info = "ЕЕЕ. Успешная сделка!";
                     String activeSell = appUser.getActiveBuy();
                     createTable.addNoteAboutSell("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeSell, 0), Integer.valueOf(parseStringFromBD(activeSell, 3)));
-                    appUser.setBuyUserState(NOT_BUY);
+                    appUser.setSellUserState(NOT_SELL);
                     appUserDAO.save(appUser);
                 } else if (cmd.equalsIgnoreCase("НЕТ")) {
                     info = "Сделка отменена. Если захотите опять что-то купить введите команду /buy";
-                    appUser.setBuyUserState(NOT_BUY);
+                    appUser.setSellUserState(NOT_SELL);
                     appUserDAO.save(appUser);
                 } else {
                     info = "Введите Да или Нет. Или же команду /cancel";

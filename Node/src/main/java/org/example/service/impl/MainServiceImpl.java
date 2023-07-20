@@ -86,6 +86,7 @@ public class MainServiceImpl implements MainService {
         } else if (SELL.equals(serviceCommand)) {
             appUser.setSellUserState(SELL_CHANGE_STOCK);
             appUserDAO.save(appUser);
+            sendAnswer(createTable.getInfoAboutBag("telegramUser_"+appUser.getTelegramUserId()), appUser.getTelegramUserId());
             return "Введите ключ акции, которую хотите продать";
         } else {
             return "Неизвестная команда! Чтобы посмотреть список доступных команд введите /help";
@@ -102,6 +103,9 @@ public class MainServiceImpl implements MainService {
     private String cancelProcess(AppUser appUser) {
         if(!appUser.getBuyUserState().equals(NOT_BUY)){
             appUser.setBuyUserState(NOT_BUY);
+        }
+        if (!appUser.getSellUserState().equals(NOT_SELL)){
+            appUser.setSellUserState(NOT_SELL);
         }
         appUser.setState(BASIC_STATE);
         appUserDAO.save(appUser);

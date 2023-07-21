@@ -43,9 +43,9 @@ public class CreateTableImpl implements CreateTable {
             BigDecimal averagePurchasePrice = stock.getPrice().multiply(countFromDB).add(purchase.multiply(countFromUser));
             BigDecimal withDivide = averagePurchasePrice.divide(BigDecimal.valueOf(count+stock.getCountStock()), RoundingMode.HALF_UP);
             stock.setCountStock(stock.getCountStock()+count);
-            String sqlUpdate = "UPDATE " + tableName + " SET count_stonks = ?, time_buy = ?, purchase = ? WHERE code_stocks = ?";
+            String sqlUpdate = "UPDATE " + tableName + " SET count_stonks = ?, time_buy = ?, purchase_stonks = ? WHERE code_stocks = ?";
             jdbcTemplate.update(sqlUpdate, stock.getCountStock(), LocalDateTime.now(), withDivide, key);
-            //TODO проверить работу средней стоимости и докупки
+            //TODO цена покупки до сих пор в целых числах
 
         } else {
             String sql = "INSERT INTO " + tableName + " (code_stocks, count_stonks, time_buy, purchase_stonks) VALUES (?, ?, ?, ?)";

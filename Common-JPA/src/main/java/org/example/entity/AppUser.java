@@ -4,6 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -20,7 +21,6 @@ public class AppUser {
     private Long id;
     private Long telegramUserId;
     //TODO убрать chatID так как в нем тоже самое значение как и в telegramUserID
-    private Long chatId;
     @CreationTimestamp
     private LocalDateTime firstLoginDate;
     private String firstName;
@@ -35,5 +35,6 @@ public class AppUser {
     @Enumerated(EnumType.STRING)
     private SellUserState sellUserState;
     private String activeBuy;
+    private BigDecimal walletMoney;
 
 }

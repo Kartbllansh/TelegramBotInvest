@@ -17,6 +17,7 @@
         <module>Utils</module>
         <module>Rest-Service</module>
         <module>Stonks</module>
+        <module>WalletMoney</module>
     </modules>
 
     <properties>

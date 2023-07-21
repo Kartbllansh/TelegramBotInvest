@@ -53,7 +53,6 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
                 appUserDAO.save(appUser);
                 break;
             case CHANGE_STONKS:
-                //TODO добавить эффект докупки, чтобы не было строчек с двумя одинаковыми ключами
                 //TODO стоимость акции в базу данных записывается в виде целого числа
                 if(!(stockInformationService.getInfoAboutStocks(cmd)==null)) {
                     String cost = stockInformationService.getInfoAboutStocks(cmd).getPrice();
@@ -73,8 +72,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
                 if(cmd.equalsIgnoreCase("ДА")){
                     info = "ЕЕЕ. Успешная сделка!";
                     String activeBuy = appUser.getActiveBuy();
-                    //TODO проверить тут парсинг BigDecimial
-                    createTable.addNoteAboutBuy("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeBuy, 0), Integer.valueOf(parseStringFromBD(activeBuy, 2)), LocalDateTime.now(), BigDecimal.valueOf(Integer.parseInt(parseStringFromBD(activeBuy, 1))));
+                    createTable.addNoteAboutBuy("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeBuy, 0), Integer.valueOf(parseStringFromBD(activeBuy, 2)), LocalDateTime.now(), BigDecimal.valueOf(Double.parseDouble(parseStringFromBD(activeBuy, 1))));
                     appUser.setBuyUserState(NOT_BUY);
                     appUserDAO.save(appUser);
                 } else if (cmd.equalsIgnoreCase("НЕТ")) {

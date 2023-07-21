@@ -180,3 +180,20 @@ INFO  2023-07-20 19:01:28 UpdateProducerImpl:19 UpdateProducer work.../sell
 INFO  2023-07-20 19:01:39 UpdateProducerImpl:19 UpdateProducer work...AAPL
 ERROR 2023-07-20 19:01:40 TelegramBot:64 org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException: Text parameter can't be empty in method: SendMessage(chatId=534271654, messageThreadId=null, text=, parseMode=null, disableWebPagePreview=null, disableNotification=null, replyToMessageId=null, replyMarkup=null, entities=null, allowSendingWithoutReply=null, protectContent=null)
 INFO  2023-07-20 19:01:49 UpdateProducerImpl:19 UpdateProducer work.../cancel
+INFO  2023-07-21 14:22:03 TelegramBot:28 Constructor-token work
+INFO  2023-07-21 14:22:03 TelegramBot:33 check username
+INFO  2023-07-21 14:22:04 TelegramBot:33 check username
+INFO  2023-07-21 14:22:04 TelegramBot:33 check username
+INFO  2023-07-21 14:22:04 TelegramBot:33 check username
+INFO  2023-07-21 14:22:05 Main:16 Main.class running...
+INFO  2023-07-21 14:29:58 UpdateProducerImpl:19 UpdateProducer work.../sell
+INFO  2023-07-21 14:30:07 UpdateProducerImpl:19 UpdateProducer work...MSFT
+ERROR 2023-07-21 14:30:22 TelegramBot:64 org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException: Text parameter can't be empty in method: SendMessage(chatId=534271654, messageThreadId=null, text=, parseMode=null, disableWebPagePreview=null, disableNotification=null, replyToMessageId=null, replyMarkup=null, entities=null, allowSendingWithoutReply=null, protectContent=null)
+INFO  2023-07-21 14:32:36 UpdateProducerImpl:19 UpdateProducer work.../cancel
+INFO  2023-07-21 14:32:44 UpdateProducerImpl:19 UpdateProducer work.../buy
+INFO  2023-07-21 14:32:48 UpdateProducerImpl:19 UpdateProducer work...MSFT
+ERROR 2023-07-21 14:32:50 TelegramBot:64 org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException: Text parameter can't be empty in method: SendMessage(chatId=534271654, messageThreadId=null, text=, parseMode=null, disableWebPagePreview=null, disableNotification=null, replyToMessageId=null, replyMarkup=null, entities=null, allowSendingWithoutReply=null, protectContent=null)
+INFO  2023-07-21 14:32:57 UpdateProducerImpl:19 UpdateProducer work...2
+ERROR 2023-07-21 14:32:58 TelegramBot:64 org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException: Text parameter can't be empty in method: SendMessage(chatId=534271654, messageThreadId=null, text=, parseMode=null, disableWebPagePreview=null, disableNotification=null, replyToMessageId=null, replyMarkup=null, entities=null, allowSendingWithoutReply=null, protectContent=null)
+INFO  2023-07-21 14:33:03 UpdateProducerImpl:19 UpdateProducer work...Да
+ERROR 2023-07-21 14:38:46 TelegramBot:64 org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException: Text parameter can't be empty in method: SendMessage(chatId=534271654, messageThreadId=null, text=, parseMode=null, disableWebPagePreview=null, disableNotification=null, replyToMessageId=null, replyMarkup=null, entities=null, allowSendingWithoutReply=null, protectContent=null)

@@ -137,7 +137,6 @@ public class MainServiceImpl implements MainService {
                     .firstName(telegramUser.getFirstName())
                     .isActive(false)
                     .state(BASIC_STATE)
-                    .chatId(update.getMessage().getChatId())
                     .buyUserState(NOT_BUY)
                     .sellUserState(NOT_SELL)
                     .build();

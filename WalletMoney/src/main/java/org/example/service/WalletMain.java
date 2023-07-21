@@ -6,6 +6,6 @@ import java.math.BigDecimal;
 
 public interface WalletMain {
     String toKnowBalance(AppUser appUser);
-    void topUpWallet(BigDecimal summa, AppUser appUser);
+    String topUpWallet(BigDecimal summa, AppUser appUser);
     //Todo придумать еще идеи к методам
 }

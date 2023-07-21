@@ -6,6 +6,9 @@ public enum CommandService {
     CANCEL("/cancel"),
     START("/start"),
     BUY("/buy"),
+    WALLET_MONEY("/wallet"),
+    WALLET_LOOK_BALANCE("/look_balance"),
+    WALLET_TOP_UP_CMD("/top_up"),
     SELL("/sell");
 
     private final String value;

@@ -36,5 +36,7 @@ public class AppUser {
     private SellUserState sellUserState;
     private String activeBuy;
     private BigDecimal walletMoney;
+    @Enumerated(EnumType.STRING)
+    private WalletUserState walletUserState;
 
 }

@@ -21,11 +21,13 @@ private final AppUser appUser;
     @Override
     public String toKnowBalance(AppUser appUser) {
         BigDecimal balance = appUser.getWalletMoney();
-        return "На вашем счету на данный момент "+balance;
+        return "На вашем счету на данный момент "+balance+" $";
     }
 
     @Override
-    public void topUpWallet(BigDecimal summa, AppUser appUser) {
-
+    public String topUpWallet(BigDecimal summa, AppUser appUser) {
+        appUser.setWalletMoney(appUser.getWalletMoney().add(summa));
+        appUserDAO.save(appUser);
+        return "Баланс успешно пополнен на "+summa+" теперь у вас на счету"+ appUser.getWalletMoney();
     }
 }

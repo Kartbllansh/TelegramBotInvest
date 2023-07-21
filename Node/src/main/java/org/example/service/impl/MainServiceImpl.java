@@ -13,6 +13,8 @@ import static org.example.entity.BuyUserState.*;
 import static org.example.entity.SellUserState.*;
 import static org.example.entity.UserState.BASIC_STATE;
 import static org.example.entity.UserState.WAIT_FOR_EMAIL_STATE;
+import static org.example.entity.WalletUserState.NOT_WALLET;
+import static org.example.entity.WalletUserState.WALLET_CHANGE_CMD;
 import static org.example.enums.CommandService.*;
 
 @Service
@@ -37,6 +39,7 @@ public class MainServiceImpl implements MainService {
         var appUser = findOrSaveAppUser(update);
         var buyUserState = appUser.getBuyUserState();
         var sellUserState = appUser.getSellUserState();
+        var walletUserState = appUser.getWalletUserState();
         var userState = appUser.getState();
         var text = update.getMessage().getText();
         var output = "";
@@ -49,8 +52,9 @@ public class MainServiceImpl implements MainService {
                 buyOrSellService.onActionBuy(appUser, text, chatId);
             } else if (!NOT_SELL.equals(sellUserState)) {
                 buyOrSellService.onActionSell(appUser, text, chatId);
-            }
-         else {
+            } else if (!NOT_WALLET.equals(walletUserState)) {
+                //TODO method for work with wallet
+            } else {
                 output = processServiceCommand(appUser, text);
             }
 
@@ -88,6 +92,11 @@ public class MainServiceImpl implements MainService {
             appUserDAO.save(appUser);
             sendAnswer(createTable.getInfoAboutBag("telegramUser_"+appUser.getTelegramUserId()), appUser.getTelegramUserId());
             return "Введите ключ акции, которую хотите продать";
+
+        } else if (WALLET_MONEY.equals(serviceCommand)) {
+            appUser.setWalletUserState(WALLET_CHANGE_CMD);
+            appUserDAO.save(appUser);
+            return "Выберите какую из команд вы хотели бы использовать: типо список";
         } else {
             return "Неизвестная команда! Чтобы посмотреть список доступных команд введите /help";
         }
@@ -106,6 +115,9 @@ public class MainServiceImpl implements MainService {
         }
         if (!appUser.getSellUserState().equals(NOT_SELL)){
             appUser.setSellUserState(NOT_SELL);
+        }
+        if(!appUser.getWalletUserState().equals(NOT_WALLET)){
+            appUser.setWalletUserState(NOT_WALLET);
         }
         appUser.setState(BASIC_STATE);
         appUserDAO.save(appUser);
@@ -139,14 +151,13 @@ public class MainServiceImpl implements MainService {
                     .state(BASIC_STATE)
                     .buyUserState(NOT_BUY)
                     .sellUserState(NOT_SELL)
+                    .walletUserState(NOT_WALLET)
                     .build();
             return appUserDAO.save(transientAppUser);
         }
         return optional.get();
     }
-    private void doNewUniqTable(Long telegramId){
 
-    }
     private void sendAnswer(String output, Long chatId) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);

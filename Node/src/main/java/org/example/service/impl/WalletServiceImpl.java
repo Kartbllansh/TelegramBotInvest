@@ -49,7 +49,6 @@ public class WalletServiceImpl implements WalletService {
         sendAnswer(someInfo, chatId);
     } else {
         sendAnswer("Пожалуйста введите корректное число или нажмите /cancel, чтобы выйти", chatId);
-        //TODO add in method cancel obrabotky WalletState
     }
     }
     private void sendAnswer(String output, Long chatId) {

@@ -3,10 +3,7 @@ package org.example.service.impl;
 import lombok.extern.log4j.Log4j;
 import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
-import org.example.service.BuyOrSellService;
-import org.example.service.CreateTable;
-import org.example.service.ProducerService;
-import org.example.service.StocksInformationService;
+import org.example.service.*;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
@@ -24,12 +21,14 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
     private final AppUserDAO appUserDAO;
     private final StocksInformationService stockInformationService;
     private final CreateTable createTable;
+    private final WalletMain walletMain;
 
-    public BuyOrSellServiceImpl(ProducerService producerService, AppUserDAO appUserDAO, StocksInformationService stocksInformationService, CreateTable createTable) {
+    public BuyOrSellServiceImpl(ProducerService producerService, AppUserDAO appUserDAO, StocksInformationService stocksInformationService, CreateTable createTable, WalletMain walletMain) {
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
         this.stockInformationService = stocksInformationService;
         this.createTable = createTable;
+        this.walletMain = walletMain;
     }
 
     @Override
@@ -70,9 +69,14 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
                 break;
             case BUY_PROOF:
                 if(cmd.equalsIgnoreCase("ДА")){
-                    info = "ЕЕЕ. Успешная сделка!";
+
                     String activeBuy = appUser.getActiveBuy();
-                    createTable.addNoteAboutBuy("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeBuy, 0), Integer.valueOf(parseStringFromBD(activeBuy, 2)), LocalDateTime.now(), BigDecimal.valueOf(Double.parseDouble(parseStringFromBD(activeBuy, 1))));
+                    int count = Integer.parseInt(parseStringFromBD(activeBuy, 2));
+                    BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(parseStringFromBD(activeBuy, 1)));
+                    createTable.addNoteAboutBuy("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeBuy, 0), count, LocalDateTime.now(), purchace);
+                    BigDecimal countFromUser = BigDecimal.valueOf(count);
+                    String processBuy = walletMain.topDownWallet(purchace.multiply(countFromUser), appUser);
+                    info = "Успешно произошла покупка \n "+processBuy;
                     appUser.setBuyUserState(NOT_BUY);
                     appUserDAO.save(appUser);
                 } else if (cmd.equalsIgnoreCase("НЕТ")) {
@@ -136,9 +140,14 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
                 break;
             case SELL_PROOF:
                 if(cmd.equalsIgnoreCase("ДА")){
-                    info = "ЕЕЕ. Успешная сделка!";
+
                     String activeSell = appUser.getActiveBuy();
-                    createTable.addNoteAboutSell("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeSell, 0), Integer.valueOf(parseStringFromBD(activeSell, 3)));
+                    int count = Integer.parseInt(parseStringFromBD(activeSell, 3));
+                    BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(parseStringFromBD(activeSell, 1)));
+                    BigDecimal countFromUser = BigDecimal.valueOf(count);
+                    createTable.addNoteAboutSell("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeSell, 0), count);
+                    String processSell = walletMain.topUpWallet(countFromUser.multiply(purchace), appUser);
+                    info = "Успешная сделка! \n"+processSell;
                     appUser.setSellUserState(NOT_SELL);
                     appUserDAO.save(appUser);
                 } else if (cmd.equalsIgnoreCase("НЕТ")) {
@@ -158,12 +167,12 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
     private String parseStringFromBD(String s, int i){
         String[] parts = s.split(":");
         if(i==0){
-            return parts[0];
+            return parts[0]; //символ
         } else if (i==1) {
-            return parts[1];
+            return parts[1]; //стоимость
 
         } else {
-            return parts[2];
+            return parts[2]; //количество
         }
     }
     private void sendAnswer(String output, Long chatId) {

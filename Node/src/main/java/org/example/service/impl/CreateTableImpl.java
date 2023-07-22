@@ -69,6 +69,7 @@ public class CreateTableImpl implements CreateTable {
         } else {
             log.error("Отрицательное значение в addNoteAboutSell");
         }
+
         //TODO  метод, который будет позволять рассчитывать какое количество акций осталось на счету у пользователя
         //TODO String должен вернуть пользователю, что по итогу вышло
 

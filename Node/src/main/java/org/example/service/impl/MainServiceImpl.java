@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import java.math.BigDecimal;
+
 import static org.example.entity.BuyUserState.*;
 import static org.example.entity.SellUserState.*;
 import static org.example.entity.UserState.BASIC_STATE;
@@ -20,13 +22,15 @@ import static org.example.enums.CommandService.*;
 @Service
 @Log4j
 public class MainServiceImpl implements MainService {
+    private final WalletService walletService;
     private final BuyOrSellService buyOrSellService;
     private final CreateTable createTable;
     private final ProducerService producerService;
     private final AppUserDAO appUserDAO;
     private final AppUserService appUserService;
 
-    public MainServiceImpl(BuyOrSellService buyOrSellService, CreateTable createTable, ProducerService producerService, AppUserDAO appUserDAO, AppUserService appUserService) {
+    public MainServiceImpl(WalletService walletService, BuyOrSellService buyOrSellService, CreateTable createTable, ProducerService producerService, AppUserDAO appUserDAO, AppUserService appUserService) {
+        this.walletService = walletService;
         this.buyOrSellService = buyOrSellService;
         this.createTable = createTable;
         this.producerService = producerService;
@@ -53,7 +57,7 @@ public class MainServiceImpl implements MainService {
             } else if (!NOT_SELL.equals(sellUserState)) {
                 buyOrSellService.onActionSell(appUser, text, chatId);
             } else if (!NOT_WALLET.equals(walletUserState)) {
-                //TODO method for work with wallet
+                walletService.onActiveWallet(appUser, text, chatId);
             } else {
                 output = processServiceCommand(appUser, text);
             }
@@ -149,6 +153,8 @@ public class MainServiceImpl implements MainService {
                     .firstName(telegramUser.getFirstName())
                     .isActive(false)
                     .state(BASIC_STATE)
+                    .walletMoney(BigDecimal.valueOf(1000.00))
+                    //TODO рассказать пользователю, что у него есть на счету косарик
                     .buyUserState(NOT_BUY)
                     .sellUserState(NOT_SELL)
                     .walletUserState(NOT_WALLET)

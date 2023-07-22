@@ -9,12 +9,10 @@ import java.math.BigDecimal;
 @Service
 public class WalletMainImpl implements WalletMain {
 private final AppUserDAO appUserDAO;
-private final AppUser appUser;
 //TODO механизм, позволяющий работать с разными валютами
 
-    public WalletMainImpl(AppUserDAO appUserDAO, AppUser appUser) {
+    public WalletMainImpl(AppUserDAO appUserDAO) {
         this.appUserDAO = appUserDAO;
-        this.appUser = appUser;
     }
 
 
@@ -28,6 +26,13 @@ private final AppUser appUser;
     public String topUpWallet(BigDecimal summa, AppUser appUser) {
         appUser.setWalletMoney(appUser.getWalletMoney().add(summa));
         appUserDAO.save(appUser);
-        return "Баланс успешно пополнен на "+summa+" теперь у вас на счету"+ appUser.getWalletMoney();
+        return "Ваш счет увеличился на "+summa+" теперь у вас на счету"+ appUser.getWalletMoney();
+    }
+
+    @Override
+    public String topDownWallet(BigDecimal summa, AppUser appUser) {
+        appUser.setWalletMoney(appUser.getWalletMoney().subtract(summa));
+        appUserDAO.save(appUser);
+        return "С вашего счета снято "+summa+" сейчас у вас на счету "+appUser.getWalletMoney();
     }
 }

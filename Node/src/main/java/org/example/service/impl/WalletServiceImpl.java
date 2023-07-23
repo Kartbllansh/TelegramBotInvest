@@ -11,6 +11,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import java.math.BigDecimal;
 
+import static org.example.entity.WalletUserState.NOT_WALLET;
 import static org.example.entity.WalletUserState.WALLET_TOP_UP_CHANGE_COUNT;
 import static org.example.enums.CommandService.WALLET_LOOK_BALANCE;
 import static org.example.enums.CommandService.WALLET_TOP_UP_CMD;
@@ -47,6 +48,8 @@ public class WalletServiceImpl implements WalletService {
         BigDecimal bigDecimal = new BigDecimal(text);
         String someInfo = walletMain.topUpWallet(bigDecimal, appUser);
         sendAnswer(someInfo, chatId);
+        appUser.setWalletUserState(NOT_WALLET);
+        appUserDAO.save(appUser);
     } else {
         sendAnswer("Пожалуйста введите корректное число или нажмите /cancel, чтобы выйти", chatId);
     }

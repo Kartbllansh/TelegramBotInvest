@@ -75,8 +75,9 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
                     BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(parseStringFromBD(activeBuy, 1)));
                     createTable.addNoteAboutBuy("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeBuy, 0), count, LocalDateTime.now(), purchace);
                     BigDecimal countFromUser = BigDecimal.valueOf(count);
-                    String processBuy = walletMain.topDownWallet(purchace.multiply(countFromUser), appUser);
-                    info = "Успешно произошла покупка \n "+processBuy;
+                    info = walletMain.topDownWallet(purchace.multiply(countFromUser), appUser);
+                    //TODO настроить текстовые ответы
+                    //info = "Успешно произошла покупка \n "+processBuy;
                     appUser.setBuyUserState(NOT_BUY);
                     appUserDAO.save(appUser);
                 } else if (cmd.equalsIgnoreCase("НЕТ")) {
@@ -97,6 +98,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         String info ="";
         switch (appUser.getSellUserState()){
             case SELL_CHANGE_COUNT:
+                //TODO на данный момент программа не проверяет на моменте выбора количества акций возможность покупки
                 if (cmd.trim().matches("\\d+")){
                     long count = Long.parseLong(cmd);
                     String temporaryValue = appUser.getActiveBuy();
@@ -126,6 +128,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
                         String cost = stockInformationService.getInfoAboutStocks(cmd).getPrice();
                         String symbol = stockInformationService.getInfoAboutStocks(cmd).getSymbol();
                         sendAnswer("Выбрана акция " + cmd, chatId);
+                        //TODO обработать сообщение снизу так как пользователь не имеет 3 акции
                         sendAnswer("Введите также количество акций, которое вы хотите продать. Сейчас у вас 3", chatId);
                         appUser.setSellUserState(SELL_CHANGE_COUNT);
                         appUser.setActiveBuy(symbol + ":" + cost);
@@ -146,8 +149,8 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
                     BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(parseStringFromBD(activeSell, 1)));
                     BigDecimal countFromUser = BigDecimal.valueOf(count);
                     createTable.addNoteAboutSell("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeSell, 0), count);
-                    String processSell = walletMain.topUpWallet(countFromUser.multiply(purchace), appUser);
-                    info = "Успешная сделка! \n"+processSell;
+                    info = walletMain.topUpWallet(countFromUser.multiply(purchace), appUser);
+                    //info = "Успешная сделка! \n"+processSell;
                     appUser.setSellUserState(NOT_SELL);
                     appUserDAO.save(appUser);
                 } else if (cmd.equalsIgnoreCase("НЕТ")) {

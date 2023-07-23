@@ -24,15 +24,29 @@ private final AppUserDAO appUserDAO;
 
     @Override
     public String topUpWallet(BigDecimal summa, AppUser appUser) {
+        // Проверка, что переданная сумма положительна
+        if (summa.compareTo(BigDecimal.ZERO) <= 0) {
+            return "Сумма для пополнения должна быть положительной.";
+        }
+
         appUser.setWalletMoney(appUser.getWalletMoney().add(summa));
         appUserDAO.save(appUser);
-        return "Ваш счет увеличился на "+summa+" теперь у вас на счету"+ appUser.getWalletMoney();
+        return "Ваш счет увеличился на " + summa + ". Теперь у вас на счету " + appUser.getWalletMoney();
     }
+
 
     @Override
     public String topDownWallet(BigDecimal summa, AppUser appUser) {
-        appUser.setWalletMoney(appUser.getWalletMoney().subtract(summa));
+        BigDecimal currentBalance = appUser.getWalletMoney();
+
+        // Проверка, достаточно ли средств на счете
+        if (currentBalance.compareTo(summa) < 0) {
+            return "Недостаточно средств на вашем счету.";
+        }
+
+        appUser.setWalletMoney(currentBalance.subtract(summa));
         appUserDAO.save(appUser);
-        return "С вашего счета снято "+summa+" сейчас у вас на счету "+appUser.getWalletMoney();
+        return "С вашего счета снято " + summa + ". Теперь у вас на счету " + appUser.getWalletMoney();
     }
+
 }

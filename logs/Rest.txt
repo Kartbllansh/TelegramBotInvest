@@ -5,3 +5,4 @@ ERROR 2023-07-07 21:11:45 MyControllerAdvice:33 Exception java.io.FileNotFoundEx
 INFO  2023-07-09 13:07:58 ActivationController:22 Успешная регистрация пользователя
 INFO  2023-07-09 13:21:10 ActivationController:22 Успешная регистрация пользователя
 INFO  2023-07-19 18:28:33 ActivationController:26 Успешная регистрация пользователя
+INFO  2023-07-23 20:45:32 ActivationController:26 Успешная регистрация пользователя

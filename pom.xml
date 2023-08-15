@@ -18,6 +18,8 @@
         <module>Rest-Service</module>
         <module>Stonks</module>
         <module>WalletMoney</module>
+        <module>DataBaseParsing</module>
+        <module>MOEX</module>
     </modules>
 
     <properties>

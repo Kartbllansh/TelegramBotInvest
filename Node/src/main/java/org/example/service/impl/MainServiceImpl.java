@@ -52,6 +52,7 @@ public class MainServiceImpl implements MainService {
         if (CANCEL.equals(serviceCommand)) {
             output = cancelProcess(appUser);
         } else if (BASIC_STATE.equals(userState)) {
+
             if(!NOT_BUY.equals(buyUserState)) {
                 buyOrSellService.onActionBuy(appUser, text, chatId);
             } else if (!NOT_SELL.equals(sellUserState)) {
@@ -66,7 +67,9 @@ public class MainServiceImpl implements MainService {
             output = appUserService.setEmail(appUser, text);
         } else {
             log.error("Unknown user state: " + userState);
-            output = "Неизвестная ошибка! Введите /cancel и попробуйте снова!";
+            output = "Неизвестная ошибка! \n"
+                    +  "Введите /cancel и попробуйте снова! \n"
+                    +"Либо введите /help и посмотрите допустимые команды";
         }
 
         sendAnswer(output, chatId);
@@ -90,17 +93,22 @@ public class MainServiceImpl implements MainService {
         } else if(BUY.equals(serviceCommand)){
             appUser.setBuyUserState(CHANGE_STONKS);
             appUserDAO.save(appUser);
-            return "Введите код акции, которую хотите купить";
+            return appUser.getUserName()+", вы активировали команду /buy! \n"
+                            +"Введите код акции, которую хотите купить";
         } else if (SELL.equals(serviceCommand)) {
             appUser.setSellUserState(SELL_CHANGE_STOCK);
             appUserDAO.save(appUser);
             sendAnswer(createTable.getInfoAboutBag("telegramUser_"+appUser.getTelegramUserId()), appUser.getTelegramUserId());
-            return "Введите ключ акции, которую хотите продать";
+            return appUser.getUserName()+", вы активировали команду /sell! \n"
+                    +"Введите ключ акции, которую хотите продать";
 
         } else if (WALLET_MONEY.equals(serviceCommand)) {
             appUser.setWalletUserState(WALLET_CHANGE_CMD);
             appUserDAO.save(appUser);
-            return "Выберите какую из команд вы хотели бы использовать: типо список";
+            return appUser.getUserName()+", Вы активировали команду, позволящую работать с балансом на вашем кошельке. \n"
+                    +"Выберите какую из команд вы хотели бы использовать: \n"
+                    +"* /top_up - пополните баланс \n"
+                    +" * /look_balance - посмотрите, сколько у вас на счету денег";
         } else {
             return "Неизвестная команда! Чтобы посмотреть список доступных команд введите /help";
         }

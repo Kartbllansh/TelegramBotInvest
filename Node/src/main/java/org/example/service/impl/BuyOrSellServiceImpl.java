@@ -33,61 +33,15 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
 
     @Override
     public void onActionBuy(AppUser appUser, String cmd, Long chatId) {
-        String info = "";
         switch (appUser.getBuyUserState()){
-
             case CHANGE_COUNT:
-                if (cmd.trim().matches("\\d+")){
-                    long count = Long.parseLong(cmd);
-                    info ="Успешно куплено "+count+" акций";
-                    String temporaryValue = appUser.getActiveBuy();
-                    String newValue = temporaryValue+":"+count;
-                    appUser.setActiveBuy(newValue);
-                } else {
-                    info = "Введено неправильно значение. Бот ожидает число.";
-                }
-                sendAnswer(info, chatId);
-                sendAnswer("Подтверждение! Если вы подтверждаете покупку введите Да, если отменяете Нет", chatId);
-                appUser.setBuyUserState(BUY_PROOF);
-                appUserDAO.save(appUser);
+               buyChangeCount(appUser, cmd, chatId);
                 break;
             case CHANGE_STONKS:
-                //TODO стоимость акции в базу данных записывается в виде целого числа
-                if(!(stockInformationService.getInfoAboutStocks(cmd)==null)) {
-                    String cost = stockInformationService.getInfoAboutStocks(cmd).getPrice();
-                    String symbol = stockInformationService.getInfoAboutStocks(cmd).getSymbol();
-                    info = "Цена ценной бумаги " + cmd + " равняется " + cost + " это цена на момент " + stockInformationService.getInfoAboutStocks(cmd).getLatestTradingDay();
-                    sendAnswer(info, chatId);
-                    sendAnswer("Какое количество акций вы хотите приобрести?", chatId);
-
-                    appUser.setBuyUserState(CHANGE_COUNT);
-                    appUser.setActiveBuy(symbol+":"+cost);
-                    appUserDAO.save(appUser);
-                } else {
-                    sendAnswer("Ценной бумаги с таким символом нет", chatId);
-                }
+                buyChangeStocks(appUser, cmd, chatId);
                 break;
             case BUY_PROOF:
-                if(cmd.equalsIgnoreCase("ДА")){
-
-                    String activeBuy = appUser.getActiveBuy();
-                    int count = Integer.parseInt(parseStringFromBD(activeBuy, 2));
-                    BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(parseStringFromBD(activeBuy, 1)));
-                    createTable.addNoteAboutBuy("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeBuy, 0), count, LocalDateTime.now(), purchace);
-                    BigDecimal countFromUser = BigDecimal.valueOf(count);
-                    info = walletMain.topDownWallet(purchace.multiply(countFromUser), appUser);
-                    //TODO настроить текстовые ответы
-                    //info = "Успешно произошла покупка \n "+processBuy;
-                    appUser.setBuyUserState(NOT_BUY);
-                    appUserDAO.save(appUser);
-                } else if (cmd.equalsIgnoreCase("НЕТ")) {
-                    info = "Сделка отменена. Если захотите опять что-то купить введите команду /buy";
-                    appUser.setBuyUserState(NOT_BUY);
-                    appUserDAO.save(appUser);
-                } else {
-                    info = "Введите Да или Нет. Или же команду /cancel";
-                }
-                sendAnswer(info, chatId);
+                buyProof(appUser, cmd, chatId);
                 break;
         }
 
@@ -95,76 +49,146 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
 
     @Override
     public void onActionSell(AppUser appUser, String cmd, Long chatId) {
-        String info ="";
         switch (appUser.getSellUserState()){
             case SELL_CHANGE_COUNT:
-                //TODO на данный момент программа не проверяет на моменте выбора количества акций возможность покупки
-                if (cmd.trim().matches("\\d+")){
-                    long count = Long.parseLong(cmd);
-                    String temporaryValue = appUser.getActiveBuy();
-                    String codeStocks =parseStringFromBD(temporaryValue, 0);
-                    Long someResult = createTable.checkAboutCountSell(count, "telegramuser_"+appUser.getTelegramUserId(), codeStocks);
-                    if(someResult>=0) {
-                        info = "Успешно продано " + count + " акций " + parseStringFromBD(temporaryValue, 0);
-                        sendAnswer(info, chatId);
-                        sendAnswer("Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId);
-                        appUser.setSellUserState(SELL_PROOF);
-                        String newValue = temporaryValue + ":" + count;
-                        appUser.setActiveBuy(newValue);
-                        appUserDAO.save(appUser);
-                    } else {
-                     sendAnswer("Нельзя продать такое количество акций, у вас их меньше", chatId);
-                     //TODO подсказка почему пользователь мог ошибиться
-                    }
-                } else {
-                    info = "Введено неправильно значение. Бот ожидает число.";
-                    sendAnswer(info, chatId);
-                }
-
+                sellChangeCount(appUser, cmd, chatId);
                 break;
             case SELL_CHANGE_STOCK:
-                if(createTable.checkAboutCodeStock("telegramuser_"+appUser.getTelegramUserId(), cmd)) {
-                    if (!(stockInformationService.getInfoAboutStocks(cmd) == null)) {
-                        String cost = stockInformationService.getInfoAboutStocks(cmd).getPrice();
-                        String symbol = stockInformationService.getInfoAboutStocks(cmd).getSymbol();
-                        sendAnswer("Выбрана акция " + cmd, chatId);
-                        //TODO обработать сообщение снизу так как пользователь не имеет 3 акции
-                        sendAnswer("Введите также количество акций, которое вы хотите продать. Сейчас у вас 3", chatId);
-                        appUser.setSellUserState(SELL_CHANGE_COUNT);
-                        appUser.setActiveBuy(symbol + ":" + cost);
-                        appUserDAO.save(appUser);
-                    } else {
-                        sendAnswer("Данный код акции не видит Vantage", chatId);
-                    }
-                } else {
-                    sendAnswer("В твоем портфеле нет такой акции", chatId);
-                }
-
+               sellChangeStock(appUser, cmd, chatId);
                 break;
             case SELL_PROOF:
-                if(cmd.equalsIgnoreCase("ДА")){
-
-                    String activeSell = appUser.getActiveBuy();
-                    int count = Integer.parseInt(parseStringFromBD(activeSell, 3));
-                    BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(parseStringFromBD(activeSell, 1)));
-                    BigDecimal countFromUser = BigDecimal.valueOf(count);
-                    createTable.addNoteAboutSell("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeSell, 0), count);
-                    info = walletMain.topUpWallet(countFromUser.multiply(purchace), appUser);
-                    //info = "Успешная сделка! \n"+processSell;
-                    appUser.setSellUserState(NOT_SELL);
-                    appUserDAO.save(appUser);
-                } else if (cmd.equalsIgnoreCase("НЕТ")) {
-                    info = "Сделка отменена. Если захотите опять что-то купить введите команду /buy";
-                    appUser.setSellUserState(NOT_SELL);
-                    appUserDAO.save(appUser);
-                } else {
-                    info = "Введите Да или Нет. Или же команду /cancel";
-                }
-                sendAnswer(info, chatId);
+                sellProof(appUser, cmd, chatId);
                 break;
         }
 
 
+    }
+
+    private void buyChangeCount(AppUser appUser, String cmd, Long chatId){
+        String info = "";
+        if (cmd.trim().matches("\\d+")){
+
+            long count = Long.parseLong(cmd);
+            String newValue = appUser.getActiveBuy()+":"+count;
+            info ="Успешно куплено "+count+" акций";
+            appUser.setActiveBuy(newValue);
+
+        } else {
+            info = "Введено неправильно значение. Бот ожидает число.";
+        }
+        sendAnswer(info, chatId);
+        sendAnswer("Подтверждение! Если вы подтверждаете покупку введите Да, если отменяете Нет", chatId);
+        appUser.setBuyUserState(BUY_PROOF);
+        appUserDAO.save(appUser);
+    }
+
+    private void buyChangeStocks(AppUser appUser, String cmd, Long chatId){
+        String info = "";
+        //TODO стоимость акции в базу данных записывается в виде целого числа
+        if(!(stockInformationService.getInfoAboutStocks(cmd)==null)) {
+            String cost = stockInformationService.getInfoAboutStocks(cmd).getPrice();
+            String symbol = stockInformationService.getInfoAboutStocks(cmd).getSymbol();
+            info = "Цена ценной бумаги " + cmd + " равняется " + cost + " это цена на момент " + stockInformationService.getInfoAboutStocks(cmd).getLatestTradingDay();
+
+            sendAnswer(info, chatId);
+            sendAnswer("Какое количество акций вы хотите приобрести?", chatId);
+            appUser.setBuyUserState(CHANGE_COUNT);
+            appUser.setActiveBuy(symbol+":"+cost);
+            appUserDAO.save(appUser);
+        } else {
+            sendAnswer("Ценной бумаги с таким символом нет", chatId);
+        }
+    }
+
+    private void buyProof(AppUser appUser, String cmd, Long chatId){
+        String info = "";
+        if(cmd.equalsIgnoreCase("ДА")){
+
+            String activeBuy = appUser.getActiveBuy();
+            int count = Integer.parseInt(parseStringFromBD(activeBuy, 2));
+            BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(parseStringFromBD(activeBuy, 1)));
+            BigDecimal countFromUser = BigDecimal.valueOf(count);
+
+            createTable.addNoteAboutBuy("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeBuy, 0), count, LocalDateTime.now(), purchace);
+            info = walletMain.topDownWallet(purchace.multiply(countFromUser), appUser);
+            //TODO настроить текстовые ответы
+
+            appUser.setBuyUserState(NOT_BUY);
+            appUserDAO.save(appUser);
+        } else if (cmd.equalsIgnoreCase("НЕТ")) {
+            info = "Сделка отменена. Если захотите опять что-то купить введите команду /buy";
+            appUser.setBuyUserState(NOT_BUY);
+            appUserDAO.save(appUser);
+        } else {
+            info = "Введите Да или Нет. Или же команду /cancel";
+        }
+        sendAnswer(info, chatId);
+    }
+
+    private void sellChangeCount(AppUser appUser, String cmd, Long chatId){
+        //TODO на данный момент программа не проверяет на моменте выбора количества акций возможность покупки
+        String info = "";
+        if (cmd.trim().matches("\\d+")){
+            long count = Long.parseLong(cmd);
+            String temporaryValue = appUser.getActiveBuy();
+            String codeStocks =parseStringFromBD(temporaryValue, 0);
+            Long someResult = createTable.checkAboutCountSell(count, "telegramuser_"+appUser.getTelegramUserId(), codeStocks);
+            if(someResult>=0) {
+                info = "Успешно продано " + count + " акций " + parseStringFromBD(temporaryValue, 0);
+                sendAnswer(info, chatId);
+                sendAnswer("Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId);
+                appUser.setSellUserState(SELL_PROOF);
+                appUser.setActiveBuy(temporaryValue + ":" + count);
+                appUserDAO.save(appUser);
+            } else {
+                sendAnswer("Нельзя продать такое количество акций, у вас их меньше", chatId);
+                //TODO подсказка почему пользователь мог ошибиться
+            }
+        } else {
+            info = "Введено неправильно значение. Бот ожидает число.";
+            sendAnswer(info, chatId);
+        }
+    }
+    private void sellChangeStock(AppUser appUser, String cmd, Long chatId){
+        if(createTable.checkAboutCodeStock("telegramuser_"+appUser.getTelegramUserId(), cmd)) {
+            if (!(stockInformationService.getInfoAboutStocks(cmd) == null)) {
+                String cost = stockInformationService.getInfoAboutStocks(cmd).getPrice();
+                String symbol = stockInformationService.getInfoAboutStocks(cmd).getSymbol();
+                sendAnswer("Выбрана акция " + cmd, chatId);
+                //TODO обработать сообщение снизу так как пользователь не имеет 3 акции
+                sendAnswer("Введите также количество акций, которое вы хотите продать. Сейчас у вас 3", chatId);
+                appUser.setSellUserState(SELL_CHANGE_COUNT);
+                appUser.setActiveBuy(symbol + ":" + cost);
+                appUserDAO.save(appUser);
+            } else {
+                sendAnswer("Данный код акции не видит Vantage", chatId);
+            }
+        } else {
+            sendAnswer("В твоем портфеле нет такой акции", chatId);
+        }
+
+    }
+
+    private void sellProof(AppUser appUser, String cmd, Long chatId){
+        String info = "";
+        if(cmd.equalsIgnoreCase("ДА")){
+            String activeSell = appUser.getActiveBuy();
+            int count = Integer.parseInt(parseStringFromBD(activeSell, 3));
+            BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(parseStringFromBD(activeSell, 1)));
+            BigDecimal countFromUser = BigDecimal.valueOf(count);
+
+            createTable.addNoteAboutSell("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeSell, 0), count);
+            info = walletMain.topUpWallet(countFromUser.multiply(purchace), appUser);
+            appUser.setSellUserState(NOT_SELL);
+            appUserDAO.save(appUser);
+        } else if (cmd.equalsIgnoreCase("НЕТ")) {
+            info = "Сделка отменена. Если захотите опять что-то купить введите команду /buy";
+            appUser.setSellUserState(NOT_SELL);
+            appUserDAO.save(appUser);
+        } else {
+            info = "Введите Да или Нет. Или же команду /cancel";
+        }
+        sendAnswer(info, chatId);
     }
 
     private String parseStringFromBD(String s, int i){

@@ -22,7 +22,7 @@ public class StocksServiceImpl implements StocksInformationService {
     private static final String BASE_URL = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=";
 
 
-    @Override
+    /*@Override
     public GlobalQuote getInfoAboutStocks(String keyStock) {
         String url = BASE_URL + keyStock + "&apikey=" + API_KEY;
 
@@ -43,7 +43,7 @@ public class StocksServiceImpl implements StocksInformationService {
         }
 
         return null;
-    }
+    }*/
     private GlobalQuote parseJson(String jsonStr){
         try {
             ObjectMapper objectMapper = new ObjectMapper();

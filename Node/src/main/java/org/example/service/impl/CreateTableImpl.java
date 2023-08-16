@@ -36,7 +36,7 @@ public class CreateTableImpl implements CreateTable {
     public void addNoteAboutBuy(String tableName, String key, Integer count, LocalDateTime localDateTime, BigDecimal purchase) {
         if (checkAboutCodeStock(tableName, key)){
             String sql = "SELECT * FROM " + tableName + " WHERE code_stocks = ?";
-            Stocks stock = jdbcTemplate.queryForObject(sql, new StocksRowMapper(), "MSFT");
+            Stocks stock = jdbcTemplate.queryForObject(sql, new StocksRowMapper(), key);
             assert stock != null;
             BigDecimal countFromDB = BigDecimal.valueOf(stock.getCountStock());
             BigDecimal countFromUser = BigDecimal.valueOf(count);

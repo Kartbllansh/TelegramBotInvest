@@ -11,8 +11,7 @@ public class StockMain {
 
     public static void main(String[] args) {
         SpringApplication.run(StockMain.class);
-        StocksServiceImpl service = new StocksServiceImpl();
-        System.out.println(service.getInfoAboutStocks("MSST").getPrice());
+
 
     }
 }

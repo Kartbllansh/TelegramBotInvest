@@ -3,6 +3,7 @@ package org.example.service.impl;
 import lombok.extern.log4j.Log4j;
 import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
+import org.example.jpa.entity.StockQuote;
 import org.example.service.*;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -19,16 +20,16 @@ import static org.example.entity.SellUserState.*;
 public class BuyOrSellServiceImpl implements BuyOrSellService {
     private final ProducerService producerService;
     private final AppUserDAO appUserDAO;
-    private final StocksInformationService stockInformationService;
     private final CreateTable createTable;
     private final WalletMain walletMain;
+    private final StockServiceImpl stockService;
 
-    public BuyOrSellServiceImpl(ProducerService producerService, AppUserDAO appUserDAO, StocksInformationService stocksInformationService, CreateTable createTable, WalletMain walletMain) {
+    public BuyOrSellServiceImpl(ProducerService producerService, AppUserDAO appUserDAO, CreateTable createTable, WalletMain walletMain, StockServiceImpl stockService) {
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
-        this.stockInformationService = stocksInformationService;
         this.createTable = createTable;
         this.walletMain = walletMain;
+        this.stockService = stockService;
     }
 
     @Override
@@ -71,6 +72,8 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
             long count = Long.parseLong(cmd);
             String newValue = appUser.getActiveBuy()+":"+count;
             info ="Успешно куплено "+count+" акций";
+            //TODO изменить строчку сверху
+            //TODO настроить Id  в базе данных
             appUser.setActiveBuy(newValue);
 
         } else {
@@ -84,11 +87,12 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
 
     private void buyChangeStocks(AppUser appUser, String cmd, Long chatId){
         String info = "";
+        StockQuote stockQuote = stockService.getInfoAboutTicket(cmd);
         //TODO стоимость акции в базу данных записывается в виде целого числа
-        if(!(stockInformationService.getInfoAboutStocks(cmd)==null)) {
-            String cost = stockInformationService.getInfoAboutStocks(cmd).getPrice();
-            String symbol = stockInformationService.getInfoAboutStocks(cmd).getSymbol();
-            info = "Цена ценной бумаги " + cmd + " равняется " + cost + " это цена на момент " + stockInformationService.getInfoAboutStocks(cmd).getLatestTradingDay();
+        if(!(stockQuote==null)) {
+            BigDecimal cost = stockQuote.getPrevLegalClosePrice();
+            String symbol = stockQuote.getSecId();
+            info = "Цена ценной бумаги " + cmd + " равняется " + cost + " это цена на момент " + stockQuote.getDate();
 
             sendAnswer(info, chatId);
             sendAnswer("Какое количество акций вы хотите приобрести?", chatId);
@@ -151,9 +155,10 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
     }
     private void sellChangeStock(AppUser appUser, String cmd, Long chatId){
         if(createTable.checkAboutCodeStock("telegramuser_"+appUser.getTelegramUserId(), cmd)) {
-            if (!(stockInformationService.getInfoAboutStocks(cmd) == null)) {
-                String cost = stockInformationService.getInfoAboutStocks(cmd).getPrice();
-                String symbol = stockInformationService.getInfoAboutStocks(cmd).getSymbol();
+            StockQuote stockQuote = stockService.getInfoAboutTicket(cmd);
+            if (!(stockQuote== null)) {
+                BigDecimal cost = stockQuote.getPrevLegalClosePrice();
+                String symbol = stockQuote.getSecId();
                 sendAnswer("Выбрана акция " + cmd, chatId);
                 //TODO обработать сообщение снизу так как пользователь не имеет 3 акции
                 sendAnswer("Введите также количество акций, которое вы хотите продать. Сейчас у вас 3", chatId);

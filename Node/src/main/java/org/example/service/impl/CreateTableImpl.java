@@ -26,14 +26,14 @@ public class CreateTableImpl implements CreateTable {
 
     @Override
     public void createTable(String tableName) {
-        String sql = "CREATE TABLE IF NOT EXISTS "+tableName+ " ( id_deal SERIAL PRIMARY KEY, code_stocks VARCHAR(255), count_stonks INTEGER, time_buy TIMESTAMP, purchase_stonks NUMERIC(10, 2) );";
+        String sql = "CREATE TABLE IF NOT EXISTS "+tableName+ " ( id_deal SERIAL PRIMARY KEY, code_stocks VARCHAR(255), count_stonks INTEGER, time_buy TIMESTAMP, purchase_stonks NUMERIC(10, 2), shortName VARCHAR(255) );";
         jdbcTemplate.execute(sql);
         log.info("Создана индивидувльная таблица с именем "+tableName);
     }
 
 
     @Override
-    public void addNoteAboutBuy(String tableName, String key, Integer count, LocalDateTime localDateTime, BigDecimal purchase) {
+    public void addNoteAboutBuy(String tableName, String key, Integer count, LocalDateTime localDateTime, BigDecimal purchase, String shortName) {
         if (checkAboutCodeStock(tableName, key)){
             String sql = "SELECT * FROM " + tableName + " WHERE code_stocks = ?";
             Stocks stock = jdbcTemplate.queryForObject(sql, new StocksRowMapper(), key);
@@ -43,13 +43,13 @@ public class CreateTableImpl implements CreateTable {
             BigDecimal averagePurchasePrice = stock.getPrice().multiply(countFromDB).add(purchase.multiply(countFromUser));
             BigDecimal withDivide = averagePurchasePrice.divide(BigDecimal.valueOf(count+stock.getCountStock()), RoundingMode.HALF_UP);
             stock.setCountStock(stock.getCountStock()+count);
-            String sqlUpdate = "UPDATE " + tableName + " SET count_stonks = ?, time_buy = ?, purchase_stonks = ? WHERE code_stocks = ?";
+            String sqlUpdate = "UPDATE " + tableName + " SET count_stonks = ?, time_buy = ?, purchase_stonks = ?, shortName = ? WHERE code_stocks = ?";
             jdbcTemplate.update(sqlUpdate, stock.getCountStock(), LocalDateTime.now(), withDivide, key);
             //TODO цена покупки до сих пор в целых числах
 
         } else {
             String sql = "INSERT INTO " + tableName + " (code_stocks, count_stonks, time_buy, purchase_stonks) VALUES (?, ?, ?, ?)";
-            jdbcTemplate.update(sql, key, count, localDateTime, purchase);
+            jdbcTemplate.update(sql, key, count, localDateTime, purchase, shortName);
             log.info("Добавлена запись в таблицу " + tableName);
         }
     }
@@ -110,5 +110,11 @@ public class CreateTableImpl implements CreateTable {
         // Значение codeStock найдено в таблице
         // Значение codeStock не найдено в таблице
         return rowSet.next();
+    }
+
+    @Override
+    public Long countOfTheBag(String tableName, String codeStock) {
+        String sql = "SELECT count_stonks FROM " + tableName + " WHERE code_stocks = ?";
+        return jdbcTemplate.queryForObject(sql, Long.class, codeStock);
     }
 }

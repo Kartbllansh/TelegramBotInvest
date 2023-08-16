@@ -19,7 +19,7 @@ private final AppUserDAO appUserDAO;
     @Override
     public String toKnowBalance(AppUser appUser) {
         BigDecimal balance = appUser.getWalletMoney();
-        return "На вашем счету на данный момент "+balance+" $";
+        return "На вашем счету на данный момент "+balance+"₽";
     }
 
     @Override
@@ -31,7 +31,7 @@ private final AppUserDAO appUserDAO;
 
         appUser.setWalletMoney(appUser.getWalletMoney().add(summa));
         appUserDAO.save(appUser);
-        return "Ваш счет увеличился на " + summa + ". Теперь у вас на счету " + appUser.getWalletMoney();
+        return "Ваш счет увеличился на " + summa + ". Теперь у вас на счету " + appUser.getWalletMoney()+"₽";
     }
 
 
@@ -46,7 +46,7 @@ private final AppUserDAO appUserDAO;
 
         appUser.setWalletMoney(currentBalance.subtract(summa));
         appUserDAO.save(appUser);
-        return "С вашего счета снято " + summa + ". Теперь у вас на счету " + appUser.getWalletMoney();
+        return "С вашего счета снято " + summa + ". Теперь у вас на счету " + appUser.getWalletMoney()+"₽";
     }
 
 }

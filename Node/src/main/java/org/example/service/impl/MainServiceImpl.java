@@ -88,7 +88,7 @@ public class MainServiceImpl implements MainService {
             return help();
         } else if (START.equals(serviceCommand)) {
             log.info("Новый пользователь с именем " + appUser.getUserName());
-            return "Приветствую! Чтобы посмотреть список доступных команд введите /help";
+            return "Приветствую, "+appUser.getUserName()+ "!\n {тут будет красивое вступление} \n Чтобы посмотреть список доступных команд введите /help";
 
         } else if(BUY.equals(serviceCommand)){
             appUser.setBuyUserState(CHANGE_STONKS);
@@ -118,6 +118,7 @@ public class MainServiceImpl implements MainService {
         return "Список доступных команд:\n"
                 + "/cancel - отмена выполнения текущей команды;\n"
                 + "/registration - регистрация пользователя;\n"
+                + "/wallet - получить информацию о вашем кошельке"
                 + "/buy - покупка ценной бумаги;\n"
                 + "/sell - продажа ценной бумаги";
     }
@@ -167,6 +168,7 @@ public class MainServiceImpl implements MainService {
                     .sellUserState(NOT_SELL)
                     .walletUserState(NOT_WALLET)
                     .build();
+            sendAnswer("Вас счет пополнен на 1000₽", update.getMessage().getChatId());
             return appUserDAO.save(transientAppUser);
         }
         return optional.get();

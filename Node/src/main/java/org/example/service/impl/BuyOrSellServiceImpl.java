@@ -71,8 +71,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
 
             long count = Long.parseLong(cmd);
             String newValue = appUser.getActiveBuy()+":"+count;
-            info ="Успешно куплено "+count+" акций";
-            //TODO изменить строчку сверху
+            info ="Покупка "+count+" "+parseStringFromBD(newValue, 2)+" ("+parseStringFromBD(newValue, 0)+") ";
             //TODO настроить Id  в базе данных
             appUser.setActiveBuy(newValue);
 
@@ -97,10 +96,11 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
             sendAnswer(info, chatId);
             sendAnswer("Какое количество акций вы хотите приобрести?", chatId);
             appUser.setBuyUserState(CHANGE_COUNT);
-            appUser.setActiveBuy(symbol+":"+cost);
+            appUser.setActiveBuy(symbol+":"+cost+":"+stockQuote.getShortName());
             appUserDAO.save(appUser);
         } else {
-            sendAnswer("Ценной бумаги с таким символом нет", chatId);
+            sendAnswer("Чат-бот не знаком с такой ценной бумаги. В ближайшее время мы попробуем добавить данную компанию в список доступных.", chatId);
+            //TODO добавить лог для записи, какие акции хотели купить
         }
     }
 
@@ -109,11 +109,11 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         if(cmd.equalsIgnoreCase("ДА")){
 
             String activeBuy = appUser.getActiveBuy();
-            int count = Integer.parseInt(parseStringFromBD(activeBuy, 2));
+            int count = Integer.parseInt(parseStringFromBD(activeBuy, 3));
             BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(parseStringFromBD(activeBuy, 1)));
             BigDecimal countFromUser = BigDecimal.valueOf(count);
 
-            createTable.addNoteAboutBuy("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeBuy, 0), count, LocalDateTime.now(), purchace);
+            createTable.addNoteAboutBuy("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeBuy, 0), count, LocalDateTime.now(), purchace, parseStringFromBD(activeBuy, 2));
             info = walletMain.topDownWallet(purchace.multiply(countFromUser), appUser);
             //TODO настроить текстовые ответы
 
@@ -138,7 +138,8 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
             String codeStocks =parseStringFromBD(temporaryValue, 0);
             Long someResult = createTable.checkAboutCountSell(count, "telegramuser_"+appUser.getTelegramUserId(), codeStocks);
             if(someResult>=0) {
-                info = "Успешно продано " + count + " акций " + parseStringFromBD(temporaryValue, 0);
+                info = "Продажа " + count + " акций " + parseStringFromBD(temporaryValue, 2)+"("+parseStringFromBD(temporaryValue, 0)+")";
+
                 sendAnswer(info, chatId);
                 sendAnswer("Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId);
                 appUser.setSellUserState(SELL_PROOF);
@@ -160,16 +161,17 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
                 BigDecimal cost = stockQuote.getPrevLegalClosePrice();
                 String symbol = stockQuote.getSecId();
                 sendAnswer("Выбрана акция " + cmd, chatId);
-                //TODO обработать сообщение снизу так как пользователь не имеет 3 акции
-                sendAnswer("Введите также количество акций, которое вы хотите продать. Сейчас у вас 3", chatId);
+                sendAnswer("Введите также количество акций, которое вы хотите продать. Сейчас у вас "+createTable.countOfTheBag("telegramuser_"+appUser.getTelegramUserId(), symbol), chatId);
                 appUser.setSellUserState(SELL_CHANGE_COUNT);
-                appUser.setActiveBuy(symbol + ":" + cost);
+                appUser.setActiveBuy(symbol + ":" + cost+":"+stockQuote.getShortName());
                 appUserDAO.save(appUser);
             } else {
-                sendAnswer("Данный код акции не видит Vantage", chatId);
+                sendAnswer("Чат-бот не знаком с такой ценной бумаги. Убедитесь, что вы хотите продать именно "+cmd+"\n Если окажется, что вас запрос верен, напишите нам в поддержку. \n Мы обязательно поможем", chatId);
+                createTable.getInfoAboutBag("telegramuser_"+appUser.getTelegramUserId());
             }
         } else {
-            sendAnswer("В твоем портфеле нет такой акции", chatId);
+            sendAnswer("Такой акции нет в вашем инвестиционном портфеле \n В следующем сообщении будут приведены акции, находящиеся в вашем портфеле", chatId);
+            createTable.getInfoAboutBag("telegramuser_"+appUser.getTelegramUserId());
         }
 
     }
@@ -203,8 +205,10 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         } else if (i==1) {
             return parts[1]; //стоимость
 
+        } else if (i==2){
+            return parts[2]; //shortname
         } else {
-            return parts[2]; //количество
+            return parts[3]; //количество
         }
     }
     private void sendAnswer(String output, Long chatId) {

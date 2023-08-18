@@ -1,6 +1,7 @@
 package org.example.service.impl;
 
 import lombok.extern.log4j.Log4j;
+import org.example.service.CallBackMainService;
 import org.example.service.ConsumerService;
 import org.example.service.MainService;
 import org.example.service.ProducerService;
@@ -16,10 +17,12 @@ import static broker.kartbllansh.model.RabbitQueue.*;
 public class ConsumerServiceImpl implements ConsumerService {
     private final MainService mainService;
     private final ProducerService producerService;
+    private final CallBackMainService callBackMainService;
 
-    public ConsumerServiceImpl(MainService mainService, ProducerService producerService) {
+    public ConsumerServiceImpl(MainService mainService, ProducerService producerService, CallBackMainService callBackMainService) {
         this.mainService = mainService;
         this.producerService = producerService;
+        this.callBackMainService = callBackMainService;
     }
 
     @Override
@@ -49,5 +52,11 @@ public class ConsumerServiceImpl implements ConsumerService {
         sendMessage.setChatId(update.getMessage().getChatId());
         sendMessage.setText("На данный момент бот не умеет работать с фотографиями. \n Напишите в поддержку, если у вас есть идеи для функционала. \n Спасибо! ");
         producerService.producerAnswer(sendMessage);
+    }
+    @Override
+    @RabbitListener(queues = CALLBACK_QUERY_UPDATE)
+    public void consumeCallBackUpdates(Update update){
+        log.info("Node ; CallBack is received");
+        callBackMainService.processCallBackQuery(update);
     }
 }

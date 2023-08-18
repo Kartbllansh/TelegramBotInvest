@@ -148,8 +148,8 @@ public class MainServiceImpl implements MainService {
     public void processPhotoMessage(Update update) {
 
     }
-
-    private AppUser findOrSaveAppUser(Update update){
+@Override
+    public AppUser findOrSaveAppUser(Update update){
         var telegramUser = update.getMessage().getFrom();
 
         var optional = appUserDAO.findByTelegramUserId(telegramUser.getId());

@@ -7,9 +7,13 @@ import org.example.jpa.entity.StockQuote;
 import org.example.service.*;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.example.entity.BuyUserState.*;
 import static org.example.entity.BuyUserState.NOT_BUY;
@@ -216,5 +220,29 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         sendMessage.setChatId(chatId);
         sendMessage.setText(output);
         producerService.producerAnswer(sendMessage);
+    }
+    private void sendAnswerWithInlineKeyboardYesOrNo(String output, long chatId){
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(output);
+        InlineKeyboardMarkup markupInLineKeyboard = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine = new ArrayList<>();
+
+        var yesButton = new InlineKeyboardButton();
+        yesButton.setText("Да");
+        yesButton.setCallbackData("YES_BUTTON");
+
+        var noButton = new InlineKeyboardButton();
+        noButton.setText("Нет");
+        noButton.setCallbackData("NO_BUTTON");
+
+        rowInLine.add(yesButton);
+        rowInLine.add(noButton);
+        rowsInLine.add(rowInLine);
+        markupInLineKeyboard.setKeyboard(rowsInLine);
+        sendMessage.setReplyMarkup(markupInLineKeyboard);
+
+
     }
 }

@@ -36,9 +36,15 @@ public class UpdateConroller {
 
         if (update.hasMessage()) {
             distributeMessagesByType(update);
+        } else if (update.hasCallbackQuery()) {
+            processCallBackQuery(update);
         } else {
             log.error("Unsupported message type is received: " + update);
         }
+    }
+
+    private void processCallBackQuery(Update update) {
+        updateProducer.produce(CALLBACK_QUERY_UPDATE, update);
     }
 
     private void distributeMessagesByType(Update update) {
@@ -69,12 +75,12 @@ public class UpdateConroller {
     }
     private void processPhotoMessage(Update update) {
         updateProducer.produce(PHOTO_MESSAGE_UPDATE, update);
-        setFileIsReceivedView(update);
+        //setFileIsReceivedView(update);
     }
 
     private void processDocMessage(Update update) {
         updateProducer.produce(DOC_MESSAGE_UPDATE, update);
-        setFileIsReceivedView(update);
+        //setFileIsReceivedView(update);
     }
 
     private void processTextMessage(Update update) {

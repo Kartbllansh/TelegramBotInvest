@@ -5,11 +5,14 @@ import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
 import org.example.enums.CommandService;
 import org.example.service.*;
+import org.example.utils.ButtonForKeyboard;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.example.entity.BuyUserState.*;
 import static org.example.entity.SellUserState.*;
@@ -105,9 +108,19 @@ public class MainServiceImpl implements MainService {
                 appUser.setSellUserState(SELL_CHANGE_STOCK);
                 appUserDAO.save(appUser);
                 sendAnswer(createTable.getInfoAboutBag("telegramUser_"+appUser.getTelegramUserId()), appUser.getTelegramUserId());
+                List<String> list = createTable.getAllKeysInBag("telegramUser_"+appUser.getTelegramUserId());
                 //TODO клавиатура с предложением какие акции продать
-                sendAnswer(appUser.getUserName()+", вы активировали команду /sell! \n"
-                        +"Введите ключ акции, которую хотите продать", chatId);
+                List<ButtonForKeyboard> buttonsList = new ArrayList<>();
+                String output = appUser.getUserName()+", вы активировали команду /sell! \n"
+                        +"Введите ключ акции, которую хотите продать";
+
+                for (String buttonText : list) {
+                    buttonsList.add(new ButtonForKeyboard(buttonText, buttonText));
+                }
+
+                buyOrSellService.sendAnswerWithInlineKeyboard(output, chatId, buttonsList.toArray(new ButtonForKeyboard[0]));
+                //sendAnswer(appUser.getUserName()+", вы активировали команду /sell! \n"
+                     //   +"Введите ключ акции, которую хотите продать", chatId);
                 break;
             case WALLET_MONEY:
                 appUser.setWalletUserState(WALLET_CHANGE_CMD);
@@ -118,8 +131,8 @@ public class MainServiceImpl implements MainService {
                         +" * /look_balance - посмотрите, сколько у вас на счету денег", chatId);
                 break;
             default:
-                sendAnswer("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId);
-                //TODO добавить в клавиатуру Inline command help
+                //sendAnswer("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId);
+                buyOrSellService.sendAnswerWithInlineKeyboard("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId, new ButtonForKeyboard("Help", "HELP_COMMAND"));
                 break;
         }
 
@@ -180,7 +193,6 @@ public class MainServiceImpl implements MainService {
                     .sellUserState(NOT_SELL)
                     .walletUserState(NOT_WALLET)
                     .build();
-            sendAnswer("Вас счет пополнен на 1000₽", update.getMessage().getChatId());
             return appUserDAO.save(transientAppUser);
         }
         return optional.get();

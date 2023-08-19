@@ -159,3 +159,21 @@ ERROR 2023-08-19 18:18:03 TelegramBot:87 org.telegram.telegrambots.meta.exceptio
 ERROR 2023-08-19 18:21:01 TelegramBot:87 org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException: Text parameter can't be empty in method: SendMessage(chatId=534271654, messageThreadId=null, text=, parseMode=null, disableWebPagePreview=null, disableNotification=null, replyToMessageId=null, replyMarkup=null, entities=null, allowSendingWithoutReply=null, protectContent=null)
 ERROR 2023-08-19 18:22:49 TelegramBot:87 org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException: Text parameter can't be empty in method: SendMessage(chatId=534271654, messageThreadId=null, text=, parseMode=null, disableWebPagePreview=null, disableNotification=null, replyToMessageId=null, replyMarkup=null, entities=null, allowSendingWithoutReply=null, protectContent=null)
 ERROR 2023-08-19 18:25:23 TelegramBot:87 org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException: Text parameter can't be empty in method: SendMessage(chatId=534271654, messageThreadId=null, text=, parseMode=null, disableWebPagePreview=null, disableNotification=null, replyToMessageId=null, replyMarkup=null, entities=null, allowSendingWithoutReply=null, protectContent=null)
+INFO  2023-08-19 21:28:11 TelegramBot:34 Constructor-token work
+INFO  2023-08-19 21:28:11 TelegramBot:39 check username
+INFO  2023-08-19 21:28:12 TelegramBot:39 check username
+INFO  2023-08-19 21:28:12 TelegramBot:39 check username
+INFO  2023-08-19 21:28:12 TelegramBot:39 check username
+INFO  2023-08-19 21:28:12 Main:16 Main.class running...
+INFO  2023-08-19 21:34:20 TelegramBot:34 Constructor-token work
+INFO  2023-08-19 21:34:20 TelegramBot:39 check username
+INFO  2023-08-19 21:34:22 TelegramBot:39 check username
+INFO  2023-08-19 21:34:22 TelegramBot:39 check username
+INFO  2023-08-19 21:34:22 TelegramBot:39 check username
+INFO  2023-08-19 21:34:22 Main:16 Main.class running...
+INFO  2023-08-19 21:59:44 TelegramBot:34 Constructor-token work
+INFO  2023-08-19 21:59:44 TelegramBot:39 check username
+INFO  2023-08-19 21:59:45 TelegramBot:39 check username
+INFO  2023-08-19 21:59:45 TelegramBot:39 check username
+INFO  2023-08-19 21:59:45 TelegramBot:39 check username
+INFO  2023-08-19 21:59:46 Main:16 Main.class running...

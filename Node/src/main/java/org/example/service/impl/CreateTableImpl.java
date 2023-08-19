@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -93,6 +94,20 @@ public class CreateTableImpl implements CreateTable {
                 result.append(codeStock).append(" - в количестве ").append(countStock).append(" акций, купленных по цене ").append(price).append("\n");
             }
             return result.toString();
+        }
+    }
+    public List<String> getAllKeysInBag(String tableName){
+        List<String> list = new ArrayList<>();
+        String sql = "SELECT * FROM " + tableName;
+        List<Stocks> bags = jdbcTemplate.query(sql, new StocksRowMapper());
+        if (bags.isEmpty()) {
+            return null;
+        } else {
+            for (Stocks stocks : bags) {
+                String codeStock = stocks.getCodeStock();
+                list.add(codeStock);
+            }
+            return list;
         }
     }
 

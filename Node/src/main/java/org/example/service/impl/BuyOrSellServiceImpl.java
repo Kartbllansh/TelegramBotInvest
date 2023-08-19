@@ -239,16 +239,18 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         sendMessage.setText(output);
         InlineKeyboardMarkup markupInLineKeyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine = new ArrayList<>();
 
         for (ButtonForKeyboard button : buttons) {
             InlineKeyboardButton inlineButton = new InlineKeyboardButton();
             inlineButton.setText(button.getText());
             inlineButton.setCallbackData(button.getCallbackData());
 
-            List<InlineKeyboardButton> rowInLine = new ArrayList<>();
+
             rowInLine.add(inlineButton);
-            rowsInLine.add(rowInLine);
+
         }
+        rowsInLine.add(rowInLine);
 
         markupInLineKeyboard.setKeyboard(rowsInLine);
         sendMessage.setReplyMarkup(markupInLineKeyboard);

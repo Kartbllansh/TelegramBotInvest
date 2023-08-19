@@ -2,6 +2,7 @@ package org.example.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface CreateTable {
     void createTable(String name);
@@ -13,4 +14,5 @@ public interface CreateTable {
     Boolean checkAboutCodeStock(String tableName, String codeStock);
 
     Long countOfTheBag(String tableName, String codeStock);
+    List<String> getAllKeysInBag(String tableName);
 }

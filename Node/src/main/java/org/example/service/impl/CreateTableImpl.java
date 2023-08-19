@@ -44,11 +44,11 @@ public class CreateTableImpl implements CreateTable {
             BigDecimal withDivide = averagePurchasePrice.divide(BigDecimal.valueOf(count+stock.getCountStock()), RoundingMode.HALF_UP);
             stock.setCountStock(stock.getCountStock()+count);
             String sqlUpdate = "UPDATE " + tableName + " SET count_stonks = ?, time_buy = ?, purchase_stonks = ?, shortName = ? WHERE code_stocks = ?";
-            jdbcTemplate.update(sqlUpdate, stock.getCountStock(), LocalDateTime.now(), withDivide, key);
+            jdbcTemplate.update(sqlUpdate, stock.getCountStock(), LocalDateTime.now(), withDivide, shortName, key);
             //TODO цена покупки до сих пор в целых числах
 
         } else {
-            String sql = "INSERT INTO " + tableName + " (code_stocks, count_stonks, time_buy, purchase_stonks) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO " + tableName + " (code_stocks, count_stonks, time_buy, purchase_stonks, shortName) VALUES (?, ?, ?, ?, ?)";
             jdbcTemplate.update(sql, key, count, localDateTime, purchase, shortName);
             log.info("Добавлена запись в таблицу " + tableName);
         }
@@ -117,4 +117,6 @@ public class CreateTableImpl implements CreateTable {
         String sql = "SELECT count_stonks FROM " + tableName + " WHERE code_stocks = ?";
         return jdbcTemplate.queryForObject(sql, Long.class, codeStock);
     }
+
+
 }

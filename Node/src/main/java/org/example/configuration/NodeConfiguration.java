@@ -1,6 +1,6 @@
 package org.example.configuration;
 
-import org.example.service.StocksInformationService;
+import org.example.utils.ButtonForKeyboard;
 import org.example.utils.CryptoTool;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +14,10 @@ public class NodeConfiguration {
     @Bean
     public CryptoTool getCryptoTool() {
         return new CryptoTool(salt);
+    }
+    @Bean
+    public ButtonForKeyboard buttonForKeyboard() {
+        return new ButtonForKeyboard("Button Text", "Button Callback Data");
     }
 
 }

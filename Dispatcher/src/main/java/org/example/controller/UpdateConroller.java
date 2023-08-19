@@ -5,8 +5,9 @@ import org.example.service.UpdateProducer;
 import org.example.utils.MessageUtils;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
-
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 
 import static broker.kartbllansh.model.RabbitQueue.*;
@@ -67,6 +68,13 @@ public class UpdateConroller {
 
     public void setView(SendMessage sendMessage) {
         telegramBot.sendAnswerMessage(sendMessage);
+    }
+    public void setViewWithCallBack(EditMessageText editMessageText){
+        try {
+            telegramBot.execute(editMessageText);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
     private void setFileIsReceivedView(Update update) {
         var sendMessage = messageUtils.generateSendMessageWithText(update,

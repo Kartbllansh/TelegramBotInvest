@@ -35,4 +35,12 @@ public class RabbitConfiguration {
     public Queue answerMessageQueue() {
         return new Queue(ANSWER_MESSAGE);
     }
+    @Bean
+    public Queue callBackQuery(){
+        return new Queue(CALLBACK_QUERY_UPDATE);
+    }
+    @Bean
+    public Queue answerCallBackQuery(){
+        return new Queue(ANSWER_CALLBACK_ANSWER);
+    }
 }

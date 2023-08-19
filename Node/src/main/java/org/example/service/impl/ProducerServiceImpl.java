@@ -5,7 +5,9 @@ import org.example.service.ProducerService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 
+import static broker.kartbllansh.model.RabbitQueue.ANSWER_CALLBACK_ANSWER;
 import static broker.kartbllansh.model.RabbitQueue.ANSWER_MESSAGE;
 
 @Service
@@ -20,5 +22,10 @@ public class ProducerServiceImpl  implements ProducerService {
     @Override
     public void producerAnswer(SendMessage sendMessage) {
       rabbitTemplate.convertAndSend(ANSWER_MESSAGE, sendMessage );
+    }
+
+    @Override
+    public void producerAnswerWithCallBack(EditMessageText editMessageText) {
+        rabbitTemplate.convertAndSend(ANSWER_CALLBACK_ANSWER, editMessageText);
     }
 }

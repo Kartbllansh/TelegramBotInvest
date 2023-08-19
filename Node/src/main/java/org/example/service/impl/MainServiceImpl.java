@@ -60,58 +60,69 @@ public class MainServiceImpl implements MainService {
             } else if (!NOT_WALLET.equals(walletUserState)) {
                 walletService.onActiveWallet(appUser, text, chatId);
             } else {
-                output = processServiceCommand(appUser, text);
+                processServiceCommand(appUser, text, chatId);
             }
 
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
             output = appUserService.setEmail(appUser, text);
+            sendAnswer(output, chatId);
         } else {
             log.error("Unknown user state: " + userState);
             output = "Неизвестная ошибка! \n"
                     +  "Введите /cancel и попробуйте снова! \n"
                     +"Либо введите /help и посмотрите допустимые команды";
+            sendAnswer(output, chatId);
         }
 
-        sendAnswer(output, chatId);
+
 
 
 
     }
 
-
-    private String processServiceCommand(AppUser appUser, String cmd) {
+    //TODO создание адекватного процесса авторизации
+    private void processServiceCommand(AppUser appUser, String cmd, long chatId) {
         var serviceCommand = CommandService.fromValue(cmd);
-        if (REGISTRATION.equals(serviceCommand)) {
-            log.info("Регистрация пользователя "+appUser.getUserName()+" с почтой "+appUser.getEmail());
-            return appUserService.registerUser(appUser);
-        } else if (HELP.equals(serviceCommand)) {
-            return help();
-        } else if (START.equals(serviceCommand)) {
-            log.info("Новый пользователь с именем " + appUser.getUserName());
-            return "Приветствую, "+appUser.getUserName()+ "!\n {тут будет красивое вступление} \n Чтобы посмотреть список доступных команд введите /help";
-
-        } else if(BUY.equals(serviceCommand)){
-            appUser.setBuyUserState(CHANGE_STONKS);
-            appUserDAO.save(appUser);
-            return appUser.getUserName()+", вы активировали команду /buy! \n"
-                            +"Введите код акции, которую хотите купить";
-        } else if (SELL.equals(serviceCommand)) {
-            appUser.setSellUserState(SELL_CHANGE_STOCK);
-            appUserDAO.save(appUser);
-            sendAnswer(createTable.getInfoAboutBag("telegramUser_"+appUser.getTelegramUserId()), appUser.getTelegramUserId());
-            return appUser.getUserName()+", вы активировали команду /sell! \n"
-                    +"Введите ключ акции, которую хотите продать";
-
-        } else if (WALLET_MONEY.equals(serviceCommand)) {
-            appUser.setWalletUserState(WALLET_CHANGE_CMD);
-            appUserDAO.save(appUser);
-            return appUser.getUserName()+", Вы активировали команду, позволящую работать с балансом на вашем кошельке. \n"
-                    +"Выберите какую из команд вы хотели бы использовать: \n"
-                    +"* /top_up - пополните баланс \n"
-                    +" * /look_balance - посмотрите, сколько у вас на счету денег";
-        } else {
-            return "Неизвестная команда! Чтобы посмотреть список доступных команд введите /help";
+        switch (serviceCommand){
+            case START:
+                log.info("Новый пользователь с именем " + appUser.getUserName());
+                sendAnswer("Приветствую, "+appUser.getUserName()+ "!\n {тут будет красивое вступление} \n Чтобы посмотреть список доступных команд введите /help", chatId);
+                break;
+            case REGISTRATION:
+                log.info("Регистрация пользователя "+appUser.getUserName()+" с почтой "+appUser.getEmail());
+                sendAnswer(appUserService.registerUser(appUser), chatId);
+                break;
+            case HELP:
+                sendAnswer(help(), chatId);
+                break;
+            case BUY:
+                appUser.setBuyUserState(CHANGE_STONKS);
+                appUserDAO.save(appUser);
+                sendAnswer(appUser.getUserName()+", вы активировали команду /buy! \n"
+                        +"Введите код акции, которую хотите купить", chatId);
+                break;
+            case SELL:
+                appUser.setSellUserState(SELL_CHANGE_STOCK);
+                appUserDAO.save(appUser);
+                sendAnswer(createTable.getInfoAboutBag("telegramUser_"+appUser.getTelegramUserId()), appUser.getTelegramUserId());
+                //TODO клавиатура с предложением какие акции продать
+                sendAnswer(appUser.getUserName()+", вы активировали команду /sell! \n"
+                        +"Введите ключ акции, которую хотите продать", chatId);
+                break;
+            case WALLET_MONEY:
+                appUser.setWalletUserState(WALLET_CHANGE_CMD);
+                appUserDAO.save(appUser);
+                sendAnswer(appUser.getUserName()+", Вы активировали команду, позволящую работать с балансом на вашем кошельке. \n"
+                        +"Выберите какую из команд вы хотели бы использовать: \n"
+                        +"* /top_up - пополните баланс \n"
+                        +" * /look_balance - посмотрите, сколько у вас на счету денег", chatId);
+                break;
+            default:
+                sendAnswer("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId);
+                //TODO добавить в клавиатуру Inline command help
+                break;
         }
+
     }
 
     private String help() {
@@ -150,6 +161,7 @@ public class MainServiceImpl implements MainService {
     }
 @Override
     public AppUser findOrSaveAppUser(Update update){
+
         var telegramUser = update.getMessage().getFrom();
 
         var optional = appUserDAO.findByTelegramUserId(telegramUser.getId());

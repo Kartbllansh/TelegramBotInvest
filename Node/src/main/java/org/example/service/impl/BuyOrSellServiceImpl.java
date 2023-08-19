@@ -5,6 +5,7 @@ import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
 import org.example.jpa.entity.StockQuote;
 import org.example.service.*;
+import org.example.utils.ButtonForKeyboard;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -82,8 +83,9 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         } else {
             info = "Введено неправильно значение. Бот ожидает число.";
         }
+        //TODO исправить проблемы с логикой
         sendAnswer(info, chatId);
-        sendAnswer("Подтверждение! Если вы подтверждаете покупку введите Да, если отменяете Нет", chatId);
+        sendAnswerWithInlineKeyboard("Подтверждение! Если вы подтверждаете покупку введите Да, если отменяете Нет", chatId, new ButtonForKeyboard("Да", "YES_BUTTON_BUY"), new ButtonForKeyboard("Нет", "NO_BUTTON_BUY"));
         appUser.setBuyUserState(BUY_PROOF);
         appUserDAO.save(appUser);
     }
@@ -111,18 +113,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
     private void buyProof(AppUser appUser, String cmd, Long chatId){
         String info = "";
         if(cmd.equalsIgnoreCase("ДА")){
-
-            String activeBuy = appUser.getActiveBuy();
-            int count = Integer.parseInt(parseStringFromBD(activeBuy, 3));
-            BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(parseStringFromBD(activeBuy, 1)));
-            BigDecimal countFromUser = BigDecimal.valueOf(count);
-
-            createTable.addNoteAboutBuy("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeBuy, 0), count, LocalDateTime.now(), purchace, parseStringFromBD(activeBuy, 2));
-            info = walletMain.topDownWallet(purchace.multiply(countFromUser), appUser);
-            //TODO настроить текстовые ответы
-
-            appUser.setBuyUserState(NOT_BUY);
-            appUserDAO.save(appUser);
+        info = buyProofYes(appUser);
         } else if (cmd.equalsIgnoreCase("НЕТ")) {
             info = "Сделка отменена. Если захотите опять что-то купить введите команду /buy";
             appUser.setBuyUserState(NOT_BUY);
@@ -131,6 +122,22 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
             info = "Введите Да или Нет. Или же команду /cancel";
         }
         sendAnswer(info, chatId);
+    }
+    //TODO заранее проверка о возможности покупки
+    @Override
+    public String buyProofYes(AppUser appUser){
+        String activeBuy = appUser.getActiveBuy();
+        int count = Integer.parseInt(parseStringFromBD(activeBuy, 3));
+        BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(parseStringFromBD(activeBuy, 1)));
+        BigDecimal countFromUser = BigDecimal.valueOf(count);
+
+        createTable.addNoteAboutBuy("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeBuy, 0), count, LocalDateTime.now(), purchace, parseStringFromBD(activeBuy, 2));
+        String info = "Покупка выполнена успешна! \n"+ walletMain.topDownWallet(purchace.multiply(countFromUser), appUser);
+        //TODO настроить текстовые ответы
+
+        appUser.setBuyUserState(NOT_BUY);
+        appUserDAO.save(appUser);
+        return info;
     }
 
     private void sellChangeCount(AppUser appUser, String cmd, Long chatId){
@@ -145,7 +152,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
                 info = "Продажа " + count + " акций " + parseStringFromBD(temporaryValue, 2)+"("+parseStringFromBD(temporaryValue, 0)+")";
 
                 sendAnswer(info, chatId);
-                sendAnswer("Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId);
+                sendAnswerWithInlineKeyboard("Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId, new ButtonForKeyboard("Да", "YES_BUTTON_SELL"), new ButtonForKeyboard("Нет", "NO_BUTTON_SELL"));
                 appUser.setSellUserState(SELL_PROOF);
                 appUser.setActiveBuy(temporaryValue + ":" + count);
                 appUserDAO.save(appUser);
@@ -183,17 +190,9 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
     private void sellProof(AppUser appUser, String cmd, Long chatId){
         String info = "";
         if(cmd.equalsIgnoreCase("ДА")){
-            String activeSell = appUser.getActiveBuy();
-            int count = Integer.parseInt(parseStringFromBD(activeSell, 3));
-            BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(parseStringFromBD(activeSell, 1)));
-            BigDecimal countFromUser = BigDecimal.valueOf(count);
-
-            createTable.addNoteAboutSell("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeSell, 0), count);
-            info = walletMain.topUpWallet(countFromUser.multiply(purchace), appUser);
-            appUser.setSellUserState(NOT_SELL);
-            appUserDAO.save(appUser);
+           info =  sellProofYes(appUser);
         } else if (cmd.equalsIgnoreCase("НЕТ")) {
-            info = "Сделка отменена. Если захотите опять что-то купить введите команду /buy";
+            info = "Сделка отменена. Если захотите опять что-то продать введите команду /buy";
             appUser.setSellUserState(NOT_SELL);
             appUserDAO.save(appUser);
         } else {
@@ -201,6 +200,19 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         }
         sendAnswer(info, chatId);
     }
+    public String sellProofYes(AppUser appUser){
+        String activeSell = appUser.getActiveBuy();
+        int count = Integer.parseInt(parseStringFromBD(activeSell, 3));
+        BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(parseStringFromBD(activeSell, 1)));
+        BigDecimal countFromUser = BigDecimal.valueOf(count);
+
+        createTable.addNoteAboutSell("telegramuser_"+appUser.getTelegramUserId(), parseStringFromBD(activeSell, 0), count);
+        String info = walletMain.topUpWallet(countFromUser.multiply(purchace), appUser);
+        appUser.setSellUserState(NOT_SELL);
+        appUserDAO.save(appUser);
+        return info;
+    }
+
 
     private String parseStringFromBD(String s, int i){
         String[] parts = s.split(":");
@@ -221,28 +233,25 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         sendMessage.setText(output);
         producerService.producerAnswer(sendMessage);
     }
-    private void sendAnswerWithInlineKeyboardYesOrNo(String output, long chatId){
+    public void sendAnswerWithInlineKeyboard(String output, long chatId, ButtonForKeyboard... buttons) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(output);
         InlineKeyboardMarkup markupInLineKeyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
-        List<InlineKeyboardButton> rowInLine = new ArrayList<>();
 
-        var yesButton = new InlineKeyboardButton();
-        yesButton.setText("Да");
-        yesButton.setCallbackData("YES_BUTTON");
+        for (ButtonForKeyboard button : buttons) {
+            InlineKeyboardButton inlineButton = new InlineKeyboardButton();
+            inlineButton.setText(button.getText());
+            inlineButton.setCallbackData(button.getCallbackData());
 
-        var noButton = new InlineKeyboardButton();
-        noButton.setText("Нет");
-        noButton.setCallbackData("NO_BUTTON");
+            List<InlineKeyboardButton> rowInLine = new ArrayList<>();
+            rowInLine.add(inlineButton);
+            rowsInLine.add(rowInLine);
+        }
 
-        rowInLine.add(yesButton);
-        rowInLine.add(noButton);
-        rowsInLine.add(rowInLine);
         markupInLineKeyboard.setKeyboard(rowsInLine);
         sendMessage.setReplyMarkup(markupInLineKeyboard);
-
-
+        producerService.producerAnswer(sendMessage);
     }
 }

@@ -62,10 +62,11 @@ public class MainServiceImpl implements MainService {
                 buyOrSellService.onActionBuy(appUser, text, chatId, messageId);
             } else if (!NOT_SELL.equals(sellUserState)) {
                 buyOrSellService.onActionSell(appUser, text, chatId, messageId);
+
             } else if (!NOT_WALLET.equals(walletUserState)) {
-                walletService.onActiveWallet(appUser, text, chatId);
+                walletService.onActiveWallet(appUser, text, chatId, messageId);
             } else {
-                processServiceCommand(appUser, text, chatId);
+                processServiceCommand(appUser, text, chatId, messageId);
             }
 
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
@@ -86,7 +87,7 @@ public class MainServiceImpl implements MainService {
     }
 
     //TODO создание адекватного процесса авторизации
-    private void processServiceCommand(AppUser appUser, String cmd, long chatId) {
+    private void processServiceCommand(AppUser appUser, String cmd, long chatId, long messageId) {
         var serviceCommand = CommandService.fromValue(cmd);
         if(serviceCommand==null){
             utilsService.sendMessageAnswerWithInlineKeyboard("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId, new ButtonForKeyboard("Help", "HELP_COMMAND"));
@@ -129,10 +130,10 @@ public class MainServiceImpl implements MainService {
             case WALLET_MONEY:
                 appUser.setWalletUserState(WALLET_CHANGE_CMD);
                 appUserDAO.save(appUser);
-                utilsService.sendAnswer(appUser.getUserName()+", Вы активировали команду, позволящую работать с балансом на вашем кошельке. \n"
+                utilsService.sendEditMessageAnswerWithInlineKeyboard(appUser.getUserName()+", Вы активировали команду, позволящую работать с балансом на вашем кошельке. \n"
                         +"Выберите какую из команд вы хотели бы использовать: \n"
                         +"* /top_up - пополните баланс \n"
-                        +" * /look_balance - посмотрите, сколько у вас на счету денег", chatId);
+                        +" * /look_balance - посмотрите, сколько у вас на счету денег", chatId, messageId, new ButtonForKeyboard("Пополнить", "TOP_UP_COMMAND"), new ButtonForKeyboard("Посмотреть", "LOOK_BALANCE_COMMAND"));
                 break;
             default:
                 //sendAnswer("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId);

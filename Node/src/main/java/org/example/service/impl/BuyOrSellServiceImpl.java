@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 import static org.example.entity.BuyUserState.*;
@@ -84,8 +85,9 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
                 appUser.setBuyUserState(BUY_PROOF);
                 appUserDAO.save(appUser);
             } else {
+                BigInteger abilCount = utilsService.countHowMuchStock(newValue,appUser);
                 //TODO добавить кнопки, чтобы пользователь мог понять почему ему не хватило средств
-               utilsService.sendEditMessageAnswerWithInlineKeyboard("Вам не хватает средств на "+count+" акций", chatId, messageId);
+               utilsService.sendEditMessageAnswerWithInlineKeyboard("Вам не хватает средств на "+count+" акций. \n На вашем счету на данный момент "+walletMain.toKnowBalance(appUser)+", а совершить покупку вы хотите на сумму "+utilsService.countSummaPurchase(newValue)+"\n Вы можете купить "+abilCount+" акций "+utilsService.parseStringFromBD(newValue, 2), chatId, messageId, new ButtonForKeyboard("Купить " +abilCount+" акций", abilCount.toString()), new ButtonForKeyboard("Отменить покупку", "CANCEL"));
             }
         } else {
             info = "Введено неправильно значение. Бот ожидает число.";
@@ -126,7 +128,6 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         }
         utilsService.sendAnswer(info, chatId);
     }
-    //TODO заранее проверка о возможности покупки
     @Override
     public String buyProofYes(AppUser appUser){
         String activeBuy = appUser.getActiveBuy();
@@ -144,7 +145,6 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
     }
 //TODO replyKeyboard возможность отменить команды
     private void sellChangeCount(AppUser appUser, String cmd, Long chatId){
-        //TODO на данный момент программа не проверяет на моменте выбора количества акций возможность покупки
         String info = "";
         if (cmd.trim().matches("\\d+")){
             long count = Long.parseLong(cmd);

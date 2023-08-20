@@ -22,6 +22,8 @@ private final AppUserDAO appUserDAO;
         return "На вашем счету на данный момент "+balance+"₽";
     }
 
+
+
     @Override
     public String topUpWallet(BigDecimal summa, AppUser appUser) {
         // Проверка, что переданная сумма положительна

@@ -4,6 +4,7 @@ import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
 import org.example.service.ProducerService;
 import org.example.service.UtilsService;
+import org.example.service.WalletMain;
 import org.example.utils.ButtonForKeyboard;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -12,6 +13,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +54,15 @@ public class UtilsServiceImpl implements UtilsService {
         sendMessage.setText(output);
         producerService.producerAnswer(sendMessage);
 
+    }
+
+    @Override
+    public void sendEditMessageAnswer(String output, Long chatId, long messageId) {
+      EditMessageText editMessageText = new EditMessageText();
+      editMessageText.setMessageId((int) messageId);
+      editMessageText.setChatId(chatId);
+      editMessageText.setText(output);
+      producerService.producerAnswerWithCallBack(editMessageText);
     }
 
     private InlineKeyboardMarkup doButtonInlineKeyboard(ButtonForKeyboard... buttons) {
@@ -124,5 +135,15 @@ public class UtilsServiceImpl implements UtilsService {
         BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(parseStringFromBD(activeBuy, 1)));
         BigDecimal countFromUser = BigDecimal.valueOf(count);
         return purchace.multiply(countFromUser);
+    }
+
+    @Override
+    public BigInteger countHowMuchStock(String activeBuy, AppUser appUser) {
+        BigDecimal balance = appUser.getWalletMoney();
+        BigDecimal purchase = BigDecimal.valueOf(Double.parseDouble(parseStringFromBD(activeBuy, 1)));
+        BigDecimal result = balance.divideToIntegralValue(purchase);
+
+        return result.toBigInteger();
+
     }
 }

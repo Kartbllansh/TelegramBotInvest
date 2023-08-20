@@ -2,6 +2,7 @@ package org.example.service.impl;
 
 import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
+import org.example.entity.WalletUserState;
 import org.example.jpa.entity.StockQuote;
 import org.example.service.*;
 import org.example.utils.ButtonForKeyboard;
@@ -9,8 +10,11 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import java.math.BigDecimal;
+
+import static org.example.entity.BuyUserState.BUY_PROOF;
 import static org.example.entity.BuyUserState.NOT_BUY;
 import static org.example.entity.SellUserState.*;
+import static org.example.entity.WalletUserState.WALLET_TOP_UP_CHANGE_COUNT;
 
 @Service
 public class CallBackMainServiceImpl implements CallBackMainService {
@@ -20,9 +24,10 @@ public class CallBackMainServiceImpl implements CallBackMainService {
     private final StockService stockService;
     private final CreateTable createTable;
     private final UtilsService utilsService;
+    private final WalletMain walletMain;
 
 
-    public CallBackMainServiceImpl(ProducerService producerService, AppUserDAO appUserDAO, BuyOrSellService buyOrSellService, StockService stockService, CreateTable createTable, UtilsService utilsService) {
+    public CallBackMainServiceImpl(ProducerService producerService, AppUserDAO appUserDAO, BuyOrSellService buyOrSellService, StockService stockService, CreateTable createTable, UtilsService utilsService, WalletMain walletMain) {
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
 
@@ -30,6 +35,7 @@ public class CallBackMainServiceImpl implements CallBackMainService {
         this.stockService = stockService;
         this.createTable = createTable;
         this.utilsService = utilsService;
+        this.walletMain = walletMain;
     }
 
     @Override
@@ -38,12 +44,21 @@ public class CallBackMainServiceImpl implements CallBackMainService {
     long messageId = update.getCallbackQuery().getMessage().getMessageId();
     long chatId = update.getCallbackQuery().getMessage().getChatId();
     String callBackData = update.getCallbackQuery().getData();
+
     if(callBackData.equals("CANCEL")){
     utilsService.cancelProcess(appUser);
     }
 
-    if(!appUser.getSellUserState().equals(NOT_SELL)){
+        if(!appUser.getSellUserState().equals(NOT_SELL)){
         processSell(appUser, messageId, chatId, callBackData);
+
+        if(!appUser.getBuyUserState().equals(NOT_BUY)){
+            processBuy(appUser, messageId, chatId, callBackData);
+        }
+
+        if(!appUser.getWalletUserState().equals(WalletUserState.NOT_WALLET)){
+            processWallet(appUser, messageId, chatId, callBackData);
+        }
     }
         switch (callBackData) {
             case "YES_BUTTON_BUY":
@@ -60,6 +75,35 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                 break;
             case "HELP_COMMAND":
                 producerService.producerAnswerWithCallBack(doEditMessage(messageId,chatId, utilsService.help()));
+                break;
+        }
+    }
+
+    private void processWallet(AppUser appUser, long messageId, long chatId, String callBackData) {
+        switch (appUser.getWalletUserState()){
+            case WALLET_CHANGE_CMD:
+                if(callBackData.equals("TOP_UP_COMMAND")){
+                    utilsService.sendEditMessageAnswer("Введите сумму, на которую хотите увеличить свой счет", chatId, messageId);
+                    appUser.setWalletUserState(WALLET_TOP_UP_CHANGE_COUNT);
+                    appUserDAO.save(appUser);
+                } else {
+                    String infoAboutBalance = walletMain.toKnowBalance(appUser);
+                    //utilsService.sendAnswer(infoAboutBalance, chatId);
+                    utilsService.sendEditMessageAnswer(infoAboutBalance, chatId, messageId);
+                }
+                break;
+        }
+    }
+
+    private void processBuy(AppUser appUser, long messageId, long chatId, String callBackData) {
+        switch (appUser.getBuyUserState()){
+            case CHANGE_COUNT:
+                String newValue = appUser.getActiveBuy()+":"+callBackData;
+                String info ="Покупка "+callBackData+" "+utilsService.parseStringFromBD(newValue, 2)+" ("+utilsService.parseStringFromBD(newValue, 0)+") ";
+                utilsService.sendEditMessageAnswerWithInlineKeyboard(info+"\n Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId,messageId, new ButtonForKeyboard("Да", "YES_BUTTON_SELL"), new ButtonForKeyboard("Нет", "NO_BUTTON_SELL"));
+                appUser.setActiveBuy(newValue);
+                appUser.setBuyUserState(BUY_PROOF);
+                appUserDAO.save(appUser);
                 break;
         }
     }

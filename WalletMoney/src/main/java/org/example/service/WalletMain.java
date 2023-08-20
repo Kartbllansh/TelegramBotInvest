@@ -9,4 +9,5 @@ public interface WalletMain {
     String topUpWallet(BigDecimal summa, AppUser appUser);
     //Todo придумать еще идеи к методам
     String topDownWallet(BigDecimal summa, AppUser appUser);
+    boolean checkAbilityBuy(BigDecimal summa, AppUser appUser);
 }

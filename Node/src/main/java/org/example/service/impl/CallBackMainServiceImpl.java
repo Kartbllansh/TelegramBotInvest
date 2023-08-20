@@ -6,19 +6,11 @@ import org.example.jpa.entity.StockQuote;
 import org.example.service.*;
 import org.example.utils.ButtonForKeyboard;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.example.entity.BuyUserState.NOT_BUY;
-import static org.example.entity.SellUserState.NOT_SELL;
-import static org.example.entity.SellUserState.SELL_CHANGE_COUNT;
+import static org.example.entity.SellUserState.*;
 
 @Service
 public class CallBackMainServiceImpl implements CallBackMainService {
@@ -27,15 +19,17 @@ public class CallBackMainServiceImpl implements CallBackMainService {
     private final BuyOrSellService buyOrSellService;
     private final StockService stockService;
     private final CreateTable createTable;
+    private final UtilsService utilsService;
 
 
-    public CallBackMainServiceImpl(ProducerService producerService, AppUserDAO appUserDAO, BuyOrSellService buyOrSellService, StockService stockService, CreateTable createTable) {
+    public CallBackMainServiceImpl(ProducerService producerService, AppUserDAO appUserDAO, BuyOrSellService buyOrSellService, StockService stockService, CreateTable createTable, UtilsService utilsService) {
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
 
         this.buyOrSellService = buyOrSellService;
         this.stockService = stockService;
         this.createTable = createTable;
+        this.utilsService = utilsService;
     }
 
     @Override
@@ -44,6 +38,10 @@ public class CallBackMainServiceImpl implements CallBackMainService {
     long messageId = update.getCallbackQuery().getMessage().getMessageId();
     long chatId = update.getCallbackQuery().getMessage().getChatId();
     String callBackData = update.getCallbackQuery().getData();
+    if(callBackData.equals("CANCEL")){
+    utilsService.cancelProcess(appUser);
+    }
+
     if(!appUser.getSellUserState().equals(NOT_SELL)){
         processSell(appUser, messageId, chatId, callBackData);
     }
@@ -61,12 +59,7 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                 processNoButtonSell(appUser, messageId, chatId);
                 break;
             case "HELP_COMMAND":
-                producerService.producerAnswerWithCallBack(doEditMessage(messageId,chatId, "Список доступных команд:\n"
-                        + "/cancel - отмена выполнения текущей команды;\n"
-                        + "/registration - регистрация пользователя;\n"
-                        + "/wallet - получить информацию о вашем кошельке"
-                        + "/buy - покупка ценной бумаги;\n"
-                        + "/sell - продажа ценной бумаги"));
+                producerService.producerAnswerWithCallBack(doEditMessage(messageId,chatId, utilsService.help()));
                 break;
         }
     }
@@ -74,24 +67,39 @@ public class CallBackMainServiceImpl implements CallBackMainService {
     private void processSell(AppUser appUser, long messageId, long chatId, String callBackData) {
         switch (appUser.getSellUserState()){
             case SELL_CHANGE_STOCK:
+                if (callBackData.equals("LIST_OWN_STOCK")){
+                    String output = createTable.getInfoAboutBag("telegramUser_"+appUser.getTelegramUserId());
+                    utilsService.sendEditMessageAnswerWithInlineKeyboard(output, chatId, messageId, new ButtonForKeyboard("Отмена продажи", "CANCEL"));
+                }
+
+
                 StockQuote stockQuote = stockService.getInfoAboutTicket(callBackData);
                 if (!(stockQuote== null)) {
                     BigDecimal cost = stockQuote.getPrevLegalClosePrice();
                     String symbol = stockQuote.getSecId();
                     String output = "Выбрана акция " + callBackData+" \n Введите также количество акций, которое вы хотите продать. Сейчас у вас "+createTable.countOfTheBag("telegramuser_"+appUser.getTelegramUserId(), symbol);
-                    sendAnswerWithInlineKeyboard(output, chatId, messageId, new ButtonForKeyboard("Продать все", "SELL_ALL_COMMAND"));
-                    //TODO обработать кнопку SELL_ALL_COMMAND
+                    utilsService.sendEditMessageAnswerWithInlineKeyboard(output, chatId, messageId, new ButtonForKeyboard("Продать все", "SELL_ALL_COMMAND"));
+
                     appUser.setSellUserState(SELL_CHANGE_COUNT);
                     appUser.setActiveBuy(symbol + ":" + cost+":"+stockQuote.getShortName());
                     appUserDAO.save(appUser);
                 } else {
                     String output = "Чат-бот не знаком с такой ценной бумаги. Убедитесь, что вы хотите продать именно " + callBackData + "\n Если окажется, что вас запрос верен, напишите нам в поддержку. \n Мы обязательно поможем";
-                    sendAnswerWithInlineKeyboard(output, chatId, messageId, new ButtonForKeyboard("Список ваших акций", "LIST_OWN_STOCKS"));
-                    //TODO work with button LIST_OWN_STOCK
+                    utilsService.sendEditMessageAnswerWithInlineKeyboard(output, chatId, messageId, new ButtonForKeyboard("Список ваших акций", "LIST_OWN_STOCKS"));
                     //createTable.getInfoAboutBag("telegramuser_" + appUser.getTelegramUserId());
                 }
 
                 break;
+            case SELL_CHANGE_COUNT:
+                if (callBackData.equals("SELL_ALL_COMMAND")){
+                    String temporaryValue = appUser.getActiveBuy();
+                    String symbol = utilsService.parseStringFromBD(temporaryValue, 0);
+                    long count = createTable.countOfTheBag("telegramuser_"+appUser.getTelegramUserId(), symbol);
+                    appUser.setSellUserState(SELL_PROOF);
+                    appUser.setActiveBuy(temporaryValue + ":" + count);
+                    appUserDAO.save(appUser);
+                    utilsService.sendEditMessageAnswerWithInlineKeyboard("Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId,messageId, new ButtonForKeyboard("Да", "YES_BUTTON_SELL"), new ButtonForKeyboard("Нет", "NO_BUTTON_SELL"));
+                }
         }
     }
 
@@ -132,29 +140,5 @@ public class CallBackMainServiceImpl implements CallBackMainService {
         return optional.get();
     }
 
-    public void sendAnswerWithInlineKeyboard(String output, long chatId, long messageId, ButtonForKeyboard... buttons) {
-        EditMessageText editMessageText = new EditMessageText();
-        editMessageText.setChatId(chatId);
-        editMessageText.setText(output);
-        editMessageText.setMessageId((int) messageId);
-        InlineKeyboardMarkup markupInLineKeyboard = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
-        List<InlineKeyboardButton> rowInLine = new ArrayList<>();
-
-        for (ButtonForKeyboard button : buttons) {
-            InlineKeyboardButton inlineButton = new InlineKeyboardButton();
-            inlineButton.setText(button.getText());
-            inlineButton.setCallbackData(button.getCallbackData());
-
-
-            rowInLine.add(inlineButton);
-
-        }
-        rowsInLine.add(rowInLine);
-
-        markupInLineKeyboard.setKeyboard(rowsInLine);
-        editMessageText.setReplyMarkup(markupInLineKeyboard);
-        producerService.producerAnswerWithCallBack(editMessageText);
-    }
 
 }

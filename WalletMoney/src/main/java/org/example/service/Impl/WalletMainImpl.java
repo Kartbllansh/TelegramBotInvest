@@ -49,4 +49,11 @@ private final AppUserDAO appUserDAO;
         return "С вашего счета снято " + summa + ". Теперь у вас на счету " + appUser.getWalletMoney()+"₽";
     }
 
+    @Override
+    public boolean checkAbilityBuy(BigDecimal summa, AppUser appUser) {
+        BigDecimal currentBalance = appUser.getWalletMoney();
+        return currentBalance.compareTo(summa) >= 0;
+
+    }
+
 }

@@ -7,12 +7,12 @@ import org.example.enums.CommandService;
 import org.example.service.*;
 import org.example.utils.ButtonForKeyboard;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.example.entity.BuyUserState.*;
 import static org.example.entity.SellUserState.*;
@@ -28,21 +28,22 @@ public class MainServiceImpl implements MainService {
     private final WalletService walletService;
     private final BuyOrSellService buyOrSellService;
     private final CreateTable createTable;
-    private final ProducerService producerService;
     private final AppUserDAO appUserDAO;
     private final AppUserService appUserService;
+    private final UtilsService utilsService;
 
-    public MainServiceImpl(WalletService walletService, BuyOrSellService buyOrSellService, CreateTable createTable, ProducerService producerService, AppUserDAO appUserDAO, AppUserService appUserService) {
+    public MainServiceImpl(WalletService walletService, BuyOrSellService buyOrSellService, CreateTable createTable, AppUserDAO appUserDAO, AppUserService appUserService, UtilsService utilsService) {
         this.walletService = walletService;
         this.buyOrSellService = buyOrSellService;
         this.createTable = createTable;
-        this.producerService = producerService;
         this.appUserDAO = appUserDAO;
         this.appUserService = appUserService;
+        this.utilsService = utilsService;
     }
 
     @Override
     public void processTextMessage(Update update) {
+        long messageId = update.getMessage().getMessageId();
         var appUser = findOrSaveAppUser(update);
         var buyUserState = appUser.getBuyUserState();
         var sellUserState = appUser.getSellUserState();
@@ -53,13 +54,14 @@ public class MainServiceImpl implements MainService {
         var serviceCommand = CommandService.fromValue(text);
         var chatId = update.getMessage().getChatId();
         if (CANCEL.equals(serviceCommand)) {
-            output = cancelProcess(appUser);
+            output = utilsService.cancelProcess(appUser);
+            utilsService.sendAnswer(output, chatId);
         } else if (BASIC_STATE.equals(userState)) {
 
             if(!NOT_BUY.equals(buyUserState)) {
-                buyOrSellService.onActionBuy(appUser, text, chatId);
+                buyOrSellService.onActionBuy(appUser, text, chatId, messageId);
             } else if (!NOT_SELL.equals(sellUserState)) {
-                buyOrSellService.onActionSell(appUser, text, chatId);
+                buyOrSellService.onActionSell(appUser, text, chatId, messageId);
             } else if (!NOT_WALLET.equals(walletUserState)) {
                 walletService.onActiveWallet(appUser, text, chatId);
             } else {
@@ -68,13 +70,13 @@ public class MainServiceImpl implements MainService {
 
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
             output = appUserService.setEmail(appUser, text);
-            sendAnswer(output, chatId);
+            utilsService.sendAnswer(output, chatId);
         } else {
             log.error("Unknown user state: " + userState);
             output = "Неизвестная ошибка! \n"
                     +  "Введите /cancel и попробуйте снова! \n"
                     +"Либо введите /help и посмотрите допустимые команды";
-            sendAnswer(output, chatId);
+            utilsService.sendAnswer(output, chatId);
         }
 
 
@@ -86,30 +88,32 @@ public class MainServiceImpl implements MainService {
     //TODO создание адекватного процесса авторизации
     private void processServiceCommand(AppUser appUser, String cmd, long chatId) {
         var serviceCommand = CommandService.fromValue(cmd);
-        switch (serviceCommand){
+        if(serviceCommand==null){
+            utilsService.sendMessageAnswerWithInlineKeyboard("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId, new ButtonForKeyboard("Help", "HELP_COMMAND"));
+        }
+        switch (Objects.requireNonNull(serviceCommand)){
             case START:
                 log.info("Новый пользователь с именем " + appUser.getUserName());
-                sendAnswer("Приветствую, "+appUser.getUserName()+ "!\n {тут будет красивое вступление} \n Чтобы посмотреть список доступных команд введите /help", chatId);
+                utilsService.sendAnswer("Приветствую, "+appUser.getUserName()+ "!\n {тут будет красивое вступление} \n Чтобы посмотреть список доступных команд введите /help", chatId);
                 break;
             case REGISTRATION:
                 log.info("Регистрация пользователя "+appUser.getUserName()+" с почтой "+appUser.getEmail());
-                sendAnswer(appUserService.registerUser(appUser), chatId);
+                utilsService.sendAnswer(appUserService.registerUser(appUser), chatId);
                 break;
             case HELP:
-                sendAnswer(help(), chatId);
+                utilsService.sendAnswer(utilsService.help(), chatId);
                 break;
             case BUY:
                 appUser.setBuyUserState(CHANGE_STONKS);
                 appUserDAO.save(appUser);
-                sendAnswer(appUser.getUserName()+", вы активировали команду /buy! \n"
+                utilsService.sendAnswer(appUser.getUserName()+", вы активировали команду /buy! \n"
                         +"Введите код акции, которую хотите купить", chatId);
                 break;
             case SELL:
                 appUser.setSellUserState(SELL_CHANGE_STOCK);
                 appUserDAO.save(appUser);
-                sendAnswer(createTable.getInfoAboutBag("telegramUser_"+appUser.getTelegramUserId()), appUser.getTelegramUserId());
+                utilsService.sendAnswer(createTable.getInfoAboutBag("telegramUser_"+appUser.getTelegramUserId()), appUser.getTelegramUserId());
                 List<String> list = createTable.getAllKeysInBag("telegramUser_"+appUser.getTelegramUserId());
-                //TODO клавиатура с предложением какие акции продать
                 List<ButtonForKeyboard> buttonsList = new ArrayList<>();
                 String output = appUser.getUserName()+", вы активировали команду /sell! \n"
                         +"Введите ключ акции, которую хотите продать";
@@ -118,49 +122,25 @@ public class MainServiceImpl implements MainService {
                     buttonsList.add(new ButtonForKeyboard(buttonText, buttonText));
                 }
 
-                buyOrSellService.sendAnswerWithInlineKeyboard(output, chatId, buttonsList.toArray(new ButtonForKeyboard[0]));
+                utilsService.sendMessageAnswerWithInlineKeyboard(output, chatId, buttonsList.toArray(new ButtonForKeyboard[0]));
                 //sendAnswer(appUser.getUserName()+", вы активировали команду /sell! \n"
                      //   +"Введите ключ акции, которую хотите продать", chatId);
                 break;
             case WALLET_MONEY:
                 appUser.setWalletUserState(WALLET_CHANGE_CMD);
                 appUserDAO.save(appUser);
-                sendAnswer(appUser.getUserName()+", Вы активировали команду, позволящую работать с балансом на вашем кошельке. \n"
+                utilsService.sendAnswer(appUser.getUserName()+", Вы активировали команду, позволящую работать с балансом на вашем кошельке. \n"
                         +"Выберите какую из команд вы хотели бы использовать: \n"
                         +"* /top_up - пополните баланс \n"
                         +" * /look_balance - посмотрите, сколько у вас на счету денег", chatId);
                 break;
             default:
                 //sendAnswer("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId);
-                buyOrSellService.sendAnswerWithInlineKeyboard("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId, new ButtonForKeyboard("Help", "HELP_COMMAND"));
+                utilsService.sendMessageAnswerWithInlineKeyboard("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId, new ButtonForKeyboard("Help", "HELP_COMMAND"));
                 break;
         }
 
     }
-
-    private String help() {
-        return "Список доступных команд:\n"
-                + "/cancel - отмена выполнения текущей команды;\n"
-                + "/registration - регистрация пользователя;\n"
-                + "/wallet - получить информацию о вашем кошельке"
-                + "/buy - покупка ценной бумаги;\n"
-                + "/sell - продажа ценной бумаги";
-    }
-    private String cancelProcess(AppUser appUser) {
-        if(!appUser.getBuyUserState().equals(NOT_BUY)){
-            appUser.setBuyUserState(NOT_BUY);
-        }
-        if (!appUser.getSellUserState().equals(NOT_SELL)){
-            appUser.setSellUserState(NOT_SELL);
-        }
-        if(!appUser.getWalletUserState().equals(NOT_WALLET)){
-            appUser.setWalletUserState(NOT_WALLET);
-        }
-        appUser.setState(BASIC_STATE);
-        appUserDAO.save(appUser);
-        return "Команда отменена!";
-    }
-
 
 
     @Override
@@ -179,7 +159,7 @@ public class MainServiceImpl implements MainService {
 
         var optional = appUserDAO.findByTelegramUserId(telegramUser.getId());
         if(optional.isEmpty()){
-            createTable.createTable("telegramUser_"+telegramUser.getId().toString());
+            createTable.createTable("telegramUser_"+telegramUser.getId());
             AppUser transientAppUser = AppUser.builder()
                     .telegramUserId(telegramUser.getId())
                     .userName(telegramUser.getUserName())
@@ -198,12 +178,7 @@ public class MainServiceImpl implements MainService {
         return optional.get();
     }
 
-    private void sendAnswer(String output, Long chatId) {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        sendMessage.setText(output);
-        producerService.producerAnswer(sendMessage);
-    }
+
 
 
 }

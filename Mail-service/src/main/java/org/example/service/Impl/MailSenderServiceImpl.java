@@ -1,5 +1,6 @@
 package org.example.service.Impl;
 
+import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.log4j.Log4j;
 import org.example.dto.MailParams;
 import org.example.service.MailSenderService;
@@ -24,7 +25,7 @@ public class MailSenderServiceImpl implements MailSenderService {
 
     @Override
     public void send(MailParams mailParams) {
-        var subject ="Активация аккаунта StocksBot";
+        var subject = EmojiParser.parseToUnicode("Активация аккаунта в StocksBot"+":e-mail:") ;
         var messageBody = getActivationMailBody(mailParams.getId());
         var emailTo = mailParams.getEmailTo();
 

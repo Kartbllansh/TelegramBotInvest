@@ -11,8 +11,7 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.Update;
 import java.math.BigDecimal;
 
-import static org.example.entity.BuyUserState.BUY_PROOF;
-import static org.example.entity.BuyUserState.NOT_BUY;
+import static org.example.entity.BuyUserState.*;
 import static org.example.entity.SellUserState.*;
 import static org.example.entity.WalletUserState.WALLET_TOP_UP_CHANGE_COUNT;
 
@@ -75,6 +74,12 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                 break;
             case "HELP_COMMAND":
                 producerService.producerAnswerWithCallBack(doEditMessage(messageId,chatId, utilsService.help()));
+                break;
+            case "BUY_COMMAND":
+                appUser.setBuyUserState(CHANGE_STONKS);
+                appUserDAO.save(appUser);
+                utilsService.sendAnswer(appUser.getUserName()+", вы активировали команду /buy! \n"
+                        +"Введите код акции, которую хотите купить", chatId);
                 break;
         }
     }

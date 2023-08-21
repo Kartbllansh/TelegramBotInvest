@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import com.vdurmont.emoji.EmojiParser;
 import jakarta.ws.rs.BadRequestException;
 
 import jakarta.ws.rs.NotFoundException;
@@ -31,6 +32,6 @@ public class MyControllerAdvice {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGenericException(Exception ex) {
         log.error("Exception "+ex);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EmojiParser.parseToUnicode("Internal Server Error"+":x:"));
     }
 }

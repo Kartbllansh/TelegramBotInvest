@@ -1,4 +1,5 @@
 package org.example.controller;
+import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.log4j.Log4j;
 import org.example.service.UserActivationService;
 import org.example.utils.CryptoTool;
@@ -24,7 +25,8 @@ public class ActivationController {
 
             userActivationService.getMessageAboutRegist(id);
             log.info("Успешная регистрация пользователя");
-            return ResponseEntity.ok().body("Регистрация успешно завершена!");
+            return ResponseEntity.ok().body(EmojiParser.parseToUnicode("Регистрация успешно завершена!"+":white_check_mark:"+"\n Возвращайтесь в чат-бот и давайте инвестировать"+"\t\n" +
+                    ":money_with_wings:"));
         }
         return ResponseEntity.internalServerError().build();
     }

@@ -1,5 +1,6 @@
 package org.example.service.Impl;
 
+import com.vdurmont.emoji.EmojiParser;
 import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
 import org.example.service.WalletMain;
@@ -19,7 +20,7 @@ private final AppUserDAO appUserDAO;
     @Override
     public String toKnowBalance(AppUser appUser) {
         BigDecimal balance = appUser.getWalletMoney();
-        return "На вашем счету на данный момент "+balance+"₽";
+        return appUser.getUserName()+", \n На вашем счету на данный момент "+balance+"₽";
     }
 
 
@@ -28,12 +29,12 @@ private final AppUserDAO appUserDAO;
     public String topUpWallet(BigDecimal summa, AppUser appUser) {
         // Проверка, что переданная сумма положительна
         if (summa.compareTo(BigDecimal.ZERO) <= 0) {
-            return "Сумма для пополнения должна быть положительной.";
+            return EmojiParser.parseToUnicode("К сожалению, наш бот пока не умеет пополнять счет на отрицательную сумму"+":thinking:"+"\n Если вы хотите избавиться от денег на счету напишите нам в поддержку \n Мы обязательно вам поможем"+":revolving_hearts:") ;
         }
 
         appUser.setWalletMoney(appUser.getWalletMoney().add(summa));
         appUserDAO.save(appUser);
-        return "Ваш счет увеличился на " + summa + ". Теперь у вас на счету " + appUser.getWalletMoney()+"₽";
+        return "Пополнение счета  на " + summa + " выполнено успешно"+":dollar:"+ " \n Теперь на вашем счету " + appUser.getWalletMoney()+"₽";
     }
 
 
@@ -43,12 +44,12 @@ private final AppUserDAO appUserDAO;
 
         // Проверка, достаточно ли средств на счете
         if (currentBalance.compareTo(summa) < 0) {
-            return "Недостаточно средств на вашем счету.";
+            return EmojiParser.parseToUnicode("Недостаточно средств на вашем счету."+":worried:");
         }
 
         appUser.setWalletMoney(currentBalance.subtract(summa));
         appUserDAO.save(appUser);
-        return "С вашего счета снято " + summa + ". Теперь у вас на счету " + appUser.getWalletMoney()+"₽";
+        return "С вашего счета снято " + summa + ". \n Теперь у вас на счету " + appUser.getWalletMoney()+"₽";
     }
 
     @Override

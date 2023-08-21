@@ -70,6 +70,7 @@ public class MainServiceImpl implements MainService {
             }
 
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
+            //TODO делать чтобы метод снизу возвращал EditMessage вместе с кнопками
             output = appUserService.setEmail(appUser, text);
             utilsService.sendAnswer(output, chatId);
         } else {

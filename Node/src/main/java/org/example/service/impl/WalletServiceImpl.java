@@ -48,7 +48,7 @@ public class WalletServiceImpl implements WalletService {
     if (isNumber(text)){
         BigDecimal bigDecimal = new BigDecimal(text);
         String someInfo = walletMain.topUpWallet(bigDecimal, appUser);
-        utilsService.sendEditMessageAnswer(someInfo, chatId, messageId);
+        utilsService.sendAnswer(someInfo, chatId);
         appUser.setWalletUserState(NOT_WALLET);
         appUserDAO.save(appUser);
     } else {

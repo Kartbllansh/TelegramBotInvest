@@ -1,5 +1,6 @@
 package org.example.service.impl;
 
+import com.vdurmont.emoji.EmojiParser;
 import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
 import org.example.entity.WalletUserState;
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
 
 import static org.example.entity.BuyUserState.*;
 import static org.example.entity.SellUserState.*;
+import static org.example.entity.WalletUserState.NOT_WALLET;
 import static org.example.entity.WalletUserState.WALLET_TOP_UP_CHANGE_COUNT;
 
 @Service
@@ -45,20 +47,18 @@ public class CallBackMainServiceImpl implements CallBackMainService {
     String callBackData = update.getCallbackQuery().getData();
 
     if(callBackData.equals("CANCEL")){
-    utilsService.cancelProcess(appUser);
+    String cancel = utilsService.cancelProcess(appUser);
+    utilsService.sendEditMessageAnswer(cancel, chatId, messageId);
     }
 
-        if(!appUser.getSellUserState().equals(NOT_SELL)){
-        processSell(appUser, messageId, chatId, callBackData);
-
-        if(!appUser.getBuyUserState().equals(NOT_BUY)){
+        if(!appUser.getSellUserState().equals(NOT_SELL)) {
+            processSell(appUser, messageId, chatId, callBackData);
+        } else if(!appUser.getBuyUserState().equals(NOT_BUY)){
             processBuy(appUser, messageId, chatId, callBackData);
-        }
-
-        if(!appUser.getWalletUserState().equals(WalletUserState.NOT_WALLET)){
+        } else if(!appUser.getWalletUserState().equals(NOT_WALLET)){
             processWallet(appUser, messageId, chatId, callBackData);
         }
-    }
+
         switch (callBackData) {
             case "YES_BUTTON_BUY":
                 processYesButtonBuy(appUser, messageId, chatId);
@@ -171,7 +171,7 @@ public class CallBackMainServiceImpl implements CallBackMainService {
     }
 
     private void processYesButtonBuy(AppUser appUser, long messageId, long chatId) {
-     producerService.producerAnswerWithCallBack(doEditMessage(messageId, chatId, buyOrSellService.buyProofYes(appUser)));
+     producerService.producerAnswerWithCallBack(doEditMessage(messageId, chatId, EmojiParser.parseToUnicode(buyOrSellService.buyProofYes(appUser))));
     }
 
     private EditMessageText doEditMessage(long messageId, long chatId, String output){

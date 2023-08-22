@@ -43,4 +43,8 @@ public class RabbitConfiguration {
     public Queue answerCallBackQuery(){
         return new Queue(ANSWER_CALLBACK_ANSWER);
     }
+    @Bean
+    public Queue deleteMessageAnswer(){
+        return new Queue(DELETE_MESSAGE_ANSWER);
+    }
 }

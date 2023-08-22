@@ -8,6 +8,8 @@ import org.example.jpa.entity.StockQuote;
 import org.example.service.*;
 import org.example.utils.ButtonForKeyboard;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -109,10 +111,11 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
             utilsService.sendAnswer(info+" \n \n Какое количество акций вы хотите приобрести?", chatId);
             //utilsService.sendAnswer("Какое количество акций вы хотите приобрести?", chatId);
             appUser.setBuyUserState(CHANGE_COUNT);
-            appUser.setActiveBuy(symbol+":"+cost+":"+stockQuote.getShortName());
+            String messageIdFromDis = appUser.getActiveBuy();
+            appUser.setActiveBuy(symbol+":"+cost+":"+stockQuote.getShortName()+":"+messageIdFromDis);
             appUserDAO.save(appUser);
         } else {
-            utilsService.sendMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode("Чат-бот не знаком с такой ценной бумаги"+":robot:")+"\n  В ближайшее время мы попробуем добавить данную компанию в список доступных. \n Введите другую акцию или отмените покупку", chatId, new ButtonForKeyboard("Отменить", "CANCEL"));
+            utilsService.sendMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode("Чат-бот не знаком с такой ценной бумагой, как "+cmd+":robot:")+"\n  В ближайшее время мы попробуем добавить данную компанию в список доступных. \n Введите другую акцию или отмените покупку", chatId, new ButtonForKeyboard("Отменить", "CANCEL"));
             //TODO добавить лог для записи, какие акции хотели купить
         }
     }
@@ -136,7 +139,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
     @Override
     public String buyProofYes(AppUser appUser){
         String activeBuy = appUser.getActiveBuy();
-        int count = Integer.parseInt(utilsService.parseStringFromBD(activeBuy, 3));
+        int count = Integer.parseInt(utilsService.parseStringFromBD(activeBuy, 4));
         BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(utilsService.parseStringFromBD(activeBuy, 1)));
         BigDecimal countFromUser = BigDecimal.valueOf(count);
 
@@ -211,7 +214,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
     }
     public String sellProofYes(AppUser appUser){
         String activeSell = appUser.getActiveBuy();
-        int count = Integer.parseInt(utilsService.parseStringFromBD(activeSell, 3));
+        int count = Integer.parseInt(utilsService.parseStringFromBD(activeSell, 4));
         BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(utilsService.parseStringFromBD(activeSell, 1)));
         BigDecimal countFromUser = BigDecimal.valueOf(count);
 

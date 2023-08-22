@@ -110,6 +110,7 @@ public class MainServiceImpl implements MainService {
                 appUserDAO.save(appUser);
                 utilsService.sendAnswer(appUser.getUserName()+", вы активировали команду /buy! \n"
                         +"Введите код акции, которую хотите купить", chatId);
+
                 break;
             case SELL:
                 appUser.setSellUserState(SELL_CHANGE_STOCK);

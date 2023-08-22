@@ -8,9 +8,12 @@ import org.example.service.WalletMain;
 import org.example.utils.ButtonForKeyboard;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -54,6 +57,15 @@ public class UtilsServiceImpl implements UtilsService {
         sendMessage.setText(output);
         producerService.producerAnswer(sendMessage);
 
+    }
+
+    @Override
+    public Integer sendAnswerWithId(String output, Long chatId) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(output);
+        producerService.producerAnswer(sendMessage);
+        return sendMessage.getReplyToMessageId();
     }
 
     @Override
@@ -105,8 +117,10 @@ public class UtilsServiceImpl implements UtilsService {
 
         } else if (i==2){
             return parts[2]; //shortname
+        } else if(i==3) {
+            return parts[3]; //messageId
         } else {
-            return parts[3]; //количество
+            return parts[4]; //количество
         }
     }
 
@@ -145,5 +159,13 @@ public class UtilsServiceImpl implements UtilsService {
 
         return result.toBigInteger();
 
+    }
+
+    @Override
+    public void sendDeleteMessageAnswer(long chatId, long messageId) {
+        DeleteMessage deleteMessage = new DeleteMessage();
+        deleteMessage.setChatId(chatId);
+        deleteMessage.setMessageId((int) messageId);
+        producerService.producerDeleteMessageAnswer(deleteMessage);
     }
 }

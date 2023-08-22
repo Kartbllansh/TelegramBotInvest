@@ -79,13 +79,14 @@ public class TelegramBot extends TelegramLongPollingBot {
 
 
 
-    public void sendAnswerMessage(SendMessage message) {
+    public Integer sendAnswerMessage(SendMessage message) {
         if (message != null) {
             try {
-                execute(message);
+                return execute(message).getMessageId();
             } catch (TelegramApiException e) {
                 log.error(e);
             }
         }
+        return null;
     }
 }

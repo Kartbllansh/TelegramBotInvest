@@ -55,13 +55,13 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
     public void onActionSell(AppUser appUser, String cmd, Long chatId, long messageId) {
         switch (appUser.getSellUserState()){
             case SELL_CHANGE_COUNT:
-                sellChangeCount(appUser, cmd, chatId);
+                sellChangeCount(appUser, cmd, chatId, messageId);
                 break;
             case SELL_CHANGE_STOCK:
-               sellChangeStock(appUser, cmd, chatId);
+               sellChangeStock(appUser, cmd, chatId, messageId);
                 break;
             case SELL_PROOF:
-                sellProof(appUser, cmd, chatId);
+                sellProof(appUser, cmd, chatId, messageId);
                 break;
         }
 
@@ -101,6 +101,8 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
 
 
     }
+    //TODO переделать базу данных пользователей
+    //TODO сделать около каждого сообщения пометку, к какому процессу относиться команда
 //TODO настроить ограничение времени хранения поля activeBuy
     //TODO настроить EditMessage
     private void buyChangeStocks(AppUser appUser, String cmd, Long chatId, long messageId){
@@ -162,53 +164,58 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         return neInfo;
     }
 //TODO replyKeyboard возможность отменить команды
-    private void sellChangeCount(AppUser appUser, String cmd, Long chatId){
+    private void sellChangeCount(AppUser appUser, String cmd, Long chatId, long messageId){
+        String temporaryValue = appUser.getActiveBuy();
         String info = "";
         if (cmd.trim().matches("\\d+")){
             long count = Long.parseLong(cmd);
-            String temporaryValue = appUser.getActiveBuy();
+
             String codeStocks =utilsService.parseStringFromBD(temporaryValue, 0);
             Long someResult = createTable.checkAboutCountSell(count, "telegramuser_"+appUser.getTelegramUserId(), codeStocks);
             if(someResult>=0) {
                 info = "Продажа " + count + " акций " + utilsService.parseStringFromBD(temporaryValue, 2)+"("+utilsService.parseStringFromBD(temporaryValue, 0)+")";
-
-                utilsService.sendAnswer(info, chatId);
-                utilsService.sendMessageAnswerWithInlineKeyboard("Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId, new ButtonForKeyboard("Да", "YES_BUTTON_SELL"), new ButtonForKeyboard("Нет", "NO_BUTTON_SELL"));
+                utilsService.sendEditMessageAnswerWithInlineKeyboard(info+"Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId, Long.parseLong(utilsService.parseStringFromBD(temporaryValue, 3)), new ButtonForKeyboard("Да", "YES_BUTTON_SELL"), new ButtonForKeyboard("Нет", "NO_BUTTON_SELL"));
+                utilsService.sendDeleteMessageAnswer(chatId, messageId);
                 appUser.setSellUserState(SELL_PROOF);
                 appUser.setActiveBuy(temporaryValue + ":" + count);
                 appUserDAO.save(appUser);
             } else {
-                utilsService.sendAnswer("Нельзя продать такое количество акций, у вас их меньше", chatId);
+                utilsService.sendEditMessageAnswer("Нельзя продать"+count+" акций "+utilsService.parseStringFromBD(temporaryValue, 2)+", у вас их всего"+createTable.countOfTheBag("telegramuser_"+appUser.getTelegramUserId(),codeStocks), chatId, Long.parseLong(utilsService.parseStringFromBD(temporaryValue, 3)));
+                utilsService.sendDeleteMessageAnswer(chatId, messageId);
                 //TODO подсказка почему пользователь мог ошибиться
             }
         } else {
             info = "Введено неправильно значение. Бот ожидает число.";
-            utilsService.sendAnswer(info, chatId);
+            utilsService.sendEditMessageAnswer(info, chatId, Long.parseLong(utilsService.parseStringFromBD(temporaryValue, 3)));
+            utilsService.sendDeleteMessageAnswer(chatId, messageId);
         }
     }
-    private void sellChangeStock(AppUser appUser, String cmd, Long chatId){
+    private void sellChangeStock(AppUser appUser, String cmd, Long chatId, long messageId){
+        String oldActiveBuy = appUser.getActiveBuy();
         if(createTable.checkAboutCodeStock("telegramuser_"+appUser.getTelegramUserId(), cmd)) {
             StockQuote stockQuote = stockService.getInfoAboutTicket(cmd);
             if (!(stockQuote== null)) {
                 BigDecimal cost = stockQuote.getPrevLegalClosePrice();
                 String symbol = stockQuote.getSecId();
-                utilsService.sendAnswer("Выбрана акция " + cmd, chatId);
-                utilsService.sendAnswer("Введите также количество акций, которое вы хотите продать. Сейчас у вас "+createTable.countOfTheBag("telegramuser_"+appUser.getTelegramUserId(), symbol), chatId);
+                utilsService.sendEditMessageAnswer("Выбрана акция " + cmd+"\n Введите также количество акций, которое вы хотите продать. \n Сейчас у вас "+createTable.countOfTheBag("telegramuser_"+appUser.getTelegramUserId(), symbol), chatId, Long.parseLong(oldActiveBuy));
+                utilsService.sendDeleteMessageAnswer(chatId, messageId);
                 appUser.setSellUserState(SELL_CHANGE_COUNT);
-                appUser.setActiveBuy(symbol + ":" + cost+":"+stockQuote.getShortName());
+                appUser.setActiveBuy(symbol + ":" + cost+":"+stockQuote.getShortName()+":"+oldActiveBuy);
                 appUserDAO.save(appUser);
             } else {
-                utilsService.sendAnswer("Чат-бот не знаком с такой ценной бумаги. Убедитесь, что вы хотите продать именно "+cmd+"\n Если окажется, что вас запрос верен, напишите нам в поддержку. \n Мы обязательно поможем", chatId);
-                createTable.getInfoAboutBag("telegramuser_"+appUser.getTelegramUserId());
+                utilsService.sendEditMessageAnswer("Чат-бот не знаком с такой ценной бумаги. \n Убедитесь, что вы хотите продать именно "+cmd+"\n И введите правильный ключ акции \n Если окажется, что вас запрос верен, напишите нам в поддержку. \n Мы обязательно поможем", chatId, Long.parseLong(oldActiveBuy));
+                //createTable.getInfoAboutBag("telegramuser_"+appUser.getTelegramUserId());
+                utilsService.sendDeleteMessageAnswer(chatId, messageId);
             }
         } else {
-            utilsService.sendAnswer("Такой акции нет в вашем инвестиционном портфеле \n В следующем сообщении будут приведены акции, находящиеся в вашем портфеле", chatId);
-            createTable.getInfoAboutBag("telegramuser_"+appUser.getTelegramUserId());
+            utilsService.sendEditMessageAnswer("Такой акции нет в вашем инвестиционном портфеле \n Ваш портфель: \n "+createTable.getInfoAboutBag("telegramuser_"+appUser.getTelegramUserId()), chatId, Long.parseLong(oldActiveBuy));
+            utilsService.sendDeleteMessageAnswer(chatId, messageId);
         }
 
     }
 
-    private void sellProof(AppUser appUser, String cmd, Long chatId){
+    private void sellProof(AppUser appUser, String cmd, Long chatId, long messageId){
+        String messadeIdFrom = utilsService.parseStringFromBD(appUser.getActiveBuy(), 3);
         String info = "";
         if(cmd.equalsIgnoreCase("ДА")){
            info =  sellProofYes(appUser);
@@ -219,7 +226,8 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         } else {
             info = "Введите Да или Нет. Или же команду /cancel";
         }
-        utilsService.sendAnswer(info, chatId);
+        utilsService.sendEditMessageAnswer(info, chatId, Long.parseLong(messadeIdFrom));
+        utilsService.sendDeleteMessageAnswer(chatId, messageId);
     }
     public String sellProofYes(AppUser appUser){
         String activeSell = appUser.getActiveBuy();

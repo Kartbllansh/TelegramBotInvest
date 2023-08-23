@@ -96,7 +96,7 @@ public class MainServiceImpl implements MainService {
         switch (Objects.requireNonNull(serviceCommand)){
             case START:
                 log.info("Новый пользователь с именем " + appUser.getUserName());
-                utilsService.sendAnswer("Приветствую, "+appUser.getUserName()+ "!\n {тут будет красивое вступление} \n Чтобы посмотреть список доступных команд введите /help", chatId);
+                utilsService.sendMessageAnswerWithInlineKeyboard("Приветствую, "+appUser.getUserName()+ "!\n {тут будет красивое вступление} \n Чтобы посмотреть список доступных команд введите /help", chatId, new ButtonForKeyboard("Согласие", "CONSENT_STATE"), new ButtonForKeyboard("Обучение", "LEARNING_STATE"));
                 break;
             case REGISTRATION:
                 log.info("Регистрация пользователя "+appUser.getUserName()+" с почтой "+appUser.getEmail());

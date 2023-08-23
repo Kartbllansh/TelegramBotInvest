@@ -3,7 +3,6 @@ package org.example.service.impl;
 import com.vdurmont.emoji.EmojiParser;
 import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
-import org.example.entity.WalletUserState;
 import org.example.jpa.entity.StockQuote;
 import org.example.service.*;
 import org.example.utils.ButtonForKeyboard;
@@ -14,8 +13,11 @@ import java.math.BigDecimal;
 
 import static org.example.entity.BuyUserState.*;
 import static org.example.entity.SellUserState.*;
+import static org.example.entity.UserState.WAIT_TO_AGREE_CONSENT;
 import static org.example.entity.WalletUserState.NOT_WALLET;
 import static org.example.entity.WalletUserState.WALLET_TOP_UP_CHANGE_COUNT;
+import static org.example.enums.BigMessage.CONSENT_MESSAGE;
+import static org.example.enums.BigMessage.LEARNING_MESSAGE;
 
 @Service
 public class CallBackMainServiceImpl implements CallBackMainService {
@@ -57,6 +59,8 @@ public class CallBackMainServiceImpl implements CallBackMainService {
             processBuy(appUser, messageId, chatId, callBackData);
         } else if(!appUser.getWalletUserState().equals(NOT_WALLET)){
             processWallet(appUser, messageId, chatId, callBackData);
+        } else if(appUser.getState().equals(WAIT_TO_AGREE_CONSENT)){
+            processAgreeWithConsent(appUser, messageId, chatId, callBackData);
         }
 
         switch (callBackData) {
@@ -78,8 +82,29 @@ public class CallBackMainServiceImpl implements CallBackMainService {
             case "BUY_COMMAND":
                 appUser.setBuyUserState(CHANGE_STONKS);
                 appUserDAO.save(appUser);
-                utilsService.sendAnswer(appUser.getUserName()+", вы активировали команду /buy! \n"
-                        +"Введите код акции, которую хотите купить", chatId);
+                utilsService.sendEditMessageAnswer(appUser.getUserName()+", вы активировали команду /buy! \n"
+                        +"Введите код акции, которую хотите купить", chatId, messageId);
+                break;
+            case "CONSENT_STATE":
+                utilsService.sendEditMessageAnswerWithInlineKeyboard(CONSENT_MESSAGE, chatId, messageId, new ButtonForKeyboard("Соглашаюсь", "YES_BUTTON_CONSENT"), new ButtonForKeyboard("Отказываюсь", "NO_BUTTON_CONSENT"));
+                appUser.setState(WAIT_TO_AGREE_CONSENT);
+                appUserDAO.save(appUser);
+                break;
+            case "LEARNING_STATE":
+                utilsService.sendMessageAnswerWithInlineKeyboard(LEARNING_MESSAGE, chatId, new ButtonForKeyboard("Не придумал", "BOUT"));
+                break;
+        }
+    }
+
+    private void processAgreeWithConsent(AppUser appUser, long messageId, long chatId, String callBackData) {
+        switch (callBackData){
+            case "YES_BUTTON_CONSENT":
+                appUser.setIsActiveConsent(true);
+                utilsService.sendEditMessageAnswer("Вы согласились с условиями", chatId, messageId);
+                break;
+            case "NO_BUTTON_CONSENT":
+                appUser.setIsActiveConsent(false);
+                utilsService.sendEditMessageAnswer("Вы отказались с условиями", chatId, messageId);
                 break;
         }
     }

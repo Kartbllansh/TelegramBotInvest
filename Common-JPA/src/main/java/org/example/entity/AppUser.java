@@ -29,7 +29,8 @@ public class AppUser {
     private String email;
     @Enumerated(EnumType.STRING)
     private UserState state;
-    private Boolean isActive;
+    private Boolean isActiveMail;
+    private Boolean isActiveConsent;
     @Enumerated(EnumType.STRING)
     private BuyUserState buyUserState;
     @Enumerated(EnumType.STRING)

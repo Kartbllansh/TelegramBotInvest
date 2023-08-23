@@ -272,3 +272,15 @@ INFO  2023-08-22 22:37:02 TelegramBot:39 check username
 INFO  2023-08-22 22:37:03 TelegramBot:39 check username
 INFO  2023-08-22 22:37:03 TelegramBot:39 check username
 INFO  2023-08-22 22:37:03 Main:14 Main.class running...
+INFO  2023-08-23 10:13:18 TelegramBot:34 Constructor-token work
+INFO  2023-08-23 10:13:18 TelegramBot:39 check username
+INFO  2023-08-23 10:13:19 TelegramBot:39 check username
+INFO  2023-08-23 10:13:20 TelegramBot:39 check username
+INFO  2023-08-23 10:13:20 TelegramBot:39 check username
+INFO  2023-08-23 10:13:20 Main:13 Main.class running...
+INFO  2023-08-23 10:19:41 TelegramBot:34 Constructor-token work
+INFO  2023-08-23 10:19:41 TelegramBot:39 check username
+INFO  2023-08-23 10:19:42 TelegramBot:39 check username
+INFO  2023-08-23 10:19:42 TelegramBot:39 check username
+INFO  2023-08-23 10:19:42 TelegramBot:39 check username
+INFO  2023-08-23 10:19:43 Main:13 Main.class running...

@@ -28,7 +28,7 @@ public class MainBaseServiceImpl implements MainBaseService {
         this.stockQuoteRepository = stockQuoteRepository;
         this.restTemplate = restTemplate;
     }
-    @Scheduled(fixedRate = 600000) // Запуск каждые 10 минут (600000 миллисекунд)
+    @Scheduled(fixedRate = 6000000) // Запуск каждые 10 минут (600000 миллисекунд)
     @Override
     public void fetchStockQuote() {
         ResponseEntity<String> response = restTemplate.getForEntity(apiUrl, String.class);

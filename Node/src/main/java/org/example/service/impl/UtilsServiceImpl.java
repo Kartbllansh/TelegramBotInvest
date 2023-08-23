@@ -145,7 +145,7 @@ public class UtilsServiceImpl implements UtilsService {
 
     @Override
     public BigDecimal countSummaPurchase(String activeBuy) {
-        int count = Integer.parseInt(parseStringFromBD(activeBuy, 3));
+        int count = Integer.parseInt(parseStringFromBD(activeBuy, 4));
         BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(parseStringFromBD(activeBuy, 1)));
         BigDecimal countFromUser = BigDecimal.valueOf(count);
         return purchace.multiply(countFromUser);

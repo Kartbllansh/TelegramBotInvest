@@ -9,7 +9,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @Log4j
 public class Main {
     public static void main(String[] args) {
-        System.out.println(1);
         SpringApplication.run(Main.class);
         log.info("Main.class running...");
     }

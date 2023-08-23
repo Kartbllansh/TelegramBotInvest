@@ -12,14 +12,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
+import org.simmetrics.StringDistance;
+import org.simmetrics.metrics.StringMetrics;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class MainBaseServiceImpl implements MainBaseService {
-@Value("${url.moex}")
-    private String apiUrl;
+//@Value("${url.moex}")
+    private String apiUrl ="https://iss.moex.com/iss/engines/stock/markets/shares/boards/TQBR/securities.json?iss.meta=off&iss.only=securities&securities.columns=SECID,SHORTNAME, PREVLEGALCLOSEPRICE,PREVDATE";
 
     private final StockQuoteRepository stockQuoteRepository;
     private final RestTemplate restTemplate;
@@ -69,4 +72,6 @@ public class MainBaseServiceImpl implements MainBaseService {
 
         }
     }
+
+
 }

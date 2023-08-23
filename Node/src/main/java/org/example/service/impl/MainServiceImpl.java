@@ -70,7 +70,6 @@ public class MainServiceImpl implements MainService {
             }
 
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
-            //TODO делать чтобы метод снизу возвращал EditMessage вместе с кнопками
             output = appUserService.setEmail(appUser, text);
             utilsService.sendAnswer(output, chatId);
         } else {
@@ -87,7 +86,6 @@ public class MainServiceImpl implements MainService {
 
     }
 
-    //TODO создание адекватного процесса авторизации
     private void processServiceCommand(AppUser appUser, String cmd, long chatId, long messageId) {
         var serviceCommand = CommandService.fromValue(cmd);
         if(serviceCommand==null){
@@ -108,8 +106,8 @@ public class MainServiceImpl implements MainService {
             case BUY:
                 appUser.setBuyUserState(CHANGE_STOCK);
                 appUserDAO.save(appUser);
-                utilsService.sendAnswer(appUser.getUserName()+", вы активировали команду /buy! \n"
-                        +"Введите код акции, которую хотите купить", chatId);
+                utilsService.sendMessageAnswerWithInlineKeyboard(appUser.getUserName()+", вы активировали команду /buy! \n"
+                        +"Введите код акции, которую хотите купить", chatId, new ButtonForKeyboard("Узнать ticket", "RECOGNIZE_TICKET"));
 
                 break;
             case SELL:
@@ -126,8 +124,6 @@ public class MainServiceImpl implements MainService {
                 }
 
                 utilsService.sendMessageAnswerWithInlineKeyboard(output, chatId, buttonsList.toArray(new ButtonForKeyboard[0]));
-                //sendAnswer(appUser.getUserName()+", вы активировали команду /sell! \n"
-                     //   +"Введите ключ акции, которую хотите продать", chatId);
                 break;
             case WALLET_MONEY:
                 appUser.setWalletUserState(WALLET_CHANGE_CMD);
@@ -171,7 +167,7 @@ public class MainServiceImpl implements MainService {
                     .isActiveMail(false)
                     .state(BASIC_STATE)
                     .walletMoney(BigDecimal.valueOf(1000.00))
-                    //TODO рассказать пользователю, что у него есть на счету косарик
+
                     .buyUserState(NOT_BUY)
                     .sellUserState(NOT_SELL)
                     .walletUserState(NOT_WALLET)

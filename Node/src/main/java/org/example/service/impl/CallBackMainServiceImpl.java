@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.example.entity.BuyUserState.*;
 import static org.example.entity.SellUserState.*;
@@ -85,6 +87,21 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                 utilsService.sendEditMessageAnswer(appUser.getUserName()+", вы активировали команду /buy! \n"
                         +"Введите код акции, которую хотите купить", chatId, messageId);
                 break;
+            case "SELL_COMMAND":
+                appUser.setSellUserState(SELL_CHANGE_STOCK);
+                appUserDAO.save(appUser);
+                utilsService.sendAnswer(createTable.getInfoAboutBag("telegramUser_"+appUser.getTelegramUserId()), appUser.getTelegramUserId());
+                List<String> list = createTable.getAllKeysInBag("telegramUser_"+appUser.getTelegramUserId());
+                List<ButtonForKeyboard> buttonsList = new ArrayList<>();
+                String output = appUser.getUserName()+", вы активировали команду /sell! \n"
+                        +"Введите ключ акции, которую хотите продать";
+
+                for (String buttonText : list) {
+                    buttonsList.add(new ButtonForKeyboard(buttonText, buttonText));
+                }
+
+                utilsService.sendMessageAnswerWithInlineKeyboard(output, chatId, buttonsList.toArray(new ButtonForKeyboard[0]));
+                break;
             case "CONSENT_STATE":
                 utilsService.sendEditMessageAnswerWithInlineKeyboard(CONSENT_MESSAGE, chatId, messageId, new ButtonForKeyboard("Соглашаюсь", "YES_BUTTON_CONSENT"), new ButtonForKeyboard("Отказываюсь", "NO_BUTTON_CONSENT"));
                 appUser.setState(WAIT_TO_AGREE_CONSENT);
@@ -134,6 +151,17 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                 appUser.setActiveBuy(newValue);
                 appUser.setBuyUserState(BUY_PROOF);
                 appUserDAO.save(appUser);
+                break;
+            case CHANGE_STOCK:
+                if(callBackData.equals("RECOGNIZE_TICKET")){
+                    List<StockQuote> list = stockService.fuzzysearchCompany("сбербанк");
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for(StockQuote stockQuote : list){
+                      stringBuilder.append(stockQuote.getShortName()+" - "+stockQuote.getSecId());
+
+                    }
+                    utilsService.sendAnswer(stringBuilder.toString(), chatId);
+                }
                 break;
         }
     }

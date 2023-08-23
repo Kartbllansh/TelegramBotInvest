@@ -44,7 +44,6 @@ public class CreateTableImpl implements CreateTable {
             stock.setCountStock(stock.getCountStock()+count);
             String sqlUpdate = "UPDATE " + tableName + " SET count_stonks = ?, time_buy = ?, purchase_stonks = ?, shortName = ? WHERE code_stocks = ?";
             jdbcTemplate.update(sqlUpdate, stock.getCountStock(), LocalDateTime.now(), withDivide, shortName, key);
-            //TODO цена покупки до сих пор в целых числах
 
         } else {
             String sql = "INSERT INTO " + tableName + " (code_stocks, count_stonks, time_buy, purchase_stonks, shortName) VALUES (?, ?, ?, ?, ?)";
@@ -69,8 +68,6 @@ public class CreateTableImpl implements CreateTable {
             log.error("Отрицательное значение в addNoteAboutSell");
         }
 
-        //TODO  метод, который будет позволять рассчитывать какое количество акций осталось на счету у пользователя
-        //TODO String должен вернуть пользователю, что по итогу вышло
 
     }
 

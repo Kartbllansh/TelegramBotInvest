@@ -2,7 +2,6 @@ package org.example.controller;
 
 import lombok.extern.log4j.Log4j;
 import org.example.dao.AppUserDAO;
-import org.example.entity.AppUser;
 import org.example.service.UpdateProducer;
 import org.example.utils.MessageUtils;
 import org.springframework.stereotype.Component;
@@ -111,11 +110,6 @@ public class UpdateConroller {
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
-    }
-    private void setFileIsReceivedView(Update update) {
-        var sendMessage = messageUtils.generateSendMessageWithText(update,
-                "Файл получен! Обрабатывается...");
-        setView(sendMessage);
     }
     private void processPhotoMessage(Update update) {
         updateProducer.produce(PHOTO_MESSAGE_UPDATE, update);

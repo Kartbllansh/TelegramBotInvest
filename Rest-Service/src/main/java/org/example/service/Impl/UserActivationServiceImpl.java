@@ -21,7 +21,7 @@ private final AppUserDAO appUserDAO;
         var optional = appUserDAO.findById(userId);
         if (optional.isPresent()) {
             var user = optional.get();
-            user.setIsActive(true);
+            user.setIsActiveMail(true);
             appUserDAO.save(user);
             return true;
         }

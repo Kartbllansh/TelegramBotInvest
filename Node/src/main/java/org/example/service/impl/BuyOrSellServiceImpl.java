@@ -8,7 +8,6 @@ import org.example.jpa.entity.StockQuote;
 import org.example.service.*;
 import org.example.utils.ButtonForKeyboard;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -41,7 +40,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
             case CHANGE_COUNT:
                buyChangeCount(appUser, cmd, chatId, messageId);
                 break;
-            case CHANGE_STONKS:
+            case CHANGE_STOCK:
                 buyChangeStocks(appUser, cmd, chatId, messageId);
                 break;
             case BUY_PROOF:

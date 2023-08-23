@@ -2,7 +2,6 @@ package org.example.controller;
 import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.log4j.Log4j;
 import org.example.service.UserActivationService;
-import org.example.utils.CryptoTool;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

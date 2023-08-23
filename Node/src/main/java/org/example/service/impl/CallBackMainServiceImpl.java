@@ -80,7 +80,7 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                 producerService.producerAnswerWithCallBack(doEditMessage(messageId,chatId, utilsService.help()));
                 break;
             case "BUY_COMMAND":
-                appUser.setBuyUserState(CHANGE_STONKS);
+                appUser.setBuyUserState(CHANGE_STOCK);
                 appUserDAO.save(appUser);
                 utilsService.sendEditMessageAnswer(appUser.getUserName()+", вы активировали команду /buy! \n"
                         +"Введите код акции, которую хотите купить", chatId, messageId);

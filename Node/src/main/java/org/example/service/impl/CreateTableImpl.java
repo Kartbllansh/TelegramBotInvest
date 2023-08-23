@@ -4,14 +4,12 @@ import lombok.extern.log4j.Log4j;
 import org.example.dao.StocksRowMapper;
 import org.example.entity.Stocks;
 import org.example.service.CreateTable;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.ResultSet;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,7 +82,6 @@ public class CreateTableImpl implements CreateTable {
         if (bags.isEmpty()) {
         return "На данный момент ваш инвестиционный портфель пуст";
         } else {
-            int rowCount = 0;
             result.append("На данный момент в вашем инвестиционном портфеле находятся следующие активы: \n");
             for (Stocks stocks : bags) {
                 String codeStock = stocks.getCodeStock();
@@ -113,8 +110,9 @@ public class CreateTableImpl implements CreateTable {
 
     public Long checkAboutCountSell(Long count, String tableName, String codeStocks){
             String sql = "SELECT count_stonks FROM " + tableName + " WHERE code_stocks = ?";
-            Long countStonks = jdbcTemplate.queryForObject(sql, Long.class, codeStocks);
-            return countStonks - count;
+            Long countStocks = jdbcTemplate.queryForObject(sql, Long.class, codeStocks);
+        assert countStocks != null;
+            return countStocks - count;
     }
 
     @Override

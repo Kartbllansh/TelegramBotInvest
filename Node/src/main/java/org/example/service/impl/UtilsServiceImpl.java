@@ -4,16 +4,13 @@ import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
 import org.example.service.ProducerService;
 import org.example.service.UtilsService;
-import org.example.service.WalletMain;
 import org.example.utils.ButtonForKeyboard;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -59,14 +56,6 @@ public class UtilsServiceImpl implements UtilsService {
 
     }
 
-    @Override
-    public Integer sendAnswerWithId(String output, Long chatId) {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        sendMessage.setText(output);
-        producerService.producerAnswer(sendMessage);
-        return sendMessage.getReplyToMessageId();
-    }
 
     @Override
     public void sendEditMessageAnswer(String output, Long chatId, long messageId) {

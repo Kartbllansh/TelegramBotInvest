@@ -33,7 +33,7 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public String registerUser(AppUser appUser) {
-        if (appUser.getIsActive()) {
+        if (appUser.getIsActiveMail()) {
             return EmojiParser.parseToUnicode("Вы уже зарегистрированы!"+":white_check_mark:") ;
         } else if (appUser.getEmail() != null) {
             return EmojiParser.parseToUnicode("Вам на почту уже было отправлено письмо"+":hourglass_flowing_sand:"+ "\n"

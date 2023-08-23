@@ -106,7 +106,7 @@ public class MainServiceImpl implements MainService {
                 utilsService.sendAnswer(utilsService.help(), chatId);
                 break;
             case BUY:
-                appUser.setBuyUserState(CHANGE_STONKS);
+                appUser.setBuyUserState(CHANGE_STOCK);
                 appUserDAO.save(appUser);
                 utilsService.sendAnswer(appUser.getUserName()+", вы активировали команду /buy! \n"
                         +"Введите код акции, которую хотите купить", chatId);
@@ -168,7 +168,7 @@ public class MainServiceImpl implements MainService {
                     .userName(telegramUser.getUserName())
                     .lastName(telegramUser.getLastName())
                     .firstName(telegramUser.getFirstName())
-                    .isActive(false)
+                    .isActiveMail(false)
                     .state(BASIC_STATE)
                     .walletMoney(BigDecimal.valueOf(1000.00))
                     //TODO рассказать пользователю, что у него есть на счету косарик

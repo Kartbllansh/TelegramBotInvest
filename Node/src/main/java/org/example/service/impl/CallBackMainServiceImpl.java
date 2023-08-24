@@ -15,6 +15,7 @@ import java.util.List;
 
 import static org.example.entity.BuyUserState.*;
 import static org.example.entity.SellUserState.*;
+import static org.example.entity.UserState.BASIC_STATE;
 import static org.example.entity.UserState.WAIT_TO_AGREE_CONSENT;
 import static org.example.entity.WalletUserState.NOT_WALLET;
 import static org.example.entity.WalletUserState.WALLET_TOP_UP_CHANGE_COUNT;
@@ -100,15 +101,15 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                     buttonsList.add(new ButtonForKeyboard(buttonText, buttonText));
                 }
 
-                utilsService.sendMessageAnswerWithInlineKeyboard(output, chatId, buttonsList.toArray(new ButtonForKeyboard[0]));
+                utilsService.sendMessageAnswerWithInlineKeyboard(output, chatId, true, buttonsList.toArray(new ButtonForKeyboard[0]));
                 break;
             case "CONSENT_STATE":
-                utilsService.sendEditMessageAnswerWithInlineKeyboard(CONSENT_MESSAGE, chatId, messageId, new ButtonForKeyboard("Соглашаюсь", "YES_BUTTON_CONSENT"), new ButtonForKeyboard("Отказываюсь", "NO_BUTTON_CONSENT"));
+                utilsService.sendEditMessageAnswerWithInlineKeyboard(CONSENT_MESSAGE, chatId, messageId, true, new ButtonForKeyboard("Соглашаюсь", "YES_BUTTON_CONSENT"), new ButtonForKeyboard("Отказываюсь", "NO_BUTTON_CONSENT"));
                 appUser.setState(WAIT_TO_AGREE_CONSENT);
                 appUserDAO.save(appUser);
                 break;
             case "LEARNING_STATE":
-                utilsService.sendMessageAnswerWithInlineKeyboard(LEARNING_MESSAGE, chatId, new ButtonForKeyboard("Не придумал", "BOUT"));
+                utilsService.sendMessageAnswerWithInlineKeyboard(LEARNING_MESSAGE, chatId, true, new ButtonForKeyboard("Не придумал", "BOUT"));
                 break;
         }
     }
@@ -118,10 +119,14 @@ public class CallBackMainServiceImpl implements CallBackMainService {
             case "YES_BUTTON_CONSENT":
                 appUser.setIsActiveConsent(true);
                 utilsService.sendEditMessageAnswer("Вы согласились с условиями", chatId, messageId);
+                appUser.setState(BASIC_STATE);
+                appUserDAO.save(appUser);
                 break;
             case "NO_BUTTON_CONSENT":
                 appUser.setIsActiveConsent(false);
                 utilsService.sendEditMessageAnswer("Вы отказались с условиями", chatId, messageId);
+                appUser.setState(BASIC_STATE);
+                appUserDAO.save(appUser);
                 break;
         }
     }
@@ -147,20 +152,41 @@ public class CallBackMainServiceImpl implements CallBackMainService {
             case CHANGE_COUNT:
                 String newValue = appUser.getActiveBuy()+":"+callBackData;
                 String info ="Покупка "+callBackData+" "+utilsService.parseStringFromBD(newValue, 2)+" ("+utilsService.parseStringFromBD(newValue, 0)+") ";
-                utilsService.sendEditMessageAnswerWithInlineKeyboard(info+"\n Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId,messageId, new ButtonForKeyboard("Да", "YES_BUTTON_SELL"), new ButtonForKeyboard("Нет", "NO_BUTTON_SELL"));
+                utilsService.sendEditMessageAnswerWithInlineKeyboard(info+"\n Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId,messageId, true, new ButtonForKeyboard("Да", "YES_BUTTON_SELL"), new ButtonForKeyboard("Нет", "NO_BUTTON_SELL"));
                 appUser.setActiveBuy(newValue);
                 appUser.setBuyUserState(BUY_PROOF);
                 appUserDAO.save(appUser);
                 break;
             case CHANGE_STOCK:
                 if(callBackData.equals("RECOGNIZE_TICKET")){
-                    List<StockQuote> list = stockService.fuzzysearchCompany("сбербанк");
-                    StringBuilder stringBuilder = new StringBuilder();
-                    for(StockQuote stockQuote : list){
-                      stringBuilder.append(stockQuote.getShortName()+" - "+stockQuote.getSecId());
+                    appUser.setBuyUserState(LOOK_ID_BUY);
+                    utilsService.sendEditMessageAnswer("Введите имя компании, которая вас интересует", chatId, messageId);
+                    appUserDAO.save(appUser);
+                }
+                break;
+            case LOOK_ID_BUY:
 
-                    }
-                    utilsService.sendAnswer(stringBuilder.toString(), chatId);
+                if(callBackData.equals("BUY_ANOTHER_STOCK")){
+                   utilsService.sendEditMessageAnswer("Поиск не удался \n Воспользуйтесь браузером и выберите ключ, по которому приобретете акцию \n Как только определитесь отправте мне сообщением ключ.", chatId, messageId);
+                   appUser.setBuyUserState(CHANGE_STOCK);
+                   appUserDAO.save(appUser);
+
+                }
+
+                StockQuote stockQuote = stockService.getInfoAboutTicket(callBackData);
+                String messageIdFromDis = appUser.getActiveBuy();
+                if(!(stockQuote==null)) {
+                    BigDecimal cost = stockQuote.getPrevLegalClosePrice();
+                    String symbol = stockQuote.getSecId();
+                    info = "Стоимость ценной бумаги " + callBackData + " равняется " + cost + " это цена на момент " + stockQuote.getDate();
+                    String newActiveBuy = symbol+":"+cost+":"+stockQuote.getShortName()+":"+messageIdFromDis;
+                    utilsService.sendEditMessageAnswer(info+" \n \n Какое количество акций вы хотите приобрести? \n Максимум вы можете приобрести "+utilsService.countHowMuchStock(newActiveBuy, appUser), chatId, messageId);
+                    appUser.setBuyUserState(CHANGE_COUNT);
+
+                    appUser.setActiveBuy(newActiveBuy);
+                    appUserDAO.save(appUser);
+                } else {
+                    utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode("Чат-бот не знаком с такой ценной бумагой, как "+callBackData+"  :robot_face:")+"\n  В ближайшее время мы попробуем добавить данную компанию в список доступных. \n Введите другую акцию или отмените покупку", chatId, Long.parseLong(messageIdFromDis), true, new ButtonForKeyboard("Отменить", "CANCEL"));
                 }
                 break;
         }
@@ -171,7 +197,7 @@ public class CallBackMainServiceImpl implements CallBackMainService {
             case SELL_CHANGE_STOCK:
                 if (callBackData.equals("LIST_OWN_STOCK")){
                     String output = createTable.getInfoAboutBag("telegramUser_"+appUser.getTelegramUserId());
-                    utilsService.sendEditMessageAnswerWithInlineKeyboard(output, chatId, messageId, new ButtonForKeyboard("Отмена продажи", "CANCEL"));
+                    utilsService.sendEditMessageAnswerWithInlineKeyboard(output, chatId, messageId, true, new ButtonForKeyboard("Отмена продажи", "CANCEL"));
                 }
 
 
@@ -180,14 +206,14 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                     BigDecimal cost = stockQuote.getPrevLegalClosePrice();
                     String symbol = stockQuote.getSecId();
                     String output = "Выбрана акция " + callBackData+" \n Введите также количество акций, которое вы хотите продать. Сейчас у вас "+createTable.countOfTheBag("telegramuser_"+appUser.getTelegramUserId(), symbol);
-                    utilsService.sendEditMessageAnswerWithInlineKeyboard(output, chatId, messageId, new ButtonForKeyboard("Продать все", "SELL_ALL_COMMAND"));
+                    utilsService.sendEditMessageAnswerWithInlineKeyboard(output, chatId, messageId, true, new ButtonForKeyboard("Продать все", "SELL_ALL_COMMAND"));
 
                     appUser.setSellUserState(SELL_CHANGE_COUNT);
                     appUser.setActiveBuy(symbol + ":" + cost+":"+stockQuote.getShortName());
                     appUserDAO.save(appUser);
                 } else {
                     String output = "Чат-бот не знаком с такой ценной бумаги. Убедитесь, что вы хотите продать именно " + callBackData + "\n Если окажется, что вас запрос верен, напишите нам в поддержку. \n Мы обязательно поможем";
-                    utilsService.sendEditMessageAnswerWithInlineKeyboard(output, chatId, messageId, new ButtonForKeyboard("Список ваших акций", "LIST_OWN_STOCKS"));
+                    utilsService.sendEditMessageAnswerWithInlineKeyboard(output, chatId, messageId, true, new ButtonForKeyboard("Список ваших акций", "LIST_OWN_STOCKS"));
                     //createTable.getInfoAboutBag("telegramuser_" + appUser.getTelegramUserId());
                 }
 
@@ -200,7 +226,7 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                     appUser.setSellUserState(SELL_PROOF);
                     appUser.setActiveBuy(temporaryValue + ":" + count);
                     appUserDAO.save(appUser);
-                    utilsService.sendEditMessageAnswerWithInlineKeyboard("Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId,messageId, new ButtonForKeyboard("Да", "YES_BUTTON_SELL"), new ButtonForKeyboard("Нет", "NO_BUTTON_SELL"));
+                    utilsService.sendEditMessageAnswerWithInlineKeyboard("Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId,messageId, true, new ButtonForKeyboard("Да", "YES_BUTTON_SELL"), new ButtonForKeyboard("Нет", "NO_BUTTON_SELL"));
                 }
         }
     }

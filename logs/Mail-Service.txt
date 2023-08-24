@@ -4,3 +4,5 @@ INFO  2023-07-09 13:21:02 MailSenderServiceImpl:38 Отправлено пись
 INFO  2023-07-19 18:28:19 MailSenderServiceImpl:38 Отправлено письмо на почту cehewag873@sparkroi.com
 INFO  2023-07-23 20:45:23 MailSenderServiceImpl:38 Отправлено письмо на почту fenani3797@nmaller.com
 INFO  2023-08-19 12:55:11 MailSenderServiceImpl:38 Отправлено письмо на почту movolovo93@gmail.com
+INFO  2023-08-23 20:49:54 MailSenderServiceImpl:39 Отправлено письмо на почту pavelgerasimik@mail.ru
+INFO  2023-08-24 10:52:41 MailSenderServiceImpl:39 Отправлено письмо на почту refejen130@stypedia.com

@@ -39,7 +39,7 @@ public class WalletServiceImpl implements WalletService {
            //utilsService.sendAnswer(infoAboutBalance, chatId);
            utilsService.sendEditMessageAnswer(infoAboutBalance, chatId, messageId);
         } else if (WALLET_TOP_UP_CMD.equals(serviceCommand)) {
-            utilsService.sendEditMessageAnswerWithInlineKeyboard("Введите сумму, на которую хотите увеличить свой счет", chatId, messageId, new ButtonForKeyboard("Отмена", "CANCEL"));
+            utilsService.sendEditMessageAnswerWithInlineKeyboard("Введите сумму, на которую хотите увеличить свой счет", chatId, messageId, true, new ButtonForKeyboard("Отмена", "CANCEL"));
             appUser.setWalletUserState(WALLET_TOP_UP_CHANGE_COUNT);
             appUserDAO.save(appUser);
         }
@@ -52,7 +52,7 @@ public class WalletServiceImpl implements WalletService {
         appUser.setWalletUserState(NOT_WALLET);
         appUserDAO.save(appUser);
     } else {
-        utilsService.sendEditMessageAnswerWithInlineKeyboard("Пожалуйста введите корректное число или нажмите /cancel, чтобы выйти", chatId, messageId, new ButtonForKeyboard("Отмена", "CANCEL") );
+        utilsService.sendEditMessageAnswerWithInlineKeyboard("Пожалуйста введите корректное число или нажмите /cancel, чтобы выйти", chatId, messageId, true, new ButtonForKeyboard("Отмена", "CANCEL") );
     }
     }
 

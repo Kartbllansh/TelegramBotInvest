@@ -24,8 +24,9 @@ public class ActivationController {
 
             userActivationService.getMessageAboutRegist(id);
             log.info("Успешная регистрация пользователя");
-            return ResponseEntity.ok().body(EmojiParser.parseToUnicode("Регистрация успешно завершена!"+":white_check_mark:"+"\n Возвращайтесь в чат-бот и давайте инвестировать"+"\t\n" +
-                    ":money_with_wings:"));
+            return ResponseEntity.ok().body("Успешная регистрация");
+            /*return ResponseEntity.ok().body(EmojiParser.parseToUnicode("Регистрация успешно завершена!"+":white_check_mark:"+"\n Возвращайтесь в чат-бот и давайте инвестировать"+"\t\n" +
+                    ":money_with_wings:"));*/
         }
         return ResponseEntity.internalServerError().build();
     }

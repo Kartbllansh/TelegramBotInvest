@@ -65,26 +65,34 @@ public class UtilsServiceImpl implements UtilsService {
       editMessageText.setText(output);
       producerService.producerAnswerWithCallBack(editMessageText);
     }
+    // true -
+    // false |
+    private InlineKeyboardMarkup doButtonInlineKeyboard(boolean area, ButtonForKeyboard... buttons) {
+        InlineKeyboardMarkup markupInlineKeyboard = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
 
-    private InlineKeyboardMarkup doButtonInlineKeyboard(ButtonForKeyboard... buttons) {
-        InlineKeyboardMarkup markupInLineKeyboard = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
-        List<InlineKeyboardButton> rowInLine = new ArrayList<>();
+        int buttonsPerRow = area ? 2 : 1; // Определяем количество кнопок в строке
 
-        for (ButtonForKeyboard button : buttons) {
+        List<InlineKeyboardButton> currentRow = new ArrayList<>();
+
+        for (int i = 0; i < buttons.length; i++) {
+            ButtonForKeyboard button = buttons[i];
             InlineKeyboardButton inlineButton = new InlineKeyboardButton();
             inlineButton.setText(button.getText());
             inlineButton.setCallbackData(button.getCallbackData());
 
+            currentRow.add(inlineButton);
 
-            rowInLine.add(inlineButton);
-
+            if (currentRow.size() >= buttonsPerRow || i == buttons.length - 1) {
+                rowsInline.add(currentRow);
+                currentRow = new ArrayList<>();
+            }
         }
-        rowsInLine.add(rowInLine);
 
-        markupInLineKeyboard.setKeyboard(rowsInLine);
-        return markupInLineKeyboard;
+        markupInlineKeyboard.setKeyboard(rowsInline);
+        return markupInlineKeyboard;
     }
+
 
     @Override
     public String help() {
@@ -114,21 +122,21 @@ public class UtilsServiceImpl implements UtilsService {
     }
 
     @Override
-    public void sendMessageAnswerWithInlineKeyboard(String output, long chatId, ButtonForKeyboard... buttons) {
+    public void sendMessageAnswerWithInlineKeyboard(String output, long chatId, boolean area, ButtonForKeyboard... buttons) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(output);
-        sendMessage.setReplyMarkup(doButtonInlineKeyboard(buttons));
+        sendMessage.setReplyMarkup(doButtonInlineKeyboard(area ,buttons));
         producerService.producerAnswer(sendMessage);
     }
 
     @Override
-    public void sendEditMessageAnswerWithInlineKeyboard(String output, long chatId, long messageId, ButtonForKeyboard... buttons) {
+    public void sendEditMessageAnswerWithInlineKeyboard(String output, long chatId, long messageId,boolean area, ButtonForKeyboard... buttons) {
         EditMessageText editMessageText = new EditMessageText();
         editMessageText.setChatId(chatId);
         editMessageText.setText(output);
         editMessageText.setMessageId((int) messageId);
-        editMessageText.setReplyMarkup(doButtonInlineKeyboard(buttons));
+        editMessageText.setReplyMarkup(doButtonInlineKeyboard(area, buttons));
         producerService.producerAnswerWithCallBack(editMessageText);
     }
 

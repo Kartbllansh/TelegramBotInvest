@@ -7,5 +7,6 @@ public interface BuyOrSellService {
     void onActionSell(AppUser appUser, String cmd, Long chatId, long messageId);
     String buyProofYes(AppUser appUser);
     String sellProofYes(AppUser appUser);
+    void buyChangeStocks(AppUser appUser, String cmd, Long chatId, long messageId);
 
 }

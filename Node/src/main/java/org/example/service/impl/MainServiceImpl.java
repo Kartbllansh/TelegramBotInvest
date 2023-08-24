@@ -89,12 +89,12 @@ public class MainServiceImpl implements MainService {
     private void processServiceCommand(AppUser appUser, String cmd, long chatId, long messageId) {
         var serviceCommand = CommandService.fromValue(cmd);
         if(serviceCommand==null){
-            utilsService.sendMessageAnswerWithInlineKeyboard("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId, new ButtonForKeyboard("Help", "HELP_COMMAND"));
+            utilsService.sendMessageAnswerWithInlineKeyboard("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId, true, new ButtonForKeyboard("Help", "HELP_COMMAND"));
         }
         switch (Objects.requireNonNull(serviceCommand)){
             case START:
                 log.info("Новый пользователь с именем " + appUser.getUserName());
-                utilsService.sendMessageAnswerWithInlineKeyboard("Приветствую, "+appUser.getUserName()+ "!\n {тут будет красивое вступление} \n Чтобы посмотреть список доступных команд введите /help", chatId, new ButtonForKeyboard("Согласие", "CONSENT_STATE"), new ButtonForKeyboard("Обучение", "LEARNING_STATE"));
+                utilsService.sendMessageAnswerWithInlineKeyboard("Приветствую, "+appUser.getUserName()+ "!\n {тут будет красивое вступление} \n Чтобы посмотреть список доступных команд введите /help", chatId, false, new ButtonForKeyboard("Согласие", "CONSENT_STATE"), new ButtonForKeyboard("Обучение", "LEARNING_STATE"));
                 break;
             case REGISTRATION:
                 log.info("Регистрация пользователя "+appUser.getUserName()+" с почтой "+appUser.getEmail());
@@ -107,7 +107,7 @@ public class MainServiceImpl implements MainService {
                 appUser.setBuyUserState(CHANGE_STOCK);
                 appUserDAO.save(appUser);
                 utilsService.sendMessageAnswerWithInlineKeyboard(appUser.getUserName()+", вы активировали команду /buy! \n"
-                        +"Введите код акции, которую хотите купить", chatId, new ButtonForKeyboard("Узнать ticket", "RECOGNIZE_TICKET"));
+                        +"Введите код акции, которую хотите купить", chatId, true, new ButtonForKeyboard("Узнать ticket(not work)", "RECOGNIZE_TICKET"));
 
                 break;
             case SELL:
@@ -123,7 +123,7 @@ public class MainServiceImpl implements MainService {
                     buttonsList.add(new ButtonForKeyboard(buttonText, buttonText));
                 }
 
-                utilsService.sendMessageAnswerWithInlineKeyboard(output, chatId, buttonsList.toArray(new ButtonForKeyboard[0]));
+                utilsService.sendMessageAnswerWithInlineKeyboard(output, chatId, true, buttonsList.toArray(new ButtonForKeyboard[0]));
                 break;
             case WALLET_MONEY:
                 appUser.setWalletUserState(WALLET_CHANGE_CMD);
@@ -131,11 +131,11 @@ public class MainServiceImpl implements MainService {
                 utilsService.sendMessageAnswerWithInlineKeyboard(appUser.getUserName()+", Вы активировали команду, позволящую работать с балансом на вашем кошельке. \n"
                         +"Выберите какую из команд вы хотели бы использовать: \n"
                         +"* /top_up - пополните баланс \n"
-                        +" * /look_balance - посмотрите, сколько у вас на счету денег", chatId, new ButtonForKeyboard("Пополнить", "TOP_UP_COMMAND"), new ButtonForKeyboard("Посмотреть", "LOOK_BALANCE_COMMAND"));
+                        +" * /look_balance - посмотрите, сколько у вас на счету денег", chatId, false, new ButtonForKeyboard("Пополнить", "TOP_UP_COMMAND"), new ButtonForKeyboard("Посмотреть", "LOOK_BALANCE_COMMAND"));
                 break;
             default:
                 //sendAnswer("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId);
-                utilsService.sendMessageAnswerWithInlineKeyboard("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId, new ButtonForKeyboard("Help", "HELP_COMMAND"));
+                utilsService.sendMessageAnswerWithInlineKeyboard("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId, true, new ButtonForKeyboard("Help", "HELP_COMMAND"));
                 break;
         }
 
@@ -167,7 +167,6 @@ public class MainServiceImpl implements MainService {
                     .isActiveMail(false)
                     .state(BASIC_STATE)
                     .walletMoney(BigDecimal.valueOf(1000.00))
-
                     .buyUserState(NOT_BUY)
                     .sellUserState(NOT_SELL)
                     .walletUserState(NOT_WALLET)

@@ -12,8 +12,8 @@ public interface UtilsService {
     void sendEditMessageAnswer(String output, Long chatId, long messageId);
     String help();
     String parseStringFromBD(String s, int i);
-    void sendMessageAnswerWithInlineKeyboard(String output, long chatId, ButtonForKeyboard... buttons);
-    void sendEditMessageAnswerWithInlineKeyboard(String output, long chatId, long messageId, ButtonForKeyboard... buttons);
+    void sendMessageAnswerWithInlineKeyboard(String output, long chatId, boolean area, ButtonForKeyboard... buttons);
+    void sendEditMessageAnswerWithInlineKeyboard(String output, long chatId, long messageId,boolean area, ButtonForKeyboard... buttons);
     BigDecimal countSummaPurchase(String info);
     BigInteger countHowMuchStock(String info, AppUser appUser);
 

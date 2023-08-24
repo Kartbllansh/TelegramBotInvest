@@ -33,7 +33,8 @@ private final AppUserDAO appUserDAO;
         var optional = appUserDAO.findById(trueId);
         if(optional.isPresent()){
             var user = optional.get();
-            //long chatId = user.getChatId();
+            long chatId = user.getTelegramUserId();
+            //producerService.producerAnswer(sendMessage);
 
 
         }

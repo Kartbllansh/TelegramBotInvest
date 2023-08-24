@@ -31,7 +31,7 @@ public class StockServiceImpl implements StockService {
         return s.orElse(null);
     }
 
-    public List<StockQuote> searchOnCompany(String searchTerm, int maxResults){
+    public List<StockQuote> searchOnCompanyZAPAS(String searchTerm, int maxResults){
 // Рассчитываем порог сходства на основе максимального количества результатов
         float similarityThreshold = calculateSimilarityThreshold(maxResults);
 
@@ -54,6 +54,33 @@ public class StockServiceImpl implements StockService {
             return results;
         }
     }
+    public List<StockQuote> searchOnCompany(String searchTerm, int maxResults) {
+        float similarityThreshold = calculateSimilarityThreshold(maxResults);
+        String sqlQuery2 = "SELECT * FROM moex WHERE short_name ILIKE :searchTerm AND similarity(short_name, :searchTerm) >= :threshold";
+        String sqlQuery = "SELECT * FROM moex WHERE short_name % :searchTerm AND similarity(short_name, :searchTerm) >= :threshold";
+
+        while (true) {
+            Query query = entityManager.createNativeQuery(sqlQuery, StockQuote.class);
+            query.setParameter("searchTerm", searchTerm);
+            query.setParameter("threshold", similarityThreshold);
+
+            List<StockQuote> results = query.getResultList();
+            if (results != null && !results.isEmpty()) {
+                return results;
+            }
+
+            // Если результатов нет, уменьшаем порог сходства
+            similarityThreshold -= 0.1f; // Уменьшаем порог на 0.1 (можете настроить в соответствии с вашими требованиями)
+
+            // Если порог становится слишком низким, выходим из цикла
+            if (similarityThreshold < 0.1f) {
+                break;
+            }
+        }
+
+        return null; // Если не найдено ни одной компании при достижении минимального порога
+    }
+
 
     private float calculateSimilarityThreshold(int maxResults) {
         // Максимальный порог сходства, который будет использоваться, если maxResults = 1

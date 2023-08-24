@@ -200,7 +200,7 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                     utilsService.sendEditMessageAnswerWithInlineKeyboard(output, chatId, messageId, true, new ButtonForKeyboard("Отмена продажи", "CANCEL"));
                 }
 
-
+                String activeBuy = appUser.getActiveBuy();
                 StockQuote stockQuote = stockService.getInfoAboutTicket(callBackData);
                 if (!(stockQuote== null)) {
                     BigDecimal cost = stockQuote.getPrevLegalClosePrice();
@@ -209,7 +209,7 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                     utilsService.sendEditMessageAnswerWithInlineKeyboard(output, chatId, messageId, true, new ButtonForKeyboard("Продать все", "SELL_ALL_COMMAND"));
 
                     appUser.setSellUserState(SELL_CHANGE_COUNT);
-                    appUser.setActiveBuy(symbol + ":" + cost+":"+stockQuote.getShortName());
+                    appUser.setActiveBuy(symbol + ":" + cost+":"+stockQuote.getShortName()+":"+activeBuy);
                     appUserDAO.save(appUser);
                 } else {
                     String output = "Чат-бот не знаком с такой ценной бумаги. Убедитесь, что вы хотите продать именно " + callBackData + "\n Если окажется, что вас запрос верен, напишите нам в поддержку. \n Мы обязательно поможем";

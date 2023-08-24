@@ -91,6 +91,7 @@ public class MainServiceImpl implements MainService {
         if(serviceCommand==null){
             utilsService.sendMessageAnswerWithInlineKeyboard("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId, true, new ButtonForKeyboard("Help", "HELP_COMMAND"));
         }
+        log.info("MESSAGE"+cmd);
         switch (Objects.requireNonNull(serviceCommand)){
             case START:
                 log.info("Новый пользователь с именем " + appUser.getUserName());
@@ -132,6 +133,9 @@ public class MainServiceImpl implements MainService {
                         +"Выберите какую из команд вы хотели бы использовать: \n"
                         +"* /top_up - пополните баланс \n"
                         +" * /look_balance - посмотрите, сколько у вас на счету денег", chatId, false, new ButtonForKeyboard("Пополнить", "TOP_UP_COMMAND"), new ButtonForKeyboard("Посмотреть", "LOOK_BALANCE_COMMAND"));
+                break;
+            case SUPPORT:
+                utilsService.sendAnswer("Бла, бла... Красивый тeкст \n @Kartbllansh", chatId);
                 break;
             default:
                 //sendAnswer("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId);

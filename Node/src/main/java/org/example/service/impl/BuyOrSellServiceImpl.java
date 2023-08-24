@@ -57,7 +57,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
     }
 
     private void lookIdBuy(AppUser appUser, String cmd, Long chatId, long messageId) {
-        List<StockQuote> list = stockService.searchOnCompany(cmd, 13);
+        List<StockQuote> list = stockService.searchOnCompany(cmd, 11);
         StringBuilder stringBuilder = new StringBuilder("Результат поиска: \n \n");
         List<ButtonForKeyboard> buttonForKeyboards = new ArrayList<>();
         if (!(list == null || list.isEmpty())) {
@@ -70,7 +70,6 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         } else {
             stringBuilder.append("Ничего не найдено! \n");
         }
-        buttonForKeyboards.add(new ButtonForKeyboard("Расширить поиск(not)", "EXPAND_SEARCH"));
         buttonForKeyboards.add(new ButtonForKeyboard("Выбрать акцию самому", "BUY_ANOTHER_STOCK"));
         buttonForKeyboards.add(new ButtonForKeyboard("Отменить", "CANCEL"));
 

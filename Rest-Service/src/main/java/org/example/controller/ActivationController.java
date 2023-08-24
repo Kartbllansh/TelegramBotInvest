@@ -22,7 +22,7 @@ public class ActivationController {
         var res = userActivationService.activation(id);
         if (res) {
 
-            userActivationService.getMessageAboutRegist(id);
+            //userActivationService.getMessageAboutRegist(id);
             log.info("Успешная регистрация пользователя");
             return ResponseEntity.ok().body("Успешная регистрация");
             /*return ResponseEntity.ok().body(EmojiParser.parseToUnicode("Регистрация успешно завершена!"+":white_check_mark:"+"\n Возвращайтесь в чат-бот и давайте инвестировать"+"\t\n" +

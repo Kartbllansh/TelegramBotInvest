@@ -39554,3 +39554,11 @@ INFO  2023-08-25 17:28:42 ConsumerServiceImpl:59 Node ; CallBack is received
 INFO  2023-08-25 17:28:43 ConsumerServiceImpl:59 Node ; CallBack is received
 INFO  2023-08-25 17:28:46 MainServiceImpl:94 MESSAGE/buy
 INFO  2023-08-25 17:29:07 ConsumerServiceImpl:59 Node ; CallBack is received
+INFO  2023-08-25 17:43:24 NodeApplication:12 NodeApplication running...
+INFO  2023-08-25 17:43:36 MainServiceImpl:94 MESSAGE/buy
+INFO  2023-08-25 17:44:26 ConsumerServiceImpl:59 Node ; CallBack is received
+INFO  2023-08-25 17:45:58 MainServiceImpl:94 MESSAGE/wallet
+INFO  2023-08-25 17:46:00 ConsumerServiceImpl:59 Node ; CallBack is received
+INFO  2023-08-25 17:46:08 MainServiceImpl:94 MESSAGE/buy
+INFO  2023-08-25 17:46:35 NodeApplication:12 NodeApplication running...
+INFO  2023-08-25 17:46:42 ConsumerServiceImpl:59 Node ; CallBack is received

@@ -176,7 +176,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         BigDecimal countFromUser = BigDecimal.valueOf(count);
         appUserStockService.saveOrUpdateUserStock(appUser, utilsService.parseStringFromBD(activeBuy, 0), count, LocalDateTime.now(), purchace);
         //createTable.addNoteAboutBuy("telegramuser_"+appUser.getTelegramUserId(), utilsService.parseStringFromBD(activeBuy, 0), count, LocalDateTime.now(), purchace, utilsService.parseStringFromBD(activeBuy, 2));
-        String info = "Покупка выполнена успешна"+":white_check_mark:"+ "\n"+ walletMain.topDownWallet(purchace.multiply(countFromUser), appUser);
+        //String info = "Покупка выполнена успешна"+":white_check_mark:"+ "\n"+ walletMain.topDownWallet(purchace.multiply(countFromUser), appUser);
         String neInfo = ":white_check_mark:"+" Успешная покупка: "+utilsService.parseStringFromBD(activeBuy, 2)+"("+utilsService.parseStringFromBD(activeBuy, 0)+") "+count+" акций "+":white_check_mark:"+"\n \n "+walletMain.topDownWallet(purchace.multiply(countFromUser), appUser);
 
         appUser.setBuyUserState(NOT_BUY);
@@ -259,9 +259,9 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         int count = Integer.parseInt(utilsService.parseStringFromBD(activeSell, 4));
         BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(utilsService.parseStringFromBD(activeSell, 1)));
         BigDecimal countFromUser = BigDecimal.valueOf(count);
-
+        //TODO обработать исключения метода снизу
         appUserStockService.sellUserStock(appUser, utilsService.parseStringFromBD(activeSell, 0), count);
-        String info = walletMain.topUpWallet(countFromUser.multiply(purchace), appUser);
+        //String info = walletMain.topUpWallet(countFromUser.multiply(purchace), appUser);
         String neInfo = ":white_check_mark:"+" Успешная покупка: "+utilsService.parseStringFromBD(activeSell, 2)+"("+utilsService.parseStringFromBD(activeSell, 0)+") "+count+" акций "+":white_check_mark:"+"\n \n "+walletMain.topUpWallet(purchace.multiply(countFromUser), appUser);
         appUser.setSellUserState(NOT_SELL);
         appUserDAO.save(appUser);

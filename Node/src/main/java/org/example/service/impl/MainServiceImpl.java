@@ -40,7 +40,7 @@ public class MainServiceImpl implements MainService {
         this.appUserService = appUserService;
         this.utilsService = utilsService;
     }
-
+//c
     @Override
     public void processTextMessage(Update update) {
         long messageId = update.getMessage().getMessageId();

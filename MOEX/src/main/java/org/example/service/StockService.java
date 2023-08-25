@@ -1,6 +1,7 @@
 package org.example.service;
 
-import org.example.jpa.entity.StockQuote;
+
+import org.example.entity.StockQuote;
 
 import java.util.List;
 

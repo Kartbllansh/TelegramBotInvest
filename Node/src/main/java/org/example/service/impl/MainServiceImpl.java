@@ -162,6 +162,7 @@ public class MainServiceImpl implements MainService {
 
         var optional = appUserDAO.findByTelegramUserId(telegramUser.getId());
         if(optional.isEmpty()){
+            //тут дожно быть создание таблицы с именем "telegramUser_"+telegramUser.getId()
             createTable.createTable("telegramUser_"+telegramUser.getId());
             AppUser transientAppUser = AppUser.builder()
                     .telegramUserId(telegramUser.getId())

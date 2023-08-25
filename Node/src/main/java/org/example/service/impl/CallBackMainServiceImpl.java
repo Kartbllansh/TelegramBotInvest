@@ -3,7 +3,7 @@ package org.example.service.impl;
 import com.vdurmont.emoji.EmojiParser;
 import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
-import org.example.jpa.entity.StockQuote;
+import org.example.entity.StockQuote;
 import org.example.service.*;
 import org.example.utils.ButtonForKeyboard;
 import org.springframework.stereotype.Service;

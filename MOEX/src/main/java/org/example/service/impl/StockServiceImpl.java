@@ -1,7 +1,7 @@
 package org.example.service.impl;
 
-import org.example.jpa.dao.StockQuoteRepository;
-import org.example.jpa.entity.StockQuote;
+import org.example.dao.StockQuoteRepository;
+import org.example.entity.StockQuote;
 import org.example.service.StockService;
 import org.simmetrics.StringDistance;
 import org.simmetrics.StringMetric;

@@ -34631,3 +34631,8 @@ INFO  2023-08-24 17:19:05 MainServiceImpl:94 MESSAGE3
 INFO  2023-08-24 17:19:05 MainServiceImpl:94 MESSAGE3
 INFO  2023-08-24 17:19:05 MainServiceImpl:94 MESSAGE3
 INFO  2023-08-24 17:21:23 NodeApplication:12 NodeApplication running...
+INFO  2023-08-25 13:02:44 NodeApplication:12 NodeApplication running...
+INFO  2023-08-25 13:02:44 CreateTableImpl:30 Создана индивидувльная таблица с именем telegramUser_2051961513
+INFO  2023-08-25 13:02:44 MainServiceImpl:94 MESSAGE/start
+INFO  2023-08-25 13:02:44 MainServiceImpl:97 Новый пользователь с именем themilindd
+INFO  2023-08-25 13:02:44 MainServiceImpl:94 MESSAGE/help

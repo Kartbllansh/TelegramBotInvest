@@ -4,20 +4,16 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.example.jpa.dao.StockQuoteRepository;
-import org.example.jpa.entity.StockQuote;
+import org.example.dao.StockQuoteRepository;
+import org.example.entity.StockQuote;
 import org.example.service.MainBaseService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.simmetrics.StringDistance;
-import org.simmetrics.metrics.StringMetrics;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class MainBaseServiceImpl implements MainBaseService {

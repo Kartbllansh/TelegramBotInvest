@@ -3,6 +3,7 @@ package org.example.service.impl;
 import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.log4j.Log4j;
 import org.example.dao.AppUserDAO;
+import org.example.dao.StockQuoteRepository;
 import org.example.entity.AppUser;
 import org.example.entity.StockQuote;
 import org.example.service.*;
@@ -14,6 +15,7 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.example.entity.BuyUserState.*;
 import static org.example.entity.BuyUserState.NOT_BUY;
@@ -23,17 +25,17 @@ import static org.example.entity.SellUserState.*;
 @Service
 public class BuyOrSellServiceImpl implements BuyOrSellService {
     private final AppUserDAO appUserDAO;
-    private final CreateTable createTable;
     private final WalletMain walletMain;
     private final StockServiceImpl stockService;
     private final UtilsService utilsService;
+    private final AppUserStockService appUserStockService;
 
-    public BuyOrSellServiceImpl( AppUserDAO appUserDAO, CreateTable createTable, WalletMain walletMain, StockServiceImpl stockService, UtilsService utilsService) {
+    public BuyOrSellServiceImpl(AppUserDAO appUserDAO, WalletMain walletMain, StockServiceImpl stockService, UtilsService utilsService, AppUserStockService appUserStockService) {
         this.appUserDAO = appUserDAO;
-        this.createTable = createTable;
         this.walletMain = walletMain;
         this.stockService = stockService;
         this.utilsService = utilsService;
+        this.appUserStockService = appUserStockService;
     }
 
     @Override
@@ -149,7 +151,6 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
     }
 
     private void buyProof(AppUser appUser, String cmd, Long chatId, long messageId){
-
         if(cmd.equalsIgnoreCase("ДА")){
          String info = buyProofYes(appUser);
         utilsService.sendEditMessageAnswer(EmojiParser.parseToUnicode(info), chatId, Long.parseLong(utilsService.parseStringFromBD(appUser.getActiveBuy(), 3)));
@@ -173,8 +174,8 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         int count = Integer.parseInt(utilsService.parseStringFromBD(activeBuy, 4));
         BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(utilsService.parseStringFromBD(activeBuy, 1)));
         BigDecimal countFromUser = BigDecimal.valueOf(count);
-
-        createTable.addNoteAboutBuy("telegramuser_"+appUser.getTelegramUserId(), utilsService.parseStringFromBD(activeBuy, 0), count, LocalDateTime.now(), purchace, utilsService.parseStringFromBD(activeBuy, 2));
+        appUserStockService.saveOrUpdateUserStock(appUser, utilsService.parseStringFromBD(activeBuy, 0), count, LocalDateTime.now(), purchace);
+        //createTable.addNoteAboutBuy("telegramuser_"+appUser.getTelegramUserId(), utilsService.parseStringFromBD(activeBuy, 0), count, LocalDateTime.now(), purchace, utilsService.parseStringFromBD(activeBuy, 2));
         String info = "Покупка выполнена успешна"+":white_check_mark:"+ "\n"+ walletMain.topDownWallet(purchace.multiply(countFromUser), appUser);
         String neInfo = ":white_check_mark:"+" Успешная покупка: "+utilsService.parseStringFromBD(activeBuy, 2)+"("+utilsService.parseStringFromBD(activeBuy, 0)+") "+count+" акций "+":white_check_mark:"+"\n \n "+walletMain.topDownWallet(purchace.multiply(countFromUser), appUser);
 
@@ -189,7 +190,8 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
             long count = Long.parseLong(cmd);
 
             String codeStocks =utilsService.parseStringFromBD(temporaryValue, 0);
-            Long someResult = createTable.checkAboutCountSell(count, "telegramuser_"+appUser.getTelegramUserId(), codeStocks);
+            /*Long someResult = createTable.checkAboutCountSell(count, "telegramuser_"+appUser.getTelegramUserId(), codeStocks);*/
+            int someResult = appUserStockService.checkAboutCountSell(appUser, (int) count, codeStocks);
             if(someResult>=0) {
                 info = "Продажа " + count + " акций " + utilsService.parseStringFromBD(temporaryValue, 2)+"("+utilsService.parseStringFromBD(temporaryValue, 0)+")";
                 utilsService.sendEditMessageAnswerWithInlineKeyboard(info+"Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId, Long.parseLong(utilsService.parseStringFromBD(temporaryValue, 3)), true, new ButtonForKeyboard("Да", "YES_BUTTON_SELL"), new ButtonForKeyboard("Нет", "NO_BUTTON_SELL"));
@@ -198,7 +200,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
                 appUser.setActiveBuy(temporaryValue + ":" + count);
                 appUserDAO.save(appUser);
             } else {
-                utilsService.sendEditMessageAnswerWithInlineKeyboard("Нельзя продать"+count+" акций "+utilsService.parseStringFromBD(temporaryValue, 2)+", у вас их всего"+createTable.countOfTheBag("telegramuser_"+appUser.getTelegramUserId(),codeStocks), chatId, Long.parseLong(utilsService.parseStringFromBD(temporaryValue, 3)), true, new ButtonForKeyboard("Продать все", "SELL_ALL_COMMAND"));
+                utilsService.sendEditMessageAnswerWithInlineKeyboard("Нельзя продать"+count+" акций "+utilsService.parseStringFromBD(temporaryValue, 2)+", у вас их всего"+appUserStockService.countOfTheBag(appUser, codeStocks), chatId, Long.parseLong(utilsService.parseStringFromBD(temporaryValue, 3)), true, new ButtonForKeyboard("Продать все", "SELL_ALL_COMMAND"));
                 utilsService.sendDeleteMessageAnswer(chatId, messageId);
             }
         } else {
@@ -209,12 +211,12 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
     }
     private void sellChangeStock(AppUser appUser, String cmd, Long chatId, long messageId){
         String oldActiveBuy = appUser.getActiveBuy();
-        if(createTable.checkAboutCodeStock("telegramuser_"+appUser.getTelegramUserId(), cmd)) {
+        if(appUserStockService.hasUserBoughtStock(appUser, cmd)) {
             StockQuote stockQuote = stockService.getInfoAboutTicket(cmd);
             if (!(stockQuote== null)) {
                 BigDecimal cost = stockQuote.getPrevLegalClosePrice();
                 String symbol = stockQuote.getSecId();
-                utilsService.sendEditMessageAnswerWithInlineKeyboard("Выбрана акция " + cmd+"\n Введите также количество акций, которое вы хотите продать. \n Сейчас у вас "+createTable.countOfTheBag("telegramuser_"+appUser.getTelegramUserId(), symbol), chatId, Long.parseLong(oldActiveBuy), true, new ButtonForKeyboard("Продать все", "SELL_ALL_COMMAND"));
+                utilsService.sendEditMessageAnswerWithInlineKeyboard("Выбрана акция " + cmd+"\n Введите также количество акций, которое вы хотите продать. \n Сейчас у вас "+appUserStockService.countOfTheBag(appUser, symbol), chatId, Long.parseLong(oldActiveBuy), true, new ButtonForKeyboard("Продать все", "SELL_ALL_COMMAND"));
                 utilsService.sendDeleteMessageAnswer(chatId, messageId);
                 appUser.setSellUserState(SELL_CHANGE_COUNT);
                 appUser.setActiveBuy(symbol + ":" + cost+":"+stockQuote.getShortName()+":"+oldActiveBuy);
@@ -225,7 +227,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
                 utilsService.sendDeleteMessageAnswer(chatId, messageId);
             }
         } else {
-            utilsService.sendEditMessageAnswer("Такой акции нет в вашем инвестиционном портфеле \n Ваш портфель: \n "+createTable.getInfoAboutBag("telegramuser_"+appUser.getTelegramUserId()), chatId, Long.parseLong(oldActiveBuy));
+            utilsService.sendEditMessageAnswer("Такой акции нет в вашем инвестиционном портфеле \n Ваш портфель: \n "+appUserStockService.getInfoAboutBag(appUser), chatId, Long.parseLong(oldActiveBuy));
             utilsService.sendDeleteMessageAnswer(chatId, messageId);
         }
 
@@ -258,7 +260,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         BigDecimal purchace = BigDecimal.valueOf(Double.parseDouble(utilsService.parseStringFromBD(activeSell, 1)));
         BigDecimal countFromUser = BigDecimal.valueOf(count);
 
-        createTable.addNoteAboutSell("telegramuser_"+appUser.getTelegramUserId(), utilsService.parseStringFromBD(activeSell, 0), count);
+        appUserStockService.sellUserStock(appUser, utilsService.parseStringFromBD(activeSell, 0), count);
         String info = walletMain.topUpWallet(countFromUser.multiply(purchace), appUser);
         String neInfo = ":white_check_mark:"+" Успешная покупка: "+utilsService.parseStringFromBD(activeSell, 2)+"("+utilsService.parseStringFromBD(activeSell, 0)+") "+count+" акций "+":white_check_mark:"+"\n \n "+walletMain.topUpWallet(purchace.multiply(countFromUser), appUser);
         appUser.setSellUserState(NOT_SELL);

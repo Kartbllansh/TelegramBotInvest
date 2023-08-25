@@ -27,18 +27,18 @@ import static org.example.enums.CommandService.*;
 public class MainServiceImpl implements MainService {
     private final WalletService walletService;
     private final BuyOrSellService buyOrSellService;
-    private final CreateTable createTable;
     private final AppUserDAO appUserDAO;
     private final AppUserService appUserService;
     private final UtilsService utilsService;
+    private final AppUserStockService appUserStockService;
 
-    public MainServiceImpl(WalletService walletService, BuyOrSellService buyOrSellService, CreateTable createTable, AppUserDAO appUserDAO, AppUserService appUserService, UtilsService utilsService) {
+    public MainServiceImpl(WalletService walletService, BuyOrSellService buyOrSellService, AppUserDAO appUserDAO, AppUserService appUserService, UtilsService utilsService, AppUserStockService appUserStockService) {
         this.walletService = walletService;
         this.buyOrSellService = buyOrSellService;
-        this.createTable = createTable;
         this.appUserDAO = appUserDAO;
         this.appUserService = appUserService;
         this.utilsService = utilsService;
+        this.appUserStockService = appUserStockService;
     }
 //c
     @Override
@@ -114,8 +114,8 @@ public class MainServiceImpl implements MainService {
             case SELL:
                 appUser.setSellUserState(SELL_CHANGE_STOCK);
                 appUserDAO.save(appUser);
-                utilsService.sendAnswer(createTable.getInfoAboutBag("telegramUser_"+appUser.getTelegramUserId()), appUser.getTelegramUserId());
-                List<String> list = createTable.getAllKeysInBag("telegramUser_"+appUser.getTelegramUserId());
+                utilsService.sendAnswer(appUserStockService.getInfoAboutBag(appUser), appUser.getTelegramUserId());
+                List<String> list = appUserStockService.getAllKeysInBag(appUser);
                 List<ButtonForKeyboard> buttonsList = new ArrayList<>();
                 String output = appUser.getUserName()+", вы активировали команду /sell! \n"
                         +"Введите ключ акции, которую хотите продать";
@@ -163,7 +163,7 @@ public class MainServiceImpl implements MainService {
         var optional = appUserDAO.findByTelegramUserId(telegramUser.getId());
         if(optional.isEmpty()){
             //тут дожно быть создание таблицы с именем "telegramUser_"+telegramUser.getId()
-            createTable.createTable("telegramUser_"+telegramUser.getId());
+            //createTable.createTable("telegramUser_"+telegramUser.getId());
             AppUser transientAppUser = AppUser.builder()
                     .telegramUserId(telegramUser.getId())
                     .userName(telegramUser.getUserName())

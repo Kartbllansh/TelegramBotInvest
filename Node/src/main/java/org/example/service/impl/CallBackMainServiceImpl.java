@@ -28,20 +28,21 @@ public class CallBackMainServiceImpl implements CallBackMainService {
     private final AppUserDAO appUserDAO;
     private final BuyOrSellService buyOrSellService;
     private final StockService stockService;
-    private final CreateTable createTable;
     private final UtilsService utilsService;
     private final WalletMain walletMain;
+    private final AppUserStockService appUserStockService;
 
 
-    public CallBackMainServiceImpl(ProducerService producerService, AppUserDAO appUserDAO, BuyOrSellService buyOrSellService, StockService stockService, CreateTable createTable, UtilsService utilsService, WalletMain walletMain) {
+    public CallBackMainServiceImpl(ProducerService producerService, AppUserDAO appUserDAO, BuyOrSellService buyOrSellService, StockService stockService, UtilsService utilsService, WalletMain walletMain, AppUserStockService appUserStockService) {
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
 
         this.buyOrSellService = buyOrSellService;
         this.stockService = stockService;
-        this.createTable = createTable;
         this.utilsService = utilsService;
         this.walletMain = walletMain;
+
+        this.appUserStockService = appUserStockService;
     }
 
     @Override
@@ -91,8 +92,8 @@ public class CallBackMainServiceImpl implements CallBackMainService {
             case "SELL_COMMAND":
                 appUser.setSellUserState(SELL_CHANGE_STOCK);
                 appUserDAO.save(appUser);
-                utilsService.sendAnswer(createTable.getInfoAboutBag("telegramUser_"+appUser.getTelegramUserId()), appUser.getTelegramUserId());
-                List<String> list = createTable.getAllKeysInBag("telegramUser_"+appUser.getTelegramUserId());
+                utilsService.sendAnswer(appUserStockService.getInfoAboutBag(appUser), chatId);
+                List<String> list = appUserStockService.getAllKeysInBag(appUser);
                 List<ButtonForKeyboard> buttonsList = new ArrayList<>();
                 String output = appUser.getUserName()+", вы активировали команду /sell! \n"
                         +"Введите ключ акции, которую хотите продать";
@@ -196,7 +197,7 @@ public class CallBackMainServiceImpl implements CallBackMainService {
         switch (appUser.getSellUserState()){
             case SELL_CHANGE_STOCK:
                 if (callBackData.equals("LIST_OWN_STOCK")){
-                    String output = createTable.getInfoAboutBag("telegramUser_"+appUser.getTelegramUserId());
+                    String output = appUserStockService.getInfoAboutBag(appUser);
                     utilsService.sendEditMessageAnswerWithInlineKeyboard(output, chatId, messageId, true, new ButtonForKeyboard("Отмена продажи", "CANCEL"));
                 }
 
@@ -205,7 +206,7 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                 if (!(stockQuote== null)) {
                     BigDecimal cost = stockQuote.getPrevLegalClosePrice();
                     String symbol = stockQuote.getSecId();
-                    String output = "Выбрана акция " + callBackData+" \n Введите также количество акций, которое вы хотите продать. Сейчас у вас "+createTable.countOfTheBag("telegramuser_"+appUser.getTelegramUserId(), symbol);
+                    String output = "Выбрана акция " + callBackData+" \n Введите также количество акций, которое вы хотите продать. Сейчас у вас "+appUserStockService.countOfTheBag(appUser, symbol);
                     utilsService.sendEditMessageAnswerWithInlineKeyboard(output, chatId, messageId, true, new ButtonForKeyboard("Продать все", "SELL_ALL_COMMAND"));
 
                     appUser.setSellUserState(SELL_CHANGE_COUNT);
@@ -222,7 +223,7 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                 if (callBackData.equals("SELL_ALL_COMMAND")){
                     String temporaryValue = appUser.getActiveBuy();
                     String symbol = utilsService.parseStringFromBD(temporaryValue, 0);
-                    long count = createTable.countOfTheBag("telegramuser_"+appUser.getTelegramUserId(), symbol);
+                    long count = appUserStockService.countOfTheBag(appUser, symbol);
                     appUser.setSellUserState(SELL_PROOF);
                     appUser.setActiveBuy(temporaryValue + ":" + count);
                     appUserDAO.save(appUser);

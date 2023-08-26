@@ -4,7 +4,7 @@ import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
 import org.example.service.ProducerService;
 import org.example.service.UtilsService;
-import org.example.utils.ButtonForKeyboard;
+import org.example.dto.ButtonForKeyboard;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;

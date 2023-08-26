@@ -6,7 +6,7 @@ import org.example.enums.CommandService;
 import org.example.service.UtilsService;
 import org.example.service.WalletMain;
 import org.example.service.WalletService;
-import org.example.utils.ButtonForKeyboard;
+import org.example.dto.ButtonForKeyboard;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

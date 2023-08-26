@@ -5,7 +5,7 @@ import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
 import org.example.enums.CommandService;
 import org.example.service.*;
-import org.example.utils.ButtonForKeyboard;
+import org.example.dto.ButtonForKeyboard;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
 

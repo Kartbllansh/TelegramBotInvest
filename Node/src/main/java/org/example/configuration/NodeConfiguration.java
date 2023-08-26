@@ -1,6 +1,6 @@
 package org.example.configuration;
 
-import org.example.utils.ButtonForKeyboard;
+import org.example.dto.ButtonForKeyboard;
 import org.example.utils.CryptoTool;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

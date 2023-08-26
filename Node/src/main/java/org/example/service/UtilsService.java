@@ -1,7 +1,7 @@
 package org.example.service;
 
 import org.example.entity.AppUser;
-import org.example.utils.ButtonForKeyboard;
+import org.example.dto.ButtonForKeyboard;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

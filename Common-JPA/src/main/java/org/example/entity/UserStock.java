@@ -1,11 +1,8 @@
 package org.example.entity;
 
 import lombok.*;
-
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -32,7 +29,7 @@ public class UserStock {
     @Column(name = "count_stocks")
     private int countStock;
     @Column(name = "time_buy")
-    private LocalDateTime localDateTime;
+    private String noticeBuyOrSell;
     @Column(name = "purchase_stonks")
     private BigDecimal price;
 

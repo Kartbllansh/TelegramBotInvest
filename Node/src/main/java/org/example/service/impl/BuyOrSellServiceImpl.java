@@ -3,11 +3,10 @@ package org.example.service.impl;
 import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.log4j.Log4j;
 import org.example.dao.AppUserDAO;
-import org.example.dao.StockQuoteRepository;
 import org.example.entity.AppUser;
 import org.example.entity.StockQuote;
 import org.example.service.*;
-import org.example.utils.ButtonForKeyboard;
+import org.example.dto.ButtonForKeyboard;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -15,7 +14,6 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.example.entity.BuyUserState.*;
 import static org.example.entity.BuyUserState.NOT_BUY;
@@ -223,7 +221,6 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
                 appUserDAO.save(appUser);
             } else {
                 utilsService.sendEditMessageAnswerWithInlineKeyboard("Чат-бот не знаком с такой ценной бумаги. \n Убедитесь, что вы хотите продать именно "+cmd+"\n И введите правильный ключ акции \n Если окажется, что вас запрос верен, напишите нам в поддержку. \n Мы обязательно поможем", chatId, Long.parseLong(oldActiveBuy), true, new ButtonForKeyboard("Список ваших акций", "LIST_OWN_STOCKS"));
-                //createTable.getInfoAboutBag("telegramuser_"+appUser.getTelegramUserId());
                 utilsService.sendDeleteMessageAnswer(chatId, messageId);
             }
         } else {

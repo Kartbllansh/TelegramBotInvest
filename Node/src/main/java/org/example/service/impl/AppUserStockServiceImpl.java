@@ -3,15 +3,12 @@ package org.example.service.impl;
 import org.example.dao.StockQuoteRepository;
 import org.example.dao.UserStockDAO;
 import org.example.entity.AppUser;
-import org.example.entity.StockQuote;
 import org.example.entity.UserStock;
 import org.example.exception.InsufficientStocksException;
 import org.example.exception.UserStockNotFoundException;
 import org.example.service.AppUserStockService;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,18 +35,18 @@ public class AppUserStockServiceImpl implements AppUserStockService {
 
     //addNoteAboutBuy
     public void saveOrUpdateUserStock(AppUser user, String code, int countStock, LocalDateTime purchaseTime, BigDecimal price) {
-        //Проверка на возможность покупки
         Optional<UserStock> existingUserStock = userStockDAO.findByAppUserAndStockQuote_SecId(user, code);
 
         if (existingUserStock.isPresent()) {
             UserStock userStock = existingUserStock.get();
+            String oldInfoAboutBuy = userStock.getNoticeBuyOrSell();
             int newTotalCount = userStock.getCountStock() + countStock;
             BigDecimal newTotalPrice = userStock.getPrice().multiply(BigDecimal.valueOf(userStock.getCountStock()))
                     .add(price.multiply(BigDecimal.valueOf(countStock)))
                     .divide(BigDecimal.valueOf(newTotalCount), RoundingMode.HALF_UP);
 
             userStock.setCountStock(newTotalCount);
-            userStock.setLocalDateTime(purchaseTime);
+            userStock.setNoticeBuyOrSell(oldInfoAboutBuy+" \n BUY "+countStock+" "+purchaseTime);
             userStock.setPrice(newTotalPrice);
             userStockDAO.save(userStock);
         } else {
@@ -57,7 +54,7 @@ public class AppUserStockServiceImpl implements AppUserStockService {
                     .appUser(user)
                     .stockQuote(stockQuoteRepository.findBySecId(code).get())
                     .countStock(countStock)
-                    .localDateTime(purchaseTime)
+                    .noticeBuyOrSell("BUY "+countStock+" "+purchaseTime)
                     .price(price)
                     .build();
 
@@ -81,11 +78,10 @@ public class AppUserStockServiceImpl implements AppUserStockService {
             if (newTotalCount == 0) {
                 userStockDAO.delete(userStock);
             } else {
+                userStock.setNoticeBuyOrSell(userStock.getNoticeBuyOrSell()+"\n SELL "+countStockToSell+" "+LocalDateTime.now());
                 userStock.setCountStock(newTotalCount);
                 userStockDAO.save(userStock);
             }
-
-            // TODO Увеличение средств пользователя после продажи
 
         } else {
             throw new UserStockNotFoundException("User stock not found.");

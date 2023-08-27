@@ -186,7 +186,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         String info = "";
         if (cmd.trim().matches("\\d+")){
             long count = Long.parseLong(cmd);
-
+//TODO убрать возможность купить 0
             String codeStocks =utilsService.parseStringFromBD(temporaryValue, 0);
             /*Long someResult = createTable.checkAboutCountSell(count, "telegramuser_"+appUser.getTelegramUserId(), codeStocks);*/
             int someResult = appUserStockService.checkAboutCountSell(appUser, (int) count, codeStocks);

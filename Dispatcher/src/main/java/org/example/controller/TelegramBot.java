@@ -57,6 +57,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         listOfCommand.add(new BotCommand("/sell", "sale of shares"));
         listOfCommand.add(new BotCommand("/wallet", "commands with your wallet"));
         listOfCommand.add(new BotCommand("/cancel", "cancel active commands"));
+        listOfCommand.add(new BotCommand("/support", "support"));
     try {
         this.execute(new SetMyCommands(listOfCommand, new BotCommandScopeDefault(), null));
     } catch (TelegramApiException e) {

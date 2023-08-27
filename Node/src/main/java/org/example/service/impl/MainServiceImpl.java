@@ -53,6 +53,7 @@ public class MainServiceImpl implements MainService {
         var output = "";
         var serviceCommand = CommandService.fromValue(text);
         var chatId = update.getMessage().getChatId();
+        checlAboutConsent(appUser, chatId);
         if (CANCEL.equals(serviceCommand)) {
             output = utilsService.cancelProcess(appUser);
             utilsService.sendAnswer(output, chatId);
@@ -86,6 +87,13 @@ public class MainServiceImpl implements MainService {
 
     }
 
+    private void checlAboutConsent(AppUser appUser, long chatId) {
+        boolean check = appUser.getIsActiveConsent();
+        if(!check){
+          utilsService.sendMessageAnswerWithInlineKeyboard("Прежде чем использовать бота прочитайте правила использования бота", chatId, true, new ButtonForKeyboard("Правила", "CONSENT_STATE"));
+        }
+    }
+
     private void processServiceCommand(AppUser appUser, String cmd, long chatId, long messageId) {
         var serviceCommand = CommandService.fromValue(cmd);
         if(serviceCommand==null){
@@ -95,11 +103,13 @@ public class MainServiceImpl implements MainService {
         switch (Objects.requireNonNull(serviceCommand)){
             case START:
                 log.info("Новый пользователь с именем " + appUser.getUserName());
-                utilsService.sendMessageAnswerWithInlineKeyboard("Приветствую, "+appUser.getUserName()+ "!\n {тут будет красивое вступление} \n Чтобы посмотреть список доступных команд введите /help", chatId, false, new ButtonForKeyboard("Согласие", "CONSENT_STATE"), new ButtonForKeyboard("Обучение", "LEARNING_STATE"));
+                utilsService.sendMessageAnswerWithInlineKeyboard("Приветствую, "+appUser.getUserName()+ "!\n {тут будет красивое вступление} \n Чтобы посмотреть список доступных команд введите /help", chatId, false, new ButtonForKeyboard("Согласие", "CONSENT_STATE"));
                 break;
             case REGISTRATION:
                 log.info("Регистрация пользователя "+appUser.getUserName()+" с почтой "+appUser.getEmail());
                 utilsService.sendAnswer(appUserService.registerUser(appUser), chatId);
+                appUser.setState(WAIT_FOR_EMAIL_STATE);
+                appUserDAO.save(appUser);
                 break;
             case HELP:
                 utilsService.sendAnswer(utilsService.help(), chatId);

@@ -180,6 +180,7 @@ public class MainServiceImpl implements MainService {
                     .lastName(telegramUser.getLastName())
                     .firstName(telegramUser.getFirstName())
                     .isActiveMail(false)
+                    .isActiveConsent(false)
                     .state(BASIC_STATE)
                     .walletMoney(BigDecimal.valueOf(1000.00))
                     .buyUserState(NOT_BUY)

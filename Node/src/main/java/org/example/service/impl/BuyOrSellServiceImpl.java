@@ -14,6 +14,7 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.example.entity.BuyUserState.*;
 import static org.example.entity.BuyUserState.NOT_BUY;
@@ -58,20 +59,21 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
 
     private void lookIdBuy(AppUser appUser, String cmd, Long chatId, long messageId) {
         List<StockQuote> list = stockService.searchOnCompany(cmd, 11);
-        StringBuilder stringBuilder = new StringBuilder("Результат поиска: \n \n");
+        StringBuilder stringBuilder = new StringBuilder(EmojiParser.parseToUnicode("Результат поиска"+":mag_right:"+": \n \n"));
         List<ButtonForKeyboard> buttonForKeyboards = new ArrayList<>();
         if (!(list == null || list.isEmpty())) {
 
         for (StockQuote stockQuote : list) {
-            stringBuilder.append("Компания ").append(stockQuote.getShortName()).append(" - ").append(stockQuote.getSecId()).append("\n");
+            stringBuilder.append(EmojiParser.parseToUnicode("\t\n" +
+                    ":small_blue_diamond:")).append(" Компания ").append(stockQuote.getShortName()).append(" - ").append(stockQuote.getSecId()).append("\n");
             buttonForKeyboards.add(new ButtonForKeyboard("Купить " + stockQuote.getSecId(), stockQuote.getSecId()));
 
         }
         } else {
-            stringBuilder.append("Ничего не найдено! \n");
+            stringBuilder.append(EmojiParser.parseToUnicode("Ничего не найдено!"+":warning:"+ "\n"));
         }
-        buttonForKeyboards.add(new ButtonForKeyboard("Выбрать акцию самому", "BUY_ANOTHER_STOCK"));
-        buttonForKeyboards.add(new ButtonForKeyboard("Отменить", "CANCEL"));
+        buttonForKeyboards.add(new ButtonForKeyboard("Выбрать акцию самому"+EmojiParser.parseToUnicode(":smirk:"), "BUY_ANOTHER_STOCK"));
+        buttonForKeyboards.add(new ButtonForKeyboard("Отменить"+EmojiParser.parseToUnicode(":leftwards_arrow_with_hook:"), "CANCEL"));
 
         utilsService.sendEditMessageAnswerWithInlineKeyboard(stringBuilder.toString(), chatId, Long.parseLong(appUser.getActiveBuy()), false, buttonForKeyboards.toArray(new ButtonForKeyboard[0]));
         utilsService.sendDeleteMessageAnswer(chatId, messageId);
@@ -135,7 +137,14 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
             String symbol = stockQuote.getSecId();
             info = "Стоимость ценной бумаги " + cmd + " равняется " + cost + " это цена на момент " + stockQuote.getDate();
             String newActiveBuy = symbol+":"+cost+":"+stockQuote.getShortName()+":"+messageIdFromDis;
-            utilsService.sendEditMessageAnswer(info+" \n \n Какое количество акций вы хотите приобрести? \n Максимум вы можете приобрести "+utilsService.countHowMuchStock(newActiveBuy, appUser), chatId, Long.parseLong(messageIdFromDis));
+            BigInteger maxCount = utilsService.countHowMuchStock(newActiveBuy, appUser);
+            if(Objects.equals(maxCount, BigInteger.ZERO)){
+                appUser.setBuyUserState(NOT_BUY);
+                appUserDAO.save(appUser);
+             String s = "Покупка отменена"+EmojiParser.parseToUnicode(":x:")+ "\n К сожалению, у вас не хватает средств купить ни одной акции \n Пополните баланс или выберите другую акцию ";
+             utilsService.sendEditMessageAnswerWithInlineKeyboard(info+EmojiParser.parseToUnicode(":clock2:")+s, chatId, Long.parseLong(messageIdFromDis), false, new ButtonForKeyboard("Пополнить", "TOP_UP_COMMAND"), new ButtonForKeyboard("Купить другую акцию", "BUY_COMMAND") );
+            }
+            utilsService.sendEditMessageAnswer(info+EmojiParser.parseToUnicode(":clock2:")+" \n \n Какое количество акций вы хотите приобрести? \n Максимум вы можете приобрести "+utilsService.countHowMuchStock(newActiveBuy, appUser), chatId, Long.parseLong(messageIdFromDis));
             utilsService.sendDeleteMessageAnswer(chatId, messageId);
             //utilsService.sendAnswer("Какое количество акций вы хотите приобрести?", chatId);
             appUser.setBuyUserState(CHANGE_COUNT);

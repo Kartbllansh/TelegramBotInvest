@@ -37,7 +37,7 @@ public class AppUserServiceImpl implements AppUserService {
             return EmojiParser.parseToUnicode("Вы уже зарегистрированы!"+":white_check_mark:") ;
         } else if (appUser.getEmail() != null) {
             return EmojiParser.parseToUnicode("Вам на почту уже было отправлено письмо"+":hourglass_flowing_sand:"+ "\n"
-                    + "Перейдите по ссылке в письме для подтверждения регистрации"+":e-mail:");
+                    + EmojiParser.parseToUnicode("Перейдите по ссылке в письме для подтверждения регистрации"+":e-mail:"));
         }
         appUser.setState(WAIT_FOR_EMAIL_STATE);
         appUserDAO.save(appUser);

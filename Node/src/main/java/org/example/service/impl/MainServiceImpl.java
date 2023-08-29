@@ -20,6 +20,8 @@ import static org.example.entity.UserState.BASIC_STATE;
 import static org.example.entity.UserState.WAIT_FOR_EMAIL_STATE;
 import static org.example.entity.WalletUserState.NOT_WALLET;
 import static org.example.entity.WalletUserState.WALLET_CHANGE_CMD;
+import static org.example.enums.BigMessage.DEVELOPMENT_MESSAGE;
+import static org.example.enums.BigMessage.START_MESSAGE;
 import static org.example.enums.CommandService.*;
 
 @Service
@@ -103,7 +105,7 @@ public class MainServiceImpl implements MainService {
         switch (Objects.requireNonNull(serviceCommand)){
             case START:
                 log.info("Новый пользователь с именем " + appUser.getUserName());
-                utilsService.sendMessageAnswerWithInlineKeyboard("Приветствую, "+appUser.getUserName()+ "!\n {тут будет красивое вступление} \n Чтобы посмотреть список доступных команд введите /help", chatId, false, new ButtonForKeyboard("Согласие", "CONSENT_STATE"));
+                utilsService.sendMessageAnswerWithInlineKeyboard("Приветствую, "+appUser.getUserName()+ "!\n"+START_MESSAGE+ "\n Но перед началом согласитесь с правилами пользования ботом", chatId, false, new ButtonForKeyboard("Правила", "CONSENT_STATE"));
                 break;
             case REGISTRATION:
                 log.info("Регистрация пользователя "+appUser.getUserName()+" с почтой "+appUser.getEmail());
@@ -146,6 +148,9 @@ public class MainServiceImpl implements MainService {
                 break;
             case SUPPORT:
                 utilsService.sendAnswer("Бла, бла... Красивый тeкст \n @Kartbllansh", chatId);
+                break;
+            case DEVELOPMENT:
+                utilsService.sendAnswer(DEVELOPMENT_MESSAGE, chatId);
                 break;
             default:
                 //sendAnswer("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId);

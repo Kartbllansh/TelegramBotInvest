@@ -10,6 +10,7 @@ public enum CommandService {
     WALLET_LOOK_BALANCE("/look_balance"),
     WALLET_TOP_UP_CMD("/top_up"),
     SUPPORT("/support"),
+    DEVELOPMENT("/development"),
     SELL("/sell");
 
     private final String value;

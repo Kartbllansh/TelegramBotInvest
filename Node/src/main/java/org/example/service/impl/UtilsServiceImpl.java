@@ -1,5 +1,6 @@
 package org.example.service.impl;
 
+import com.vdurmont.emoji.EmojiParser;
 import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
 import org.example.service.ProducerService;
@@ -44,7 +45,7 @@ public class UtilsServiceImpl implements UtilsService {
         }
         appUser.setState(BASIC_STATE);
         appUserDAO.save(appUser);
-        return "Команда отменена!";
+        return "Команда отменена"+ EmojiParser.parseToUnicode(":leftwards_arrow_with_hook:");
     }
 
     @Override

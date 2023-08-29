@@ -34,7 +34,7 @@ private final AppUserDAO appUserDAO;
 
         appUser.setWalletMoney(appUser.getWalletMoney().add(summa));
         appUserDAO.save(appUser);
-        return "Пополнение счета  на " + summa + " выполнено успешно"+":dollar:"+ " \n Теперь на вашем счету " + appUser.getWalletMoney()+"₽";
+        return "Пополнение счета  на " + summa + " выполнено успешно"+EmojiParser.parseToUnicode(":dollar:")+ " \n Теперь на вашем счету " + appUser.getWalletMoney()+"₽";
     }
 
 

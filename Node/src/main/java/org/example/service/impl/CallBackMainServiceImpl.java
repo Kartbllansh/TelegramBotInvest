@@ -85,12 +85,14 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                 break;
             case "BUY_COMMAND":
                 appUser.setBuyUserState(CHANGE_STOCK);
+                appUser.setActiveBuy(utilsService.parseStringFromBD(appUser.getActiveBuy(), 3));
                 appUserDAO.save(appUser);
                 utilsService.sendEditMessageAnswer(appUser.getUserName()+", вы активировали команду /buy! \n"
                         +"Введите код акции, которую хотите купить", chatId, messageId);
                 break;
             case "SELL_COMMAND":
                 appUser.setSellUserState(SELL_CHANGE_STOCK);
+                appUser.setActiveBuy(utilsService.parseStringFromBD(appUser.getActiveBuy(), 3));
                 appUserDAO.save(appUser);
                 utilsService.sendAnswer(appUserStockService.getInfoAboutBag(appUser), chatId);
                 List<String> list = appUserStockService.getAllKeysInBag(appUser);

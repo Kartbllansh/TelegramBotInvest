@@ -1,5 +1,6 @@
 package org.example.service.impl;
 
+import com.vdurmont.emoji.EmojiParser;
 import org.example.dao.StockQuoteRepository;
 import org.example.dao.UserStockDAO;
 import org.example.entity.AppUser;
@@ -92,15 +93,16 @@ public class AppUserStockServiceImpl implements AppUserStockService {
         List<UserStock> userStocks = userStockDAO.findByAppUser(user);
 
         if (userStocks.isEmpty()) {
-            return "На данный момент ваш инвестиционный портфель пуст";
+            return "На данный момент ваш инвестиционный портфель пуст"+ EmojiParser.parseToUnicode(":unamused:");
         } else {
             StringBuilder result = new StringBuilder();
             result.append("На данный момент в вашем инвестиционном портфеле находятся следующие активы:\n");
             for (UserStock userStock : userStocks) {
                 String codeStock = userStock.getStockQuote().getSecId();
+                String shortName = userStock.getStockQuote().getShortName();
                 int countStock = userStock.getCountStock();
                 BigDecimal price = userStock.getPrice();
-                result.append(codeStock).append(" - в количестве ").append(countStock).append(" акций, купленных по цене ").append(price).append("\n");
+                result.append(EmojiParser.parseToUnicode(":small_blue_diamond: ")).append(shortName).append("( ").append(codeStock).append(" )").append(" - в количестве ").append(countStock).append(" акций, купленных по цене ").append(price).append("\n");
             }
             return result.toString();
         }

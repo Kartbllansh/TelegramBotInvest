@@ -50,7 +50,7 @@ public class AppUserServiceImpl implements AppUserService {
             InternetAddress emailAddr = new InternetAddress(email);
             emailAddr.validate();
         } catch (AddressException e) {
-            return EmojiParser.parseToUnicode("Введите, пожалуйста, корректный email"+":white_check_mark:"+" \n Для отмены команды введите /cancel");
+            return EmojiParser.parseToUnicode("Введите, пожалуйста, корректный email "+":white_check_mark:"+" \n Для отмены команды введите /cancel");
         }
         var optional = appUserDAO.findByEmail(email);
         if (optional.isEmpty()) {

@@ -22,6 +22,8 @@ import static org.example.entity.BuyUserState.NOT_BUY;
 import static org.example.entity.SellUserState.NOT_SELL;
 import static org.example.entity.UserState.BASIC_STATE;
 import static org.example.entity.WalletUserState.NOT_WALLET;
+import static org.example.enums.BigMessage.HELP_MESSAGE;
+
 @Service
 public class UtilsServiceImpl implements UtilsService {
     private final AppUserDAO appUserDAO;
@@ -97,12 +99,7 @@ public class UtilsServiceImpl implements UtilsService {
 
     @Override
     public String help() {
-        return "Список доступных команд:\n"
-                + "/cancel - отмена выполнения текущей команды;\n"
-                + "/registration - регистрация пользователя;\n"
-                + "/wallet - получить информацию о вашем кошельке"
-                + "/buy - покупка ценной бумаги;\n"
-                + "/sell - продажа ценной бумаги";
+        return HELP_MESSAGE;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.example.service.impl;
 
+import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.log4j.Log4j;
 import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
@@ -55,7 +56,9 @@ public class MainServiceImpl implements MainService {
         var output = "";
         var serviceCommand = CommandService.fromValue(text);
         var chatId = update.getMessage().getChatId();
-        checlAboutConsent(appUser, chatId);
+        if(!checlAboutConsent(appUser, chatId)){
+           return;
+        }
         if (CANCEL.equals(serviceCommand)) {
             output = utilsService.cancelProcess(appUser);
             utilsService.sendAnswer(output, chatId);
@@ -89,23 +92,32 @@ public class MainServiceImpl implements MainService {
 
     }
 
-    private void checlAboutConsent(AppUser appUser, long chatId) {
+    private boolean checlAboutConsent(AppUser appUser, long chatId) {
+        if(appUser.getIsActiveConsent()==null){
+            appUser.setIsActiveConsent(false);
+            appUserDAO.save(appUser);
+           return true;
+        }
         boolean check = appUser.getIsActiveConsent();
         if(!check){
           utilsService.sendMessageAnswerWithInlineKeyboard("Прежде чем использовать бота прочитайте правила использования бота", chatId, true, new ButtonForKeyboard("Правила", "CONSENT_STATE"));
+            return false;
         }
+
+        return true;
     }
 
     private void processServiceCommand(AppUser appUser, String cmd, long chatId, long messageId) {
         var serviceCommand = CommandService.fromValue(cmd);
         if(serviceCommand==null){
             utilsService.sendMessageAnswerWithInlineKeyboard("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId, true, new ButtonForKeyboard("Help", "HELP_COMMAND"));
+            return;
         }
         log.info("MESSAGE"+cmd);
         switch (Objects.requireNonNull(serviceCommand)){
             case START:
                 log.info("Новый пользователь с именем " + appUser.getUserName());
-                utilsService.sendMessageAnswerWithInlineKeyboard("Приветствую, "+appUser.getUserName()+ "!\n"+START_MESSAGE+ "\n Но перед началом согласитесь с правилами пользования ботом", chatId, false, new ButtonForKeyboard("Правила", "CONSENT_STATE"));
+                utilsService.sendMessageAnswerWithInlineKeyboard("Приветствую, "+appUser.getUserName()+ "!"+ EmojiParser.parseToUnicode(":wave:")+"\n"+START_MESSAGE+ "\n Но перед началом согласитесь с правилами пользования ботом", chatId, false, new ButtonForKeyboard("Правила", "CONSENT_STATE"));
                 break;
             case REGISTRATION:
                 log.info("Регистрация пользователя "+appUser.getUserName()+" с почтой "+appUser.getEmail());
@@ -147,7 +159,8 @@ public class MainServiceImpl implements MainService {
                         +" * /look_balance - посмотрите, сколько у вас на счету денег", chatId, false, new ButtonForKeyboard("Пополнить", "TOP_UP_COMMAND"), new ButtonForKeyboard("Посмотреть", "LOOK_BALANCE_COMMAND"));
                 break;
             case SUPPORT:
-                utilsService.sendAnswer("Бла, бла... Красивый тeкст \n @Kartbllansh", chatId);
+                utilsService.sendAnswer("Возникли трудности или есть вопросы? \n" +
+                        "Пишите @Kartbllansh с радостью ответим!", chatId);
                 break;
             case DEVELOPMENT:
                 utilsService.sendAnswer(DEVELOPMENT_MESSAGE, chatId);
@@ -185,7 +198,7 @@ public class MainServiceImpl implements MainService {
                     .lastName(telegramUser.getLastName())
                     .firstName(telegramUser.getFirstName())
                     .isActiveMail(false)
-                    .isActiveConsent(false)
+                    //.isActiveConsent(false)
                     .state(BASIC_STATE)
                     .walletMoney(BigDecimal.valueOf(1000.00))
                     .buyUserState(NOT_BUY)

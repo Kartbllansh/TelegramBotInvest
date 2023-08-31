@@ -20,7 +20,7 @@ public class BigMessage {
             EmojiParser.parseToUnicode(":large_blue_diamond:")+" Согласие: Используя этот бот, вы соглашаетесь с вышеуказанными правилами и условиями. Если вы не согласны с данными правилами, прекратите использование бота.";
     public static final String LEARNING_MESSAGE = "Тут будет красивая справка, как пользоваться ботом. Может даже видео";
 
-    public static final String HELP_MESSAGE = "Список доступных команд"+EmojiParser.parseToUnicode(":page_facing_up:")+"\\n\"\n" +
+    public static final String HELP_MESSAGE = "Список доступных команд"+EmojiParser.parseToUnicode(":page_facing_up:")+" \n \n" +
             EmojiParser.parseToUnicode(":large_blue_diamond:")+" /cancel - отмена выполнения текущей команды;\n " +
             EmojiParser.parseToUnicode(":large_blue_diamond:")+" /registration - регистрация пользователя;\n" +
             EmojiParser.parseToUnicode(":large_blue_diamond:")+" /wallet - получить информацию о вашем кошельке \n" +

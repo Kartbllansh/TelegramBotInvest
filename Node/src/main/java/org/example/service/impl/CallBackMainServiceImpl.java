@@ -128,7 +128,7 @@ public class CallBackMainServiceImpl implements CallBackMainService {
             case "NO_BUTTON_CONSENT":
                 appUser.setIsActiveConsent(false);
                 utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode("\t\n" +
-                        ":red_circle:")+" К сожалению, чтобы продолжить пользоваться ботом необходимо согласиться с условиями \n Если же вы принципиально не хотите соглашаться условиями, то желаем вам удачи"+EmojiParser.parseToUnicode(":revolving_hearts:")+"\n Будем признательны, если вы объясните причину нашей поддержке \n @Kartbllansh \n Будем благодарны"+EmojiParser.parseToUnicode(":heart_on_fire:"), chatId, messageId, false, new ButtonForKeyboard("Правила", "CONSENT_STATE"));
+                        ":red_circle:")+" К сожалению, чтобы продолжить пользоваться ботом необходимо согласиться с условиями \n Если же вы принципиально не хотите соглашаться условиями, то желаем вам удачи"+EmojiParser.parseToUnicode(":revolving_hearts:")+"\n Будем признательны, если вы объясните причину нашей поддержке \n @Kartbllansh \n Будем благодарны"+EmojiParser.parseToUnicode(":heart_on_fire:"), chatId, messageId, false, new ButtonForKeyboard("Правила"+EmojiParser.parseToUnicode(":open_book:"), "CONSENT_STATE"));
                 appUser.setState(BASIC_STATE);
                 appUserDAO.save(appUser);
                 break;
@@ -191,7 +191,7 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                     appUser.setActiveBuy(newActiveBuy);
                     appUserDAO.save(appUser);
                 } else {
-                    utilsService.sendEditMessageAnswerWithInlineKeyboard("Чат-бот не знаком с такой ценной бумагой, как "+callBackData+EmojiParser.parseToUnicode( ":robot_face:")+"\n  В ближайшее время мы попробуем добавить данную компанию в список доступных. \n Введите другую акцию или отмените покупку", chatId, Long.parseLong(messageIdFromDis), true, new ButtonForKeyboard("Отменить", "CANCEL"));
+                    utilsService.sendEditMessageAnswerWithInlineKeyboard("Чат-бот не знаком с такой ценной бумагой, как "+callBackData+EmojiParser.parseToUnicode( ":robot_face:")+"\n  В ближайшее время мы попробуем добавить данную компанию в список доступных. \n Введите другую акцию или отмените покупку", chatId, Long.parseLong(messageIdFromDis), true, new ButtonForKeyboard("Отменить"+EmojiParser.parseToUnicode(":leftwards_arrow_with_hook:"), "CANCEL"));
                 }
                 break;
         }
@@ -202,7 +202,7 @@ public class CallBackMainServiceImpl implements CallBackMainService {
             case SELL_CHANGE_STOCK:
                 if (callBackData.equals("LIST_OWN_STOCK")){
                     String output = appUserStockService.getInfoAboutBag(appUser);
-                    utilsService.sendEditMessageAnswerWithInlineKeyboard(output, chatId, messageId, true, new ButtonForKeyboard("Отмена продажи", "CANCEL"));
+                    utilsService.sendEditMessageAnswerWithInlineKeyboard(output, chatId, messageId, true, new ButtonForKeyboard("Отмена продажи"+EmojiParser.parseToUnicode(":leftwards_arrow_with_hook:"), "CANCEL"));
                 }
 
                 String activeBuy = appUser.getActiveBuy();
@@ -231,7 +231,9 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                     appUser.setSellUserState(SELL_PROOF);
                     appUser.setActiveBuy(temporaryValue + ":" + count);
                     appUserDAO.save(appUser);
-                    utilsService.sendEditMessageAnswerWithInlineKeyboard("Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId,messageId, true, new ButtonForKeyboard("Да", "YES_BUTTON_SELL"), new ButtonForKeyboard("Нет", "NO_BUTTON_SELL"));
+                    String info = EmojiParser.parseToUnicode(":yellow_circle:")+" Продажа " + count + " акций " + utilsService.parseStringFromBD(temporaryValue, 2)+"("+utilsService.parseStringFromBD(temporaryValue, 0)+")";
+                    utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode(info+" \n Подтверждение"+EmojiParser.parseToUnicode(":white_large_square:")+ "\n Если вы подтверждаете продажу введите 'Да'("+EmojiParser.parseToUnicode(":white_check_mark:")+"), если отменяете 'Нет'("+EmojiParser.parseToUnicode(":x:")+")"), chatId, Long.parseLong(utilsService.parseStringFromBD(temporaryValue, 3 )), true, new ButtonForKeyboard(EmojiParser.parseToUnicode("Да("+":white_check_mark:"+")"), "YES_BUTTON_SELL"), new ButtonForKeyboard(EmojiParser.parseToUnicode("Нет("+":x:"+")"), "NO_BUTTON_SELL"));
+                    // utilsService.sendEditMessageAnswerWithInlineKeyboard("Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId,messageId, true, new ButtonForKeyboard("Да", "YES_BUTTON_SELL"), new ButtonForKeyboard("Нет", "NO_BUTTON_SELL"));
                 }
         }
     }

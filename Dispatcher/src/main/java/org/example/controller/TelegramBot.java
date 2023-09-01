@@ -50,19 +50,21 @@ public class TelegramBot extends TelegramLongPollingBot {
 @PostConstruct
     private void doMenuWithCommands(){
         List<BotCommand> listOfCommand = new ArrayList<>();
-        listOfCommand.add(new BotCommand("/start", "welcome message from the bot"));
-        listOfCommand.add(new BotCommand("/registration", "mail confirmation"));
-        listOfCommand.add(new BotCommand("/help", "full command help"));
-        listOfCommand.add(new BotCommand("/buy", "purchase of shares"));
-        listOfCommand.add(new BotCommand("/sell", "sale of shares"));
-        listOfCommand.add(new BotCommand("/wallet", "commands with your wallet"));
-        listOfCommand.add(new BotCommand("/cancel", "cancel active commands"));
-        listOfCommand.add(new BotCommand("/support", "support"));
-        listOfCommand.add(new BotCommand("/development", "future updates"));
+        listOfCommand.add(new BotCommand("/start", "приветственное сообщение от бота"));
+        listOfCommand.add(new BotCommand("/help", "подсказка по командам"));
+        listOfCommand.add(new BotCommand("/buy", "покупка акций"));
+        listOfCommand.add(new BotCommand("/sell", "продажа акций"));
+        listOfCommand.add(new BotCommand("/snow_bag", "просмотр инвестиционного портфеля"));
+        listOfCommand.add(new BotCommand("/wallet", "команды для работы с кошельком"));
+        listOfCommand.add(new BotCommand("/cancel", "отмена активной команды"));
+        listOfCommand.add(new BotCommand("/registration", "подтверждение почты"));
+        listOfCommand.add(new BotCommand("/support", "техническая поддержка"));
+        listOfCommand.add(new BotCommand("/development", "будущие обновления"));
     try {
         this.execute(new SetMyCommands(listOfCommand, new BotCommandScopeDefault(), null));
     } catch (TelegramApiException e) {
         log.error("error with menu with commands");
+        log.error(e);
     }
 
 }

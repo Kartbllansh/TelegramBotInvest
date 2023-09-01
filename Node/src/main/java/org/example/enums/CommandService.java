@@ -11,6 +11,7 @@ public enum CommandService {
     WALLET_TOP_UP_CMD("/top_up"),
     SUPPORT("/support"),
     DEVELOPMENT("/development"),
+    SHOW_BAG("/show_bag"),
     SELL("/sell");
 
     private final String value;

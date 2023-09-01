@@ -17,4 +17,5 @@ public interface AppUserStockService {
     List<String> getAllKeysInBag(AppUser appUser);
     Long countOfTheBag(AppUser user, String code);
     Integer checkAboutCountSell(AppUser user, Integer count, String codeStocks);
+    String reportAboutInvestBag(AppUser appUser);
 }

@@ -10,8 +10,10 @@ import org.example.exception.UserStockNotFoundException;
 import org.example.service.AppUserStockService;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +39,8 @@ public class AppUserStockServiceImpl implements AppUserStockService {
     //addNoteAboutBuy
     public void saveOrUpdateUserStock(AppUser user, String code, int countStock, LocalDateTime purchaseTime, BigDecimal price) {
         Optional<UserStock> existingUserStock = userStockDAO.findByAppUserAndStockQuote_SecId(user, code);
-
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String formattedDateTime = purchaseTime.format(formatter);
         if (existingUserStock.isPresent()) {
             UserStock userStock = existingUserStock.get();
             String oldInfoAboutBuy = userStock.getNoticeBuyOrSell();
@@ -47,7 +50,7 @@ public class AppUserStockServiceImpl implements AppUserStockService {
                     .divide(BigDecimal.valueOf(newTotalCount), RoundingMode.HALF_UP);
 
             userStock.setCountStock(newTotalCount);
-            userStock.setNoticeBuyOrSell(oldInfoAboutBuy+" \n BUY "+countStock+" "+purchaseTime);
+            userStock.setNoticeBuyOrSell(oldInfoAboutBuy+" \n Покупка "+countStock+" акций в "+formattedDateTime);
             userStock.setPrice(newTotalPrice);
             userStockDAO.save(userStock);
         } else {
@@ -55,7 +58,7 @@ public class AppUserStockServiceImpl implements AppUserStockService {
                     .appUser(user)
                     .stockQuote(stockQuoteRepository.findBySecId(code).get())
                     .countStock(countStock)
-                    .noticeBuyOrSell("BUY "+countStock+" "+purchaseTime)
+                    .noticeBuyOrSell("Покупка "+countStock+" акций в "+formattedDateTime)
                     .price(price)
                     .build();
 
@@ -79,7 +82,9 @@ public class AppUserStockServiceImpl implements AppUserStockService {
             if (newTotalCount == 0) {
                 userStockDAO.delete(userStock);
             } else {
-                userStock.setNoticeBuyOrSell(userStock.getNoticeBuyOrSell()+"\n SELL "+countStockToSell+" "+LocalDateTime.now());
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                String formattedDateTime = LocalDateTime.now().format(formatter);
+                userStock.setNoticeBuyOrSell(userStock.getNoticeBuyOrSell()+"\n Продажа "+countStockToSell+" акций в "+formattedDateTime);
                 userStock.setCountStock(newTotalCount);
                 userStockDAO.save(userStock);
             }
@@ -136,7 +141,38 @@ public class AppUserStockServiceImpl implements AppUserStockService {
             return 0; // Если акции не найдены, считаем, что их 0
         }
     }
-}
+
+    public String reportAboutInvestBag(AppUser appUser){
+        List<UserStock> userStocks = userStockDAO.findByAppUser(appUser);
+        StringBuilder stringBuilder = new StringBuilder("Ваш инвестиционный портфель"+EmojiParser.parseToUnicode(":school_satchel:")+": \n \n");
+        BigDecimal allSumma = new BigDecimal(BigInteger.ZERO);
+        if (userStocks.isEmpty()) {
+            stringBuilder.append("В вашем портфеле нет ни одного актива").append(EmojiParser.parseToUnicode(":face_with_peeking_eye:")).append("\n _________________ \n");
+        } else {
+
+
+            for(UserStock userStock : userStocks){
+                BigDecimal countBuy = userStock.getPrice().multiply(BigDecimal.valueOf(userStock.getCountStock()));
+                BigDecimal countFactNow = userStock.getStockQuote().getPrevLegalClosePrice().multiply(BigDecimal.valueOf(userStock.getCountStock()));
+                BigDecimal inCome = countFactNow.subtract(countBuy);
+                BigDecimal incomeWithProcent = inCome.divide(countBuy);
+              allSumma =  allSumma.add(countFactNow);
+               stringBuilder.append(EmojiParser.parseToUnicode(":large_blue_diamond: ")).append(userStock.getStockQuote().getShortName()).append("(")
+                       .append(userStock.getStockQuote().getSecId()).append(")")
+                       .append(" - ").append(userStock.getCountStock()).append(" акций \n").append("Доход").append(EmojiParser.parseToUnicode(":money_with_wings:")).append(": ").append(inCome).append(" | ")
+                       .append(incomeWithProcent).append("%").append("\n").append("Время покупок и продаж").append(EmojiParser.parseToUnicode(":hourglass:")).append(": \n").append(userStock.getNoticeBuyOrSell()).append("\n")
+                       .append("_________________________ \n");
+            }
+        }
+            BigDecimal s = allSumma.add(appUser.getWalletMoney());
+            BigDecimal inComeAll = s.subtract(appUser.getTopUpAmount());
+            BigDecimal inComeWithProcent = inComeAll.divide(appUser.getTopUpAmount());
+            stringBuilder.append("На кошельке: ").append(appUser.getWalletMoney()).append("₽ \n").append("Стоимость всех активов: ")
+                    .append(allSumma).append("₽ \n").append("Пополнения за все время: ").append(appUser.getTopUpAmount()).append("₽ \n").append("Прибыль за все время").append(EmojiParser.parseToUnicode(":chart:")).append(": ").append(inComeAll).append("₽ | ").append(inComeWithProcent).append("%");
+            return stringBuilder.toString();
+
+        }
+    }
 
 
 

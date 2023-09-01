@@ -165,6 +165,9 @@ public class MainServiceImpl implements MainService {
             case DEVELOPMENT:
                 utilsService.sendAnswer(DEVELOPMENT_MESSAGE, chatId);
                 break;
+            case SHOW_BAG:
+                utilsService.sendAnswer(appUserStockService.reportAboutInvestBag(appUser), chatId);
+                break;
             default:
                 //sendAnswer("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId);
                 utilsService.sendMessageAnswerWithInlineKeyboard("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId, true, new ButtonForKeyboard("Help"+EmojiParser.parseToUnicode(":mag:"), "HELP_COMMAND"));
@@ -199,6 +202,7 @@ public class MainServiceImpl implements MainService {
                     .firstName(telegramUser.getFirstName())
                     .isActiveMail(false)
                     //.isActiveConsent(false)
+                    .topUpAmount(BigDecimal.valueOf(1000))
                     .state(BASIC_STATE)
                     .walletMoney(BigDecimal.valueOf(1000.00))
                     .buyUserState(NOT_BUY)

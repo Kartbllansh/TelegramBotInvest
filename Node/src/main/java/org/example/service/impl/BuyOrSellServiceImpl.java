@@ -103,7 +103,11 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
 
             long count = Long.parseLong(cmd);
             String newValue = oldActiveBuy+":"+count;
-
+            if(count==0){
+                info = ":receipt:"+"Покупка "+utilsService.parseStringFromBD(oldActiveBuy, 2)+" ("+utilsService.parseStringFromBD(oldActiveBuy, 0)+") "+":receipt:"+"\n \n Нельзя купить 0 акций"+EmojiParser.parseToUnicode(":warning:")+"\n Введите корректное число или отмените покупку";
+                utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode(info), chatId, Long.parseLong(utilsService.parseStringFromBD(oldActiveBuy, 3)), false, new ButtonForKeyboard("Отменить"+EmojiParser.parseToUnicode(":leftwards_arrow_with_hook:"), "CANCEL"));
+                return;
+            }
 
             boolean oppornunityPurchase = walletMain.checkAbilityBuy(utilsService.countSummaPurchase(newValue), appUser);
             if(oppornunityPurchase) {
@@ -270,7 +274,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         //TODO обработать исключения метода снизу
         appUserStockService.sellUserStock(appUser, utilsService.parseStringFromBD(activeSell, 0), count);
         //String info = walletMain.topUpWallet(countFromUser.multiply(purchace), appUser);
-        String neInfo = EmojiParser.parseToUnicode(":white_check_mark:")+" Успешная покупка: "+utilsService.parseStringFromBD(activeSell, 2)+"("+utilsService.parseStringFromBD(activeSell, 0)+") "+count+" акций "+EmojiParser.parseToUnicode(":white_check_mark:")+"\n \n "+walletMain.topUpWallet(purchace.multiply(countFromUser), appUser);
+        String neInfo = EmojiParser.parseToUnicode(":white_check_mark:")+" Успешная покупка: "+utilsService.parseStringFromBD(activeSell, 2)+"("+utilsService.parseStringFromBD(activeSell, 0)+") "+count+" акций "+EmojiParser.parseToUnicode(":white_check_mark:")+"\n \n "+walletMain.topUpWallet(purchace.multiply(countFromUser), appUser, false);
         appUser.setSellUserState(NOT_SELL);
         appUserDAO.save(appUser);
         return neInfo;

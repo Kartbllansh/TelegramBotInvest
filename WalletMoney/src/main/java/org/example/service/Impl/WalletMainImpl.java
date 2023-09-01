@@ -26,7 +26,11 @@ private final AppUserDAO appUserDAO;
 
 
     @Override
-    public String topUpWallet(BigDecimal summa, AppUser appUser) {
+    public String topUpWallet(BigDecimal summa, AppUser appUser, boolean whoTopUp) {
+        if(whoTopUp){
+            appUser.setTopUpAmount(appUser.getTopUpAmount().add(summa));
+            appUserDAO.save(appUser);
+        }
         // Проверка, что переданная сумма положительна
         if (summa.compareTo(BigDecimal.ZERO) < 0) {
             return EmojiParser.parseToUnicode("К сожалению, наш бот пока не умеет пополнять счет на отрицательную сумму"+":thinking:"+"\n Если вы хотите избавиться от денег на счету напишите нам в поддержку \n Мы обязательно вам поможем"+":revolving_hearts:") ;

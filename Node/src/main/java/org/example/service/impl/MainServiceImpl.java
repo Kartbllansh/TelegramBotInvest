@@ -100,7 +100,7 @@ public class MainServiceImpl implements MainService {
         }
         boolean check = appUser.getIsActiveConsent();
         if(!check){
-          utilsService.sendMessageAnswerWithInlineKeyboard("Прежде чем использовать бота прочитайте правила использования бота", chatId, true, new ButtonForKeyboard("Правила"+EmojiParser.parseToUnicode(":open_book:"), "CONSENT_STATE"));
+          utilsService.sendMessageAnswerWithInlineKeyboard("Прежде чем использовать бота прочитайте правила использования бота"+EmojiParser.parseToUnicode(":exclamation:"), chatId, true, new ButtonForKeyboard("Правила"+EmojiParser.parseToUnicode(":open_book:"), "CONSENT_STATE"));
             return false;
         }
 
@@ -110,7 +110,7 @@ public class MainServiceImpl implements MainService {
     private void processServiceCommand(AppUser appUser, String cmd, long chatId, long messageId) {
         var serviceCommand = CommandService.fromValue(cmd);
         if(serviceCommand==null){
-            utilsService.sendMessageAnswerWithInlineKeyboard("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId, true, new ButtonForKeyboard("Help"+EmojiParser.parseToUnicode(":mag:"), "HELP_COMMAND"));
+            utilsService.sendMessageAnswerWithInlineKeyboard("Неизвестная команда"+EmojiParser.parseToUnicode(":warning:")+  "\n Чтобы посмотреть список доступных команд введите /help", chatId, true, new ButtonForKeyboard("Help"+EmojiParser.parseToUnicode(":mag:"), "HELP_COMMAND"));
             return;
         }
         log.info("MESSAGE"+cmd);
@@ -132,7 +132,7 @@ public class MainServiceImpl implements MainService {
                 appUser.setBuyUserState(CHANGE_STOCK);
                 appUserDAO.save(appUser);
                 utilsService.sendMessageAnswerWithInlineKeyboard(appUser.getUserName()+", вы активировали команду /buy! \n"
-                        +"Введите код акции, которую хотите купить", chatId, true, new ButtonForKeyboard("Узнать ticket(not work)", "RECOGNIZE_TICKET"));
+                        +"Введите код акции, которую хотите купить", chatId, true, new ButtonForKeyboard("Узнать ticket", "RECOGNIZE_TICKET"));
 
                 break;
             case SELL:
@@ -153,14 +153,14 @@ public class MainServiceImpl implements MainService {
             case WALLET_MONEY:
                 appUser.setWalletUserState(WALLET_CHANGE_CMD);
                 appUserDAO.save(appUser);
-                utilsService.sendMessageAnswerWithInlineKeyboard(appUser.getUserName()+", Вы активировали команду, позволяющую работать с балансом на вашем кошельке. \n"
+                utilsService.sendMessageAnswerWithInlineKeyboard(appUser.getUserName()+", Вы активировали команду, позволяющую работать с балансом на вашем кошельке"+EmojiParser.parseToUnicode(":abacus:")+ "\n"
                         +"Выберите какую из команд вы хотели бы использовать: \n"
-                        +"* /top_up - пополните баланс \n"
-                        +" * /look_balance - посмотрите, сколько у вас на счету денег", chatId, false, new ButtonForKeyboard("Пополнить", "TOP_UP_COMMAND"), new ButtonForKeyboard("Посмотреть", "LOOK_BALANCE_COMMAND"));
+                        +"* /top_up - пополните баланс"+EmojiParser.parseToUnicode(":money_with_wings:")+ "\n"
+                        +" * /look_balance - посмотрите, сколько у вас на счету денег"+EmojiParser.parseToUnicode(":moneybag:"), chatId, false, new ButtonForKeyboard("Пополнить"+EmojiParser.parseToUnicode(":top: "), "TOP_UP_COMMAND"), new ButtonForKeyboard("Посмотреть"+EmojiParser.parseToUnicode(":eyes:"), "LOOK_BALANCE_COMMAND"));
                 break;
             case SUPPORT:
                 utilsService.sendAnswer("Возникли трудности или есть вопросы? \n" +
-                        "Пишите @Kartbllansh с радостью ответим!", chatId);
+                        "Пишите @Kartbllansh с радостью ответим"+EmojiParser.parseToUnicode(":two_hearts: "), chatId);
                 break;
             case DEVELOPMENT:
                 utilsService.sendAnswer(DEVELOPMENT_MESSAGE, chatId);
@@ -170,7 +170,7 @@ public class MainServiceImpl implements MainService {
                 break;
             default:
                 //sendAnswer("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId);
-                utilsService.sendMessageAnswerWithInlineKeyboard("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId, true, new ButtonForKeyboard("Help"+EmojiParser.parseToUnicode(":mag:"), "HELP_COMMAND"));
+                utilsService.sendMessageAnswerWithInlineKeyboard("Неизвестная команда"+EmojiParser.parseToUnicode(":warning:")+ " \n Чтобы посмотреть список доступных команд введите /help", chatId, true, new ButtonForKeyboard("Help"+EmojiParser.parseToUnicode(":mag:"), "HELP_COMMAND"));
                 break;
         }
 

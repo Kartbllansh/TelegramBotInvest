@@ -61,8 +61,8 @@ public class CallBackMainServiceImpl implements CallBackMainService {
             processSell(appUser, messageId, chatId, callBackData);
         } else if(!appUser.getBuyUserState().equals(NOT_BUY)){
             processBuy(appUser, messageId, chatId, callBackData);
-        } else if(!appUser.getWalletUserState().equals(NOT_WALLET)){
-            processWallet(appUser, messageId, chatId, callBackData);
+        /*} else if(!appUser.getWalletUserState().equals(NOT_WALLET)){
+            processWallet(appUser, messageId, chatId, callBackData);*/
         } else if(appUser.getState().equals(WAIT_TO_AGREE_CONSENT)){
             processAgreeWithConsent(appUser, messageId, chatId, callBackData);
         }
@@ -90,6 +90,16 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                 utilsService.sendEditMessageAnswer(appUser.getUserName()+EmojiParser.parseToUnicode(":wave:")+", \n  Вы активировали команду /buy! \n"
                         +"Введите код акции, которую хотите купить", chatId, messageId);
                 break;
+            case "TOP_UP_COMMAND":
+                utilsService.sendEditMessageAnswer("Введите сумму, на которую хотите увеличить свой счет"+EmojiParser.parseToUnicode(":money_with_wings:"), chatId, messageId);
+                appUser.setWalletUserState(WALLET_TOP_UP_CHANGE_COUNT);
+                appUserDAO.save(appUser);
+                break;
+            case "LOOK_BALANCE_COMMAND":
+                String infoAboutBalance = walletMain.toKnowBalance(appUser);
+                //utilsService.sendAnswer(infoAboutBalance, chatId);
+                utilsService.sendEditMessageAnswer(infoAboutBalance, chatId, messageId);
+                break;
             case "SELL_COMMAND":
                 appUser.setSellUserState(SELL_CHANGE_STOCK);
                 appUser.setActiveBuy(utilsService.parseStringFromBD(appUser.getActiveBuy(), 3));
@@ -107,12 +117,12 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                 utilsService.sendMessageAnswerWithInlineKeyboard(output, chatId, true, buttonsList.toArray(new ButtonForKeyboard[0]));
                 break;
             case "CONSENT_STATE":
-                utilsService.sendEditMessageAnswerWithInlineKeyboard(CONSENT_MESSAGE, chatId, messageId, true, new ButtonForKeyboard("Соглашаюсь", "YES_BUTTON_CONSENT"), new ButtonForKeyboard("Отказываюсь", "NO_BUTTON_CONSENT"));
+                utilsService.sendEditMessageAnswerWithInlineKeyboard(CONSENT_MESSAGE, chatId, messageId, true, new ButtonForKeyboard("Соглашаюсь"+EmojiParser.parseToUnicode(":white_check_mark:"), "YES_BUTTON_CONSENT"), new ButtonForKeyboard("Отказываюсь"+EmojiParser.parseToUnicode(":x: "), "NO_BUTTON_CONSENT"));
                 appUser.setState(WAIT_TO_AGREE_CONSENT);
                 appUserDAO.save(appUser);
                 break;
             case "LEARNING_STATE":
-                utilsService.sendMessageAnswerWithInlineKeyboard(LEARNING_MESSAGE, chatId, true, new ButtonForKeyboard("Не придумал", "BOUT"));
+                utilsService.sendMessageAnswerWithInlineKeyboard(LEARNING_MESSAGE, chatId, false, new ButtonForKeyboard("Пополнить"+EmojiParser.parseToUnicode(":top: "), "TOP_UP_COMMAND"), new ButtonForKeyboard("Help"+EmojiParser.parseToUnicode(":mag:"), "HELP_COMMAND"));
                 break;
         }
     }
@@ -121,14 +131,14 @@ public class CallBackMainServiceImpl implements CallBackMainService {
         switch (callBackData){
             case "YES_BUTTON_CONSENT":
                 appUser.setIsActiveConsent(true);
-                utilsService.sendEditMessageAnswerWithInlineKeyboard("Вы согласились с условиями"+EmojiParser.parseToUnicode(":white_check_mark:")+"\n Советуем пройти обучение, чтобы быстро разобраться в функционале бота", chatId, messageId, false, new ButtonForKeyboard("Обучение", "LEARNING_STATE"));
+                utilsService.sendEditMessageAnswerWithInlineKeyboard("Вы согласились с условиями"+EmojiParser.parseToUnicode(":white_check_mark:")+"\n Советуем пройти обучение, чтобы быстро разобраться в функционале бота", chatId, messageId, false, new ButtonForKeyboard("Обучение"+EmojiParser.parseToUnicode("\t\n" +
+                        ":books:"), "LEARNING_STATE"));
                 appUser.setState(BASIC_STATE);
                 appUserDAO.save(appUser);
                 break;
             case "NO_BUTTON_CONSENT":
                 appUser.setIsActiveConsent(false);
-                utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode("\t\n" +
-                        ":red_circle:")+" К сожалению, чтобы продолжить пользоваться ботом необходимо согласиться с условиями \n Если же вы принципиально не хотите соглашаться условиями, то желаем вам удачи"+EmojiParser.parseToUnicode(":revolving_hearts:")+"\n Будем признательны, если вы объясните причину нашей поддержке \n @Kartbllansh \n Будем благодарны"+EmojiParser.parseToUnicode(":heart_on_fire:"), chatId, messageId, false, new ButtonForKeyboard("Правила"+EmojiParser.parseToUnicode(":open_book:"), "CONSENT_STATE"));
+                utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode(":red_circle:")+" К сожалению, чтобы продолжить пользоваться ботом необходимо согласиться с условиями \n Если же вы принципиально не хотите соглашаться условиями, то желаем вам удачи"+EmojiParser.parseToUnicode(":revolving_hearts:")+"\n Будем признательны, если вы объясните причину нашей поддержке \n @Kartbllansh \n Будем благодарны"+EmojiParser.parseToUnicode(":heart_on_fire:"), chatId, messageId, false, new ButtonForKeyboard("Правила"+EmojiParser.parseToUnicode(":open_book:"), "CONSENT_STATE"));
                 appUser.setState(BASIC_STATE);
                 appUserDAO.save(appUser);
                 break;
@@ -165,14 +175,14 @@ public class CallBackMainServiceImpl implements CallBackMainService {
             case CHANGE_STOCK:
                 if(callBackData.equals("RECOGNIZE_TICKET")){
                     appUser.setBuyUserState(LOOK_ID_BUY);
-                    utilsService.sendEditMessageAnswer("Введите имя компании, которая вас интересует", chatId, messageId);
+                    utilsService.sendEditMessageAnswer("Введите имя компании, которая вас интересует"+EmojiParser.parseToUnicode(":arrow_right:"), chatId, messageId);
                     appUserDAO.save(appUser);
                 }
                 break;
             case LOOK_ID_BUY:
 
                 if(callBackData.equals("BUY_ANOTHER_STOCK")){
-                   utilsService.sendEditMessageAnswer("Поиск не удался"+EmojiParser.parseToUnicode(":warning:")+ "\n Воспользуйтесь браузером и выберите ключ, по которому приобретете акцию \n Как только определитесь отправьте мне сообщением ключ.", chatId, messageId);
+                   utilsService.sendEditMessageAnswer("Поиск не удался"+EmojiParser.parseToUnicode(":warning:")+ "\n Воспользуйтесь браузером и выберите ключ, по которому приобретете акцию"+EmojiParser.parseToUnicode(":chart:")+"\n Как только определитесь отправьте мне сообщением ключ"+EmojiParser.parseToUnicode(":old_key:"), chatId, messageId);
                    appUser.setBuyUserState(CHANGE_STOCK);
                    appUserDAO.save(appUser);
 
@@ -239,7 +249,7 @@ public class CallBackMainServiceImpl implements CallBackMainService {
     }
 
     private void processNoButtonSell(AppUser appUser, long messageId, long chatId) {
-        String output = "Сделка отменена. Если захотите опять что-то продать введите команду /buy";
+        String output = "Сделка отменена"+EmojiParser.parseToUnicode(":x:")+ "\n Если захотите опять что-то продать введите команду /sell";
         producerService.producerAnswerWithCallBack(doEditMessage(messageId, chatId, output));
         appUser.setSellUserState(NOT_SELL);
         appUserDAO.save(appUser);
@@ -250,7 +260,7 @@ public class CallBackMainServiceImpl implements CallBackMainService {
     }
 
     private void processNoButtonBuy(AppUser appUser, long messageId, long chatId) {
-        String output = "Сделка отменена. Если захотите опять что-то купить введите команду /buy";
+        String output = "Сделка отменена"+EmojiParser.parseToUnicode(":x:")+ "\n Если захотите опять что-то купить введите команду /buy";
     producerService.producerAnswerWithCallBack(doEditMessage(messageId, chatId, output ));
         appUser.setBuyUserState(NOT_BUY);
         appUserDAO.save(appUser);

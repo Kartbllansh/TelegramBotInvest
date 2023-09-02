@@ -148,6 +148,12 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
              String s = "Покупка отменена"+EmojiParser.parseToUnicode(":x:")+ "\n К сожалению, у вас не хватает средств купить ни одной акции \n Пополните баланс или выберите другую акцию ";
              utilsService.sendEditMessageAnswerWithInlineKeyboard(info+EmojiParser.parseToUnicode(":clock2:")+s, chatId, Long.parseLong(messageIdFromDis), false, new ButtonForKeyboard("Пополнить", "TOP_UP_COMMAND"), new ButtonForKeyboard("Купить другую акцию", "BUY_COMMAND") );
             }
+            BigInteger maxValue = utilsService.countHowMuchStock(newActiveBuy, appUser);
+            if(maxValue.equals(BigInteger.ZERO)){
+             utilsService.sendMessageAnswerWithInlineKeyboard(info+"\n К сожалению, у вас не хватает средств ни на одну акцию \n На вашем балансе: "+appUser.getWalletMoney()+"₽ \n Предлагаем вам: \n Либо пополнить баланс \n Либо выбрать другой актив", chatId, false, new ButtonForKeyboard("Пополнить", "TOP_UP_COMMAND"), new ButtonForKeyboard("Выбрать заново", "BUY_COMMAND"));
+                utilsService.sendDeleteMessageAnswer(chatId, messageId);
+                return;
+            }
             utilsService.sendEditMessageAnswer(info+EmojiParser.parseToUnicode(":clock2:")+" \n \n Какое количество акций вы хотите приобрести? \n Максимум вы можете приобрести "+utilsService.countHowMuchStock(newActiveBuy, appUser), chatId, Long.parseLong(messageIdFromDis));
             utilsService.sendDeleteMessageAnswer(chatId, messageId);
             //utilsService.sendAnswer("Какое количество акций вы хотите приобрести?", chatId);

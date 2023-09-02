@@ -18,7 +18,30 @@ public class BigMessage {
             EmojiParser.parseToUnicode(":large_blue_diamond:")+" Авторские права: Все материалы, предоставляемые ботом, защищены авторскими правами. Запрещается воспроизводство, распространение или модификация любых материалов без письменного разрешения администрации бота.\n" +
             "\n" +
             EmojiParser.parseToUnicode(":large_blue_diamond:")+" Согласие: Используя этот бот, вы соглашаетесь с вышеуказанными правилами и условиями. Если вы не согласны с данными правилами, прекратите использование бота.";
-    public static final String LEARNING_MESSAGE = "Тут будет красивая справка, как пользоваться ботом. Может даже видео";
+    public static final String LEARNING_MESSAGE = "Ваш бот для инвестиций предоставляет следующие основные команды:\n" +
+            "\n" +
+            EmojiParser.parseToUnicode(":small_orange_diamond:")+"/buy - эта команда позволяет вам приобретать инвестиционные активы. Процесс покупки состоит из трех основных этапов: выбор актива, определение количества акций для покупки и подтверждение операции. Если вы затрудняетесь с выбором актива, встроенный поиск поможет вам найти ключевую информацию, такую как код или тикер акции. Впрочем, вы также можете воспользоваться внешними поисковиками для этой цели.\n" +
+            "\n" +
+            EmojiParser.parseToUnicode(":small_orange_diamond:")+"/sell - эта команда аналогична команде /buy, но выполняет обратную функцию, позволяя вам продавать ваши инвестиционные активы.\n" +
+            "\n" +
+            EmojiParser.parseToUnicode(":small_orange_diamond:")+"/show_bag - использование этой команды позволяет вам просматривать общий обзор вашего инвестиционного портфеля. Пример такого отчета приведен ниже:\n" +
+            "\n" +
+            "Ваш инвестиционный портфель"+EmojiParser.parseToUnicode(":school_satchel:")+"\n" +
+            "\n" +
+            EmojiParser.parseToUnicode(":large_blue_diamond:")+ " Сбербанк-п (SBERP) - 3 акции\n" +
+            "Доход"+EmojiParser.parseToUnicode(":money_with_wings:")+": 454.34 | 7.6%\n" +
+            "Время покупок и продаж"+EmojiParser.parseToUnicode(":hourglass:")+":\n" +
+            "Покупка 3 акций в 2023-09-01 13:36\n" +
+            "\n" +
+            "На кошельке: 204.25₽\n" +
+            "Стоимость всех активов: 9784.75₽\n" +
+            "Пополнения за все время: 10000.00₽\n" +
+            "Прибыль за все время"+EmojiParser.parseToUnicode(":chart:")+": 534.07₽ | 6%\n" +
+            "\n" +
+            EmojiParser.parseToUnicode(":small_orange_diamond:")+"/wallet - эта команда предназначена для управления вашим кошельком и финансовыми операциями.\n" +
+            "\n" +
+            EmojiParser.parseToUnicode(":small_orange_diamond:")+"Остальные доступные команды можно найти в левом нижнем меню." +
+            "\n P.S Сейчас, первым делом, советуем вам пополнить баланс";
 
     public static final String HELP_MESSAGE = "Список доступных команд"+EmojiParser.parseToUnicode(":page_facing_up:")+" \n \n" +
             EmojiParser.parseToUnicode(":large_blue_diamond:")+" /cancel - отмена выполнения текущей команды;\n " +
@@ -26,6 +49,7 @@ public class BigMessage {
             EmojiParser.parseToUnicode(":large_blue_diamond:")+" /wallet - получить информацию о вашем кошельке \n" +
             EmojiParser.parseToUnicode(":large_blue_diamond:")+" /buy - покупка ценной бумаги; \n" +
             EmojiParser.parseToUnicode(":large_blue_diamond:")+" /sell - продажа ценной бумаги; \n"+
+            EmojiParser.parseToUnicode(":large_blue_diamond:")+" /show_bag - посмотреть портфель; \n"+
             EmojiParser.parseToUnicode(":large_blue_diamond:")+" /support - если возникли проблемы, пишите; \n"+
             EmojiParser.parseToUnicode(":large_blue_diamond:")+" /development - будущие разработки; \n";
     public static final String START_MESSAGE = "Добро пожаловать в мир виртуальной торговли нашего бота! \n Здесь ты можешь развивать свои навыки инвестирования," +

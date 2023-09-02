@@ -159,7 +159,7 @@ public class AppUserStockServiceImpl implements AppUserStockService {
               allSumma =  allSumma.add(countFactNow);
                stringBuilder.append(EmojiParser.parseToUnicode(":large_blue_diamond: ")).append(userStock.getStockQuote().getShortName()).append("(")
                        .append(userStock.getStockQuote().getSecId()).append(")")
-                       .append(" - ").append(userStock.getCountStock()).append(" акций \n").append("Доход").append(EmojiParser.parseToUnicode(":money_with_wings:")).append(": ").append(inCome).append(" | ")
+                       .append(" - ").append(userStock.getCountStock()).append(" акций \n").append("Доход").append(EmojiParser.parseToUnicode(":money_with_wings:")).append(":   ").append(inCome).append(" | ")
                        .append(incomeWithProcent).append("%").append("\n").append("Время покупок и продаж").append(EmojiParser.parseToUnicode(":hourglass:")).append(": \n").append(userStock.getNoticeBuyOrSell()).append("\n")
                        .append("_________________________ \n");
             }
@@ -168,7 +168,7 @@ public class AppUserStockServiceImpl implements AppUserStockService {
             BigDecimal inComeAll = s.subtract(appUser.getTopUpAmount());
             BigDecimal inComeWithProcent = inComeAll.divide(appUser.getTopUpAmount());
             stringBuilder.append("На кошельке: ").append(appUser.getWalletMoney()).append("₽ \n").append("Стоимость всех активов: ")
-                    .append(allSumma).append("₽ \n").append("Пополнения за все время: ").append(appUser.getTopUpAmount()).append("₽ \n").append("Прибыль за все время").append(EmojiParser.parseToUnicode(":chart:")).append(": ").append(inComeAll).append("₽ | ").append(inComeWithProcent).append("%");
+                    .append(allSumma).append("₽ \n").append("Пополнения за все время: ").append(appUser.getTopUpAmount()).append("₽ \n").append("Прибыль за все время").append(EmojiParser.parseToUnicode(":chart:")).append(":   ").append(inComeAll).append("₽ | ").append(inComeWithProcent).append("%");
             return stringBuilder.toString();
 
         }

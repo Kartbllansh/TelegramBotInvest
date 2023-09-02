@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Service
 public class MainBaseServiceImpl implements MainBaseService {
 //@Value("${url.moex}")
-    private String apiUrl ="https://iss.moex.com/iss/engines/stock/markets/shares/boards/TQBR/securities.json?iss.meta=off&iss.only=securities&securities.columns=SECID,SHORTNAME, PREVLEGALCLOSEPRICE,PREVDATE";
+    private String apiUrl ="https://iss.moex.com/iss/engines/stock/markets/shares/boards/TQBR/securities.json?iss.meta=off&iss.only=securities&securities.columns=SECID,SHORTNAME,PREVLEGALCLOSEPRICE,PREVDATE";
 
     private final StockQuoteRepository stockQuoteRepository;
     private final RestTemplate restTemplate;

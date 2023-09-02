@@ -57,7 +57,7 @@ public class AppUserServiceImpl implements AppUserService {
             appUser.setEmail(email);
             appUser.setState(BASIC_STATE);
             appUser = appUserDAO.save(appUser);
-
+//
             var cryptoUserId = cryptoTool.hashOf(appUser.getId());
             var response = sendRequestToMailService(cryptoUserId, email);
             if (response.getStatusCode() != HttpStatus.OK) {

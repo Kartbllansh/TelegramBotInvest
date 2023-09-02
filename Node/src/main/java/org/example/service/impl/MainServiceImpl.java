@@ -103,7 +103,7 @@ public class MainServiceImpl implements MainService {
           utilsService.sendMessageAnswerWithInlineKeyboard("Прежде чем использовать бота прочитайте правила использования бота"+EmojiParser.parseToUnicode(":exclamation:"), chatId, true, new ButtonForKeyboard("Правила"+EmojiParser.parseToUnicode(":open_book:"), "CONSENT_STATE"));
             return false;
         }
-
+//
         return true;
     }
 

@@ -99,6 +99,8 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                 String infoAboutBalance = walletMain.toKnowBalance(appUser);
                 //utilsService.sendAnswer(infoAboutBalance, chatId);
                 utilsService.sendEditMessageAnswer(infoAboutBalance, chatId, messageId);
+                appUser.setWalletUserState(NOT_WALLET);
+                appUserDAO.save(appUser);
                 break;
             case "SELL_COMMAND":
                 appUser.setSellUserState(SELL_CHANGE_STOCK);
@@ -122,7 +124,7 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                 appUserDAO.save(appUser);
                 break;
             case "LEARNING_STATE":
-                utilsService.sendMessageAnswerWithInlineKeyboard(LEARNING_MESSAGE, chatId, false, new ButtonForKeyboard("Пополнить"+EmojiParser.parseToUnicode(":top: "), "TOP_UP_COMMAND"), new ButtonForKeyboard("Help"+EmojiParser.parseToUnicode(":mag:"), "HELP_COMMAND"));
+                utilsService.sendEditMessageAnswerWithInlineKeyboard(LEARNING_MESSAGE, chatId, messageId, false, new ButtonForKeyboard("Пополнить"+EmojiParser.parseToUnicode(":top: "), "TOP_UP_COMMAND"), new ButtonForKeyboard("Help"+EmojiParser.parseToUnicode(":mag:"), "HELP_COMMAND"));
                 break;
         }
     }

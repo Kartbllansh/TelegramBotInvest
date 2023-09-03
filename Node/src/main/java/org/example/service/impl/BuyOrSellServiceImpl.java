@@ -139,7 +139,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         if(!(stockQuote==null)) {
             BigDecimal cost = stockQuote.getPrevLegalClosePrice();
             String symbol = stockQuote.getSecId();
-            info = "Стоимость ценной бумаги " + cmd + " равняется " + cost + " это цена на момент " + stockQuote.getDate();
+            info = "Стоимость ценной бумаги " + cmd + " равняется " + cost + " это цена на момент " + stockQuote.getDate()+EmojiParser.parseToUnicode(":hourglass_flowing_sand:");
             String newActiveBuy = symbol+":"+cost+":"+stockQuote.getShortName()+":"+messageIdFromDis;
             BigInteger maxCount = utilsService.countHowMuchStock(newActiveBuy, appUser);
             if(Objects.equals(maxCount, BigInteger.ZERO)){

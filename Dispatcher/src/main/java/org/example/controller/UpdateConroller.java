@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j;
 import org.example.dao.AppUserDAO;
 import org.example.service.UpdateProducer;
 import org.example.utils.MessageUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
@@ -101,6 +102,7 @@ public class UpdateConroller {
         try {
             telegramBot.execute(editMessageText);
         } catch (TelegramApiException e) {
+            log.error(editMessageText.getText()+" "+e);
             throw new RuntimeException(e);
         }
     }

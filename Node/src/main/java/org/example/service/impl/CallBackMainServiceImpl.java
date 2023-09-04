@@ -190,6 +190,7 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                    utilsService.sendEditMessageAnswer("Поиск не удался"+EmojiParser.parseToUnicode(":warning:")+ "\n Воспользуйтесь браузером и выберите ключ, по которому приобретете акцию"+EmojiParser.parseToUnicode(":chart:")+"\n Как только определитесь отправьте мне сообщением ключ"+EmojiParser.parseToUnicode(":old_key:"), chatId, messageId);
                    appUser.setBuyUserState(CHANGE_STOCK);
                    appUserDAO.save(appUser);
+                   return;
 
                 }
 

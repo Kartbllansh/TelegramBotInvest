@@ -157,7 +157,7 @@ public class AppUserStockServiceImpl implements AppUserStockService {
                 BigDecimal countBuy = userStock.getPrice().multiply(BigDecimal.valueOf(userStock.getCountStock()));
                 BigDecimal countFactNow = userStock.getStockQuote().getPrevLegalClosePrice().multiply(BigDecimal.valueOf(userStock.getCountStock()));
                 BigDecimal inCome = countFactNow.subtract(countBuy);
-                BigDecimal incomeWithProcent = inCome.divide(countBuy);
+                BigDecimal incomeWithProcent = inCome.divide(countBuy, 2, RoundingMode.HALF_UP);
               allSumma =  allSumma.add(countFactNow);
                stringBuilder.append(EmojiParser.parseToUnicode(":large_blue_diamond: ")).append(userStock.getStockQuote().getShortName()).append("(")
                        .append(userStock.getStockQuote().getSecId()).append(")")
@@ -168,7 +168,7 @@ public class AppUserStockServiceImpl implements AppUserStockService {
         }
             BigDecimal s = allSumma.add(appUser.getWalletMoney());
             BigDecimal inComeAll = s.subtract(appUser.getTopUpAmount());
-            BigDecimal inComeWithProcent = inComeAll.divide(appUser.getTopUpAmount());
+            BigDecimal inComeWithProcent = inComeAll.divide(appUser.getTopUpAmount(),  2, RoundingMode.HALF_UP);
             stringBuilder.append("На кошельке: ").append(appUser.getWalletMoney()).append("₽ \n").append("Стоимость всех активов: ")
                     .append(allSumma).append("₽ \n").append("Пополнения за все время: ").append(appUser.getTopUpAmount()).append("₽ \n").append("Прибыль за все время").append(EmojiParser.parseToUnicode(":chart:")).append(":   ").append(inComeAll).append("₽ | ").append(inComeWithProcent).append("%");
             return stringBuilder.toString();

@@ -12,6 +12,8 @@ public enum CommandService {
     SUPPORT("/support"),
     DEVELOPMENT("/development"),
     SHOW_BAG("/show_bag"),
+    SEND("/send"),
+    LEARNING("/learning"),
     SELL("/sell");
 
     private final String value;

@@ -1,5 +1,6 @@
 package org.example.service.impl;
 
+import com.vdurmont.emoji.EmojiParser;
 import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
 import org.example.enums.CommandService;
@@ -39,9 +40,11 @@ public class WalletServiceImpl implements WalletService {
            //utilsService.sendAnswer(infoAboutBalance, chatId);
            utilsService.sendEditMessageAnswer(infoAboutBalance, chatId, messageId);
         } else if (WALLET_TOP_UP_CMD.equals(serviceCommand)) {
-            utilsService.sendEditMessageAnswerWithInlineKeyboard("Введите сумму, на которую хотите увеличить свой счет", chatId, messageId, true, new ButtonForKeyboard("Отмена", "CANCEL"));
+            utilsService.sendMessageAnswerWithInlineKeyboard("Введите сумму, на которую хотите увеличить свой счет", chatId, true, new ButtonForKeyboard("Отмена", "CANCEL"));
             appUser.setWalletUserState(WALLET_TOP_UP_CHANGE_COUNT);
             appUserDAO.save(appUser);
+        } else{
+            utilsService.sendMessageAnswerWithInlineKeyboard("Активирована команда /wallet"+ EmojiParser.parseToUnicode("")+"\n Выберите действия из предложенных снизу в кнопках", chatId, false, new ButtonForKeyboard("Пополнить"+EmojiParser.parseToUnicode(":top: "), "TOP_UP_COMMAND"), new ButtonForKeyboard("Посмотреть"+EmojiParser.parseToUnicode(":eyes:"), "LOOK_BALANCE_COMMAND"),new ButtonForKeyboard("Отмена"+EmojiParser.parseToUnicode(":leftwards_arrow_with_hook:"), "CANCEL") );
         }
     }
     private void topUpChangeCount(AppUser appUser, String text, Long chatId, long messageId){
@@ -52,7 +55,7 @@ public class WalletServiceImpl implements WalletService {
         appUser.setWalletUserState(NOT_WALLET);
         appUserDAO.save(appUser);
     } else {
-        utilsService.sendEditMessageAnswerWithInlineKeyboard("Пожалуйста введите корректное число или нажмите /cancel, чтобы выйти", chatId, messageId, true, new ButtonForKeyboard("Отмена", "CANCEL") );
+        utilsService.sendMessageAnswerWithInlineKeyboard("Пожалуйста введите корректное число или нажмите /cancel, чтобы выйти", chatId, true, new ButtonForKeyboard("Отмена", "CANCEL") );
     }
     }
 

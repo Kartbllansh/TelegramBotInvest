@@ -7,6 +7,7 @@ import org.example.entity.AppUser;
 import org.example.enums.CommandService;
 import org.example.service.*;
 import org.example.dto.ButtonForKeyboard;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -21,13 +22,14 @@ import static org.example.entity.UserState.BASIC_STATE;
 import static org.example.entity.UserState.WAIT_FOR_EMAIL_STATE;
 import static org.example.entity.WalletUserState.NOT_WALLET;
 import static org.example.entity.WalletUserState.WALLET_CHANGE_CMD;
-import static org.example.enums.BigMessage.DEVELOPMENT_MESSAGE;
-import static org.example.enums.BigMessage.START_MESSAGE;
+import static org.example.enums.BigMessage.*;
 import static org.example.enums.CommandService.*;
 
 @Service
 @Log4j
 public class MainServiceImpl implements MainService {
+    @Value("${bot.owner}")
+    private Long idOwner;
     private final WalletService walletService;
     private final BuyOrSellService buyOrSellService;
     private final AppUserDAO appUserDAO;
@@ -108,6 +110,13 @@ public class MainServiceImpl implements MainService {
     }
 
     private void processServiceCommand(AppUser appUser, String cmd, long chatId, long messageId) {
+        if(cmd.contains("/send") && idOwner.equals(appUser.getTelegramUserId())) {
+            var users = appUserDAO.findAll();
+            for (AppUser appUser1 : users) {
+                utilsService.sendAnswer(EmojiParser.parseToUnicode(cmd.substring(cmd.indexOf(" "))), appUser1.getTelegramUserId());
+                return;
+            }
+        }
         var serviceCommand = CommandService.fromValue(cmd);
         if(serviceCommand==null){
             utilsService.sendMessageAnswerWithInlineKeyboard("Неизвестная команда"+EmojiParser.parseToUnicode(":warning:")+  "\n Чтобы посмотреть список доступных команд введите /help", chatId, true, new ButtonForKeyboard("Help"+EmojiParser.parseToUnicode(":mag:"), "HELP_COMMAND"));
@@ -170,6 +179,11 @@ public class MainServiceImpl implements MainService {
                 utilsService.sendAnswer(appUserStockService.reportAboutInvestBag(appUser), chatId);
                 log.info("Команда /show_bag активирована. Пользователем "+appUser.getUserName());
                 break;
+
+            case LEARNING:
+                utilsService.sendAnswer(LEARNING_MESSAGE, chatId);
+                break;
+
             default:
                 //sendAnswer("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId);
                 utilsService.sendMessageAnswerWithInlineKeyboard("Неизвестная команда"+EmojiParser.parseToUnicode(":warning:")+ " \n Чтобы посмотреть список доступных команд введите /help", chatId, true, new ButtonForKeyboard("Help"+EmojiParser.parseToUnicode(":mag:"), "HELP_COMMAND"));

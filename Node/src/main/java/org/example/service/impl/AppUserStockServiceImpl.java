@@ -1,6 +1,7 @@
 package org.example.service.impl;
 
 import com.vdurmont.emoji.EmojiParser;
+import lombok.extern.log4j.Log4j;
 import org.example.dao.StockQuoteRepository;
 import org.example.dao.UserStockDAO;
 import org.example.entity.AppUser;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 @Service
+@Log4j
 public class AppUserStockServiceImpl implements AppUserStockService {
 
     private final UserStockDAO userStockDAO;

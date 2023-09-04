@@ -63,7 +63,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     try {
         this.execute(new SetMyCommands(listOfCommand, new BotCommandScopeDefault(), null));
     } catch (TelegramApiException e) {
-        log.error("error with menu with commands");
+        log.error("error with menu with commands \n"+e);
         log.error(e);
     }
 

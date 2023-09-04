@@ -1,6 +1,7 @@
 package org.example.service.impl;
 
 import com.vdurmont.emoji.EmojiParser;
+import lombok.extern.log4j.Log4j;
 import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
 import org.example.entity.StockQuote;
@@ -23,6 +24,7 @@ import static org.example.enums.BigMessage.CONSENT_MESSAGE;
 import static org.example.enums.BigMessage.LEARNING_MESSAGE;
 
 @Service
+@Log4j
 public class CallBackMainServiceImpl implements CallBackMainService {
     private final ProducerService producerService;
     private final AppUserDAO appUserDAO;
@@ -117,6 +119,7 @@ public class CallBackMainServiceImpl implements CallBackMainService {
                 }
 
                 utilsService.sendMessageAnswerWithInlineKeyboard(output, chatId, true, buttonsList.toArray(new ButtonForKeyboard[0]));
+                log.info("Через кнопку активирована команда /sell. Пользователь: "+appUser.getUserName());
                 break;
             case "CONSENT_STATE":
                 utilsService.sendEditMessageAnswerWithInlineKeyboard(CONSENT_MESSAGE, chatId, messageId, true, new ButtonForKeyboard("Соглашаюсь"+EmojiParser.parseToUnicode(":white_check_mark:"), "YES_BUTTON_CONSENT"), new ButtonForKeyboard("Отказываюсь"+EmojiParser.parseToUnicode(":x: "), "NO_BUTTON_CONSENT"));

@@ -113,14 +113,12 @@ public class MainServiceImpl implements MainService {
             utilsService.sendMessageAnswerWithInlineKeyboard("Неизвестная команда"+EmojiParser.parseToUnicode(":warning:")+  "\n Чтобы посмотреть список доступных команд введите /help", chatId, true, new ButtonForKeyboard("Help"+EmojiParser.parseToUnicode(":mag:"), "HELP_COMMAND"));
             return;
         }
-        log.info("MESSAGE"+cmd);
         switch (Objects.requireNonNull(serviceCommand)){
             case START:
-                log.info("Новый пользователь с именем " + appUser.getUserName());
                 utilsService.sendMessageAnswerWithInlineKeyboard("Приветствую, "+appUser.getUserName()+ "!"+ EmojiParser.parseToUnicode(":wave:")+"\n"+START_MESSAGE+ "\n Но перед началом согласитесь с правилами пользования ботом", chatId, false, new ButtonForKeyboard("Правила"+EmojiParser.parseToUnicode(":open_book:"), "CONSENT_STATE"));
                 break;
             case REGISTRATION:
-                log.info("Регистрация пользователя "+appUser.getUserName()+" с почтой "+appUser.getEmail());
+                log.info("Регистрация пользователя "+appUser.getUserName());
                 utilsService.sendAnswer(appUserService.registerUser(appUser), chatId);
                 appUser.setState(WAIT_FOR_EMAIL_STATE);
                 appUserDAO.save(appUser);
@@ -133,7 +131,7 @@ public class MainServiceImpl implements MainService {
                 appUserDAO.save(appUser);
                 utilsService.sendMessageAnswerWithInlineKeyboard(appUser.getUserName()+", вы активировали команду /buy! \n"
                         +"Введите код акции, которую хотите купить", chatId, true, new ButtonForKeyboard("Узнать ticket", "RECOGNIZE_TICKET"));
-
+                log.info("Команда /buy активирована. Пользователем "+appUser.getUserName());
                 break;
             case SELL:
                 appUser.setSellUserState(SELL_CHANGE_STOCK);
@@ -149,7 +147,9 @@ public class MainServiceImpl implements MainService {
                 }
 
                 utilsService.sendMessageAnswerWithInlineKeyboard(output, chatId, true, buttonsList.toArray(new ButtonForKeyboard[0]));
+                log.info("Команда /sell активирована. Пользователем "+appUser.getUserName());
                 break;
+
             case WALLET_MONEY:
                 appUser.setWalletUserState(WALLET_CHANGE_CMD);
                 appUserDAO.save(appUser);
@@ -161,12 +161,14 @@ public class MainServiceImpl implements MainService {
             case SUPPORT:
                 utilsService.sendAnswer("Возникли трудности или есть вопросы? \n" +
                         "Пишите @Kartbllansh с радостью ответим"+EmojiParser.parseToUnicode(":two_hearts: "), chatId);
+                log.info("Команда /support активирована. Пользователем "+appUser.getUserName());
                 break;
             case DEVELOPMENT:
                 utilsService.sendAnswer(DEVELOPMENT_MESSAGE, chatId);
                 break;
             case SHOW_BAG:
                 utilsService.sendAnswer(appUserStockService.reportAboutInvestBag(appUser), chatId);
+                log.info("Команда /show_bag активирована. Пользователем "+appUser.getUserName());
                 break;
             default:
                 //sendAnswer("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId);
@@ -209,6 +211,7 @@ public class MainServiceImpl implements MainService {
                     .sellUserState(NOT_SELL)
                     .walletUserState(NOT_WALLET)
                     .build();
+                log.info("Новый пользователь: "+transientAppUser.getUserName());
             return appUserDAO.save(transientAppUser);
         }
         return optional.get();

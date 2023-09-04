@@ -1,6 +1,7 @@
 package org.example.service.impl;
 
 import com.vdurmont.emoji.EmojiParser;
+import lombok.extern.log4j.Log4j;
 import org.example.dao.AppUserDAO;
 import org.example.entity.AppUser;
 import org.example.service.ProducerService;
@@ -25,6 +26,7 @@ import static org.example.entity.WalletUserState.NOT_WALLET;
 import static org.example.enums.BigMessage.HELP_MESSAGE;
 
 @Service
+@Log4j
 public class UtilsServiceImpl implements UtilsService {
     private final AppUserDAO appUserDAO;
     private final ProducerService producerService;
@@ -47,6 +49,7 @@ public class UtilsServiceImpl implements UtilsService {
         }
         appUser.setState(BASIC_STATE);
         appUserDAO.save(appUser);
+       log.info("Активирована команда /cancel. Пользователь: "+appUser.getUserName());
         return "Команда отменена"+ EmojiParser.parseToUnicode(":leftwards_arrow_with_hook:");
     }
 
@@ -99,6 +102,7 @@ public class UtilsServiceImpl implements UtilsService {
 
     @Override
     public String help() {
+        log.info("Активирована команда /help");
         return HELP_MESSAGE;
     }
 

@@ -74,11 +74,11 @@ public class UpdateConroller {
     private void setUnsupportedMessageTypeView(Update update) {
       var sendMessage = messageUtils.generateSendMessageWithText(update, "Неподдерживаемый тип сообщений");
       setView(sendMessage);
+      log.error("Получен неподдерживаемый тип сообщения");
 
     }
 
     public void setView(SendMessage sendMessage) {
-        //TODO попробовать перенести запись Id в Node
         Integer messageId =  telegramBot.sendAnswerMessage(sendMessage);
         processSetMessageId(sendMessage, messageId);
     }

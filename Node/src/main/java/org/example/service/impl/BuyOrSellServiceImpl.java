@@ -172,6 +172,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
          String info = buyProofYes(appUser);
         utilsService.sendEditMessageAnswer(EmojiParser.parseToUnicode(info), chatId, Long.parseLong(utilsService.parseStringFromBD(appUser.getActiveBuy(), 3)));
         utilsService.sendDeleteMessageAnswer(chatId, messageId);
+        log.info("Успешная покупка! Пользователь: "+appUser.getUserName());
         } else if (cmd.equalsIgnoreCase("НЕТ")) {
             String info = "Сделка отменена"+EmojiParser.parseToUnicode(":x:")+ "\n Если захотите опять что-то купить введите команду /buy";
             utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode(info), chatId, Long.parseLong(utilsService.parseStringFromBD(appUser.getActiveBuy(), 3)), false, new ButtonForKeyboard("Buy", "BUY_COMMAND"));
@@ -257,6 +258,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
            info =  sellProofYes(appUser);
             utilsService.sendEditMessageAnswer(info, chatId, Long.parseLong(messadeIdFrom));
             utilsService.sendDeleteMessageAnswer(chatId, messageId);
+            log.info("Успешная продажа! Пользователь: "+appUser.getUserName());
         } else if (cmd.equalsIgnoreCase("НЕТ")) {
              info = "Сделка отменена"+EmojiParser.parseToUnicode(":x:")+ "\n Если захотите опять что-то купить введите команду /sell";
             //info = "Сделка отменена. Если захотите опять что-то продать введите команду /sell";

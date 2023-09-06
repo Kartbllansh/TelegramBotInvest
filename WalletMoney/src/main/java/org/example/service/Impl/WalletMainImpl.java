@@ -14,6 +14,8 @@ public class WalletMainImpl implements WalletMain {
 private final AppUserDAO appUserDAO;
 //TODO механизм, позволяющий работать с разными валютами
 
+    private final BigDecimal maxBalance = new BigDecimal("1000000000"); // 1 миллиард
+    private final BigDecimal maxPopolneniy = new BigDecimal("10000000000");
     public WalletMainImpl(AppUserDAO appUserDAO) {
         this.appUserDAO = appUserDAO;
     }
@@ -30,6 +32,13 @@ private final AppUserDAO appUserDAO;
     @Override
     public String topUpWallet(BigDecimal summa, AppUser appUser, boolean whoTopUp) {
         if(whoTopUp){
+            if (appUser.getWalletMoney().add(summa).compareTo(maxBalance) > 0) {
+                return EmojiParser.parseToUnicode("Извините, но вы не можете пополнить счет на сумму, которая превышает 1 миллиард." +EmojiParser.parseToUnicode(":money_with_wings:") );
+            }
+
+            if(appUser.getTopUpAmount().add(summa).compareTo(maxPopolneniy) > 0){
+                return "За все время использования бота вы пополнили кошелек больше чем на сумму 10 миллиардов:) \n К сожалению, пополнения кошелька дальше блокируется:)";
+            }
             appUser.setTopUpAmount(appUser.getTopUpAmount().add(summa));
             appUserDAO.save(appUser);
         }
@@ -37,6 +46,8 @@ private final AppUserDAO appUserDAO;
         if (summa.compareTo(BigDecimal.ZERO) < 0) {
             return EmojiParser.parseToUnicode("К сожалению, наш бот пока не умеет пополнять счет на отрицательную сумму"+":thinking:"+"\n Если вы хотите избавиться от денег на счету напишите нам в поддержку \n Мы обязательно вам поможем"+":revolving_hearts:") ;
         }
+
+
 
         appUser.setWalletMoney(appUser.getWalletMoney().add(summa));
         appUserDAO.save(appUser);

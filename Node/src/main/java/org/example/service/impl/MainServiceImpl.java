@@ -124,7 +124,7 @@ public class MainServiceImpl implements MainService {
         }
         switch (Objects.requireNonNull(serviceCommand)){
             case START:
-                utilsService.sendMessageAnswerWithInlineKeyboard("Приветствую, "+appUser.getUserName()+ "!"+ EmojiParser.parseToUnicode(":wave:")+"\n"+START_MESSAGE+ "\n Но перед началом согласитесь с правилами пользования ботом", chatId, false, new ButtonForKeyboard("Правила"+EmojiParser.parseToUnicode(":open_book:"), "CONSENT_STATE"));
+                utilsService.sendMessageAnswerWithInlineKeyboard("Приветствую, "+appUser.getUserName()+ "!"+ EmojiParser.parseToUnicode(":wave:")+"\n"+START_MESSAGE+ "\nНо перед началом согласитесь с правилами пользования ботом", chatId, false, new ButtonForKeyboard("Правила"+EmojiParser.parseToUnicode(":open_book:"), "CONSENT_STATE"));
                 break;
             case REGISTRATION:
                 log.info("Регистрация пользователя "+appUser.getUserName());
@@ -165,7 +165,7 @@ public class MainServiceImpl implements MainService {
                 utilsService.sendMessageAnswerWithInlineKeyboard(appUser.getUserName()+", Вы активировали команду, позволяющую работать с балансом на вашем кошельке"+EmojiParser.parseToUnicode(":abacus:")+ "\n"
                         +"Выберите какую из команд вы хотели бы использовать: \n"
                         +"* /top_up - пополните баланс"+EmojiParser.parseToUnicode(":money_with_wings:")+ "\n"
-                        +" * /look_balance - посмотрите, сколько у вас на счету денег"+EmojiParser.parseToUnicode(":moneybag:"), chatId, false, new ButtonForKeyboard("Пополнить"+EmojiParser.parseToUnicode(":top: "), "TOP_UP_COMMAND"), new ButtonForKeyboard("Посмотреть"+EmojiParser.parseToUnicode(":eyes:"), "LOOK_BALANCE_COMMAND"));
+                        +" * /look_balance - посмотрите, сколько у вас на счету денег"+EmojiParser.parseToUnicode(":moneybag:")+"\n \nP.S Бот не позволит пополнить баланс суммарно больше, чем на 10 миллиардов:)", chatId, false, new ButtonForKeyboard("Пополнить"+EmojiParser.parseToUnicode(":top: "), "TOP_UP_COMMAND"), new ButtonForKeyboard("Посмотреть"+EmojiParser.parseToUnicode(":eyes:"), "LOOK_BALANCE_COMMAND"));
                 break;
             case SUPPORT:
                 utilsService.sendAnswer("Возникли трудности или есть вопросы? \n" +
@@ -186,7 +186,7 @@ public class MainServiceImpl implements MainService {
 
             default:
                 //sendAnswer("Неизвестная команда! Чтобы посмотреть список доступных команд введите /help", chatId);
-                utilsService.sendMessageAnswerWithInlineKeyboard("Неизвестная команда"+EmojiParser.parseToUnicode(":warning:")+ " \n Чтобы посмотреть список доступных команд введите /help", chatId, true, new ButtonForKeyboard("Help"+EmojiParser.parseToUnicode(":mag:"), "HELP_COMMAND"));
+                utilsService.sendMessageAnswerWithInlineKeyboard("Неизвестная команда"+EmojiParser.parseToUnicode(":warning:")+ " \nЧтобы посмотреть список доступных команд введите /help", chatId, true, new ButtonForKeyboard("Help"+EmojiParser.parseToUnicode(":mag:"), "HELP_COMMAND"));
                 break;
         }
 

@@ -33,6 +33,7 @@ public class WalletServiceImpl implements WalletService {
     public void onActiveWallet(AppUser appUser, String text, Long chatId, long messageId) {
         if(appUser.getWalletUserState().equals(WALLET_TOP_UP_CHANGE_COUNT)){
             topUpChangeCount(appUser, text, chatId, messageId);
+            return;
         }
         var serviceCommand = CommandService.fromValue(text);
         if(WALLET_LOOK_BALANCE.equals(serviceCommand)){

@@ -104,7 +104,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
             long count = Long.parseLong(cmd);
             String newValue = oldActiveBuy+":"+count;
             if(count==0){
-                info = ":receipt:"+"Покупка "+utilsService.parseStringFromBD(oldActiveBuy, 2)+" ("+utilsService.parseStringFromBD(oldActiveBuy, 0)+") "+":receipt:"+"\n \n Нельзя купить 0 акций"+EmojiParser.parseToUnicode(":warning:")+"\n Введите корректное число или отмените покупку";
+                info = ":receipt:"+"Покупка "+utilsService.parseStringFromBD(oldActiveBuy, 2)+" ("+utilsService.parseStringFromBD(oldActiveBuy, 0)+") "+":receipt:"+"\n \nНельзя купить 0 акций"+EmojiParser.parseToUnicode(":warning:")+"\n Введите корректное число или отмените покупку";
                 utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode(info), chatId, Long.parseLong(utilsService.parseStringFromBD(oldActiveBuy, 3)), false, new ButtonForKeyboard("Отменить"+EmojiParser.parseToUnicode(":leftwards_arrow_with_hook:"), "CANCEL"));
                 return;
             }
@@ -112,7 +112,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
             boolean oppornunityPurchase = walletMain.checkAbilityBuy(utilsService.countSummaPurchase(newValue), appUser);
             if(oppornunityPurchase) {
                 info =":receipt:"+"Покупка "+count+" "+utilsService.parseStringFromBD(newValue, 2)+" ("+utilsService.parseStringFromBD(newValue, 0)+") "+":receipt:";
-                utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode(info+" \n Подтверждение"+":white_large_square:"+ "\n Если вы подтверждаете покупку введите 'Да'("+":white_check_mark:"+"), если отменяете 'Нет'("+":x:"+")"), chatId, Long.parseLong(utilsService.parseStringFromBD(oldActiveBuy, 3 )), true, new ButtonForKeyboard(EmojiParser.parseToUnicode("Да("+":white_check_mark:"+")"), "YES_BUTTON_BUY"), new ButtonForKeyboard(EmojiParser.parseToUnicode("Нет("+":x:"+")"), "NO_BUTTON_BUY"));
+                utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode(info+" \nПодтверждение"+":white_large_square:"+ "\nЕсли вы подтверждаете покупку введите 'Да'("+":white_check_mark:"+"), если отменяете 'Нет'("+":x:"+")"), chatId, Long.parseLong(utilsService.parseStringFromBD(oldActiveBuy, 3 )), true, new ButtonForKeyboard(EmojiParser.parseToUnicode("Да("+":white_check_mark:"+")"), "YES_BUTTON_BUY"), new ButtonForKeyboard(EmojiParser.parseToUnicode("Нет("+":x:"+")"), "NO_BUTTON_BUY"));
                 utilsService.sendDeleteMessageAnswer(chatId, messageId);
                 appUser.setActiveBuy(newValue);
 
@@ -145,16 +145,17 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
             if(Objects.equals(maxCount, BigInteger.ZERO)){
                 appUser.setBuyUserState(NOT_BUY);
                 appUserDAO.save(appUser);
-             String s = "Покупка отменена"+EmojiParser.parseToUnicode(":x:")+ "\n К сожалению, у вас не хватает средств купить ни одной акции \n Пополните баланс или выберите другую акцию ";
+             String s = "Покупка отменена"+EmojiParser.parseToUnicode(":x:")+ "\nК сожалению, у вас не хватает средств купить ни одной акции \nПополните баланс или выберите другую акцию ";
              utilsService.sendEditMessageAnswerWithInlineKeyboard(info+EmojiParser.parseToUnicode(":clock2:")+s, chatId, Long.parseLong(messageIdFromDis), false, new ButtonForKeyboard("Пополнить", "TOP_UP_COMMAND"), new ButtonForKeyboard("Купить другую акцию", "BUY_COMMAND") );
             }
             BigInteger maxValue = utilsService.countHowMuchStock(newActiveBuy, appUser);
             if(maxValue.equals(BigInteger.ZERO)){
-             utilsService.sendMessageAnswerWithInlineKeyboard(info+"\n К сожалению, у вас не хватает средств ни на одну акцию \n На вашем балансе: "+appUser.getWalletMoney()+"₽ \n Предлагаем вам: \n Либо пополнить баланс \n Либо выбрать другой актив", chatId, false, new ButtonForKeyboard("Пополнить", "TOP_UP_COMMAND"), new ButtonForKeyboard("Выбрать заново", "BUY_COMMAND"));
+             utilsService.sendMessageAnswerWithInlineKeyboard(info+"\nК сожалению, у вас не хватает средств ни на одну акцию \nНа вашем балансе: "+appUser.getWalletMoney()+"₽ \nПредлагаем вам:\n Либо пополнить баланс\n Либо выбрать другой актив", chatId, false, new ButtonForKeyboard("Пополнить", "TOP_UP_COMMAND"), new ButtonForKeyboard("Выбрать заново", "BUY_COMMAND"));
                 utilsService.sendDeleteMessageAnswer(chatId, messageId);
                 return;
             }
-            utilsService.sendEditMessageAnswer(info+EmojiParser.parseToUnicode(":clock2:")+" \n \n Какое количество акций вы хотите приобрести? \n Максимум вы можете приобрести "+utilsService.countHowMuchStock(newActiveBuy, appUser), chatId, Long.parseLong(messageIdFromDis));
+            BigInteger abillityBuy = utilsService.countHowMuchStock(newActiveBuy, appUser);
+            utilsService.sendEditMessageAnswerWithInlineKeyboard(info+EmojiParser.parseToUnicode(":clock2:")+" \n \nКакое количество акций вы хотите приобрести? \nМаксимум вы можете приобрести "+abillityBuy, chatId, Long.parseLong(messageIdFromDis), false, new ButtonForKeyboard("Купить "+abillityBuy+" акций", abillityBuy.toString()), new ButtonForKeyboard("Отменить"+EmojiParser.parseToUnicode(":leftwards_arrow_with_hook:"), "CANCEL"));
             utilsService.sendDeleteMessageAnswer(chatId, messageId);
             //utilsService.sendAnswer("Какое количество акций вы хотите приобрести?", chatId);
             appUser.setBuyUserState(CHANGE_COUNT);
@@ -162,7 +163,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
             appUser.setActiveBuy(newActiveBuy);
             appUserDAO.save(appUser);
         } else {
-            utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode("Чат-бот не знаком с такой ценной бумагой, как "+cmd+EmojiParser.parseToUnicode("  :robot_face:"))+"\n  В ближайшее время мы попробуем добавить данную компанию в список доступных. \n Введите другую акцию или отмените покупку", chatId, Long.parseLong(messageIdFromDis), false, new ButtonForKeyboard("Отменить"+EmojiParser.parseToUnicode(":leftwards_arrow_with_hook:"), "CANCEL"));
+            utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode("Чат-бот не знаком с такой ценной бумагой, как "+cmd+EmojiParser.parseToUnicode("  :robot_face:"))+"\nВ ближайшее время мы попробуем добавить данную компанию в список доступных. \nВведите другую акцию или отмените покупку", chatId, Long.parseLong(messageIdFromDis), false, new ButtonForKeyboard("Отменить"+EmojiParser.parseToUnicode(":leftwards_arrow_with_hook:"), "CANCEL"));
             utilsService.sendDeleteMessageAnswer(chatId, messageId);
         }
     }
@@ -174,13 +175,13 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         utilsService.sendDeleteMessageAnswer(chatId, messageId);
         log.info("Успешная покупка! Пользователь: "+appUser.getUserName());
         } else if (cmd.equalsIgnoreCase("НЕТ")) {
-            String info = "Сделка отменена"+EmojiParser.parseToUnicode(":x:")+ "\n Если захотите опять что-то купить введите команду /buy";
+            String info = "Сделка отменена"+EmojiParser.parseToUnicode(":x:")+ "\nЕсли захотите опять что-то купить введите команду /buy";
             utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode(info), chatId, Long.parseLong(utilsService.parseStringFromBD(appUser.getActiveBuy(), 3)), false, new ButtonForKeyboard("Buy", "BUY_COMMAND"));
             utilsService.sendDeleteMessageAnswer(chatId, messageId);
             appUser.setBuyUserState(NOT_BUY);
             appUserDAO.save(appUser);
         } else {
-            String info = "Неверное значение"+EmojiParser.parseToUnicode(":x:")+ "\n Если вы подтверждаете покупку введите 'Да'("+EmojiParser.parseToUnicode(":white_check_mark:")+"), если отменяете 'Нет'("+":x:"+"). \n Если хотите отменить покупку выберите /cancel";
+            String info = "Неверное значение"+EmojiParser.parseToUnicode(":x:")+ "\nЕсли вы подтверждаете покупку введите 'Да'("+EmojiParser.parseToUnicode(":white_check_mark:")+"), если отменяете 'Нет'("+":x:"+"). \nЕсли хотите отменить покупку выберите /cancel";
             utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode(info), chatId, Long.parseLong(utilsService.parseStringFromBD(appUser.getActiveBuy(), 3)), true, new ButtonForKeyboard(EmojiParser.parseToUnicode("Да("+":white_check_mark:"+")"), "YES_BUTTON_BUY"), new ButtonForKeyboard(EmojiParser.parseToUnicode("Нет("+":x:"+")"), "NO_BUTTON_BUY"), new ButtonForKeyboard("Отменить"+EmojiParser.parseToUnicode(":leftwards_arrow_with_hook:"), "CANCEL") );
             utilsService.sendDeleteMessageAnswer(chatId, messageId);
         }
@@ -195,7 +196,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         appUserStockService.saveOrUpdateUserStock(appUser, utilsService.parseStringFromBD(activeBuy, 0), count, LocalDateTime.now(), purchace);
         //createTable.addNoteAboutBuy("telegramuser_"+appUser.getTelegramUserId(), utilsService.parseStringFromBD(activeBuy, 0), count, LocalDateTime.now(), purchace, utilsService.parseStringFromBD(activeBuy, 2));
         //String info = "Покупка выполнена успешна"+":white_check_mark:"+ "\n"+ walletMain.topDownWallet(purchace.multiply(countFromUser), appUser);
-        String neInfo = ":white_check_mark:"+" Успешная покупка: "+utilsService.parseStringFromBD(activeBuy, 2)+"("+utilsService.parseStringFromBD(activeBuy, 0)+") "+count+" акций "+":white_check_mark:"+"\n \n "+walletMain.topDownWallet(purchace.multiply(countFromUser), appUser);
+        String neInfo = ":white_check_mark:"+" Успешная покупка: "+utilsService.parseStringFromBD(activeBuy, 2)+"("+utilsService.parseStringFromBD(activeBuy, 0)+") "+count+" акций "+":white_check_mark:"+"\n \n"+walletMain.topDownWallet(purchace.multiply(countFromUser), appUser);
 
         appUser.setBuyUserState(NOT_BUY);
         appUserDAO.save(appUser);
@@ -212,7 +213,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
             int someResult = appUserStockService.checkAboutCountSell(appUser, (int) count, codeStocks);
             if(someResult>=0) {
                 info = EmojiParser.parseToUnicode(":yellow_circle:")+" Продажа " + count + " акций " + utilsService.parseStringFromBD(temporaryValue, 2)+"("+utilsService.parseStringFromBD(temporaryValue, 0)+")";
-                utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode(info+" \n Подтверждение"+EmojiParser.parseToUnicode(":white_large_square:")+ "\n Если вы подтверждаете продажу введите 'Да'("+EmojiParser.parseToUnicode(":white_check_mark:")+"), если отменяете 'Нет'("+EmojiParser.parseToUnicode(":x:")+")"), chatId, Long.parseLong(utilsService.parseStringFromBD(temporaryValue, 3 )), true, new ButtonForKeyboard(EmojiParser.parseToUnicode("Да("+":white_check_mark:"+")"), "YES_BUTTON_SELL"), new ButtonForKeyboard(EmojiParser.parseToUnicode("Нет("+":x:"+")"), "NO_BUTTON_SELL"));
+                utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode(info+" \nПодтверждение"+EmojiParser.parseToUnicode(":white_large_square:")+ "\nЕсли вы подтверждаете продажу введите 'Да'("+EmojiParser.parseToUnicode(":white_check_mark:")+"), если отменяете 'Нет'("+EmojiParser.parseToUnicode(":x:")+")"), chatId, Long.parseLong(utilsService.parseStringFromBD(temporaryValue, 3 )), true, new ButtonForKeyboard(EmojiParser.parseToUnicode("Да("+":white_check_mark:"+")"), "YES_BUTTON_SELL"), new ButtonForKeyboard(EmojiParser.parseToUnicode("Нет("+":x:"+")"), "NO_BUTTON_SELL"));
                 //utilsService.sendEditMessageAnswerWithInlineKeyboard(info+"Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId, Long.parseLong(utilsService.parseStringFromBD(temporaryValue, 3)), true, new ButtonForKeyboard("Да", "YES_BUTTON_SELL"), new ButtonForKeyboard("Нет", "NO_BUTTON_SELL"));
                 utilsService.sendDeleteMessageAnswer(chatId, messageId);
                 appUser.setSellUserState(SELL_PROOF);
@@ -223,7 +224,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
                 utilsService.sendDeleteMessageAnswer(chatId, messageId);
             }
         } else {
-            info = "Введено неправильно значение"+EmojiParser.parseToUnicode(":warning:")+ "\n Бот ожидает число "+EmojiParser.parseToUnicode(":1234:");
+            info = "Введено неправильно значение"+EmojiParser.parseToUnicode(":warning:")+ "\nБот ожидает число "+EmojiParser.parseToUnicode(":1234:");
             utilsService.sendEditMessageAnswer(info, chatId, Long.parseLong(utilsService.parseStringFromBD(temporaryValue, 3)));
             utilsService.sendDeleteMessageAnswer(chatId, messageId);
         }
@@ -235,17 +236,17 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
             if (!(stockQuote== null)) {
                 BigDecimal cost = stockQuote.getPrevLegalClosePrice();
                 String symbol = stockQuote.getSecId();
-                utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode(":green_circle:")+" Выбрана акция " + cmd+"\n Введите также количество акций, которое вы хотите продать \n"+EmojiParser.parseToUnicode(":round_pushpin:")+" Сейчас у вас "+appUserStockService.countOfTheBag(appUser, symbol)+" акций "+stockQuote.getShortName(), chatId, Long.parseLong(oldActiveBuy), true, new ButtonForKeyboard("Продать все", "SELL_ALL_COMMAND"));
+                utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode(":green_circle:")+" Выбрана акция " + cmd+"\nВведите также количество акций, которое вы хотите продать \n"+EmojiParser.parseToUnicode(":round_pushpin:")+" Сейчас у вас "+appUserStockService.countOfTheBag(appUser, symbol)+" акций "+stockQuote.getShortName(), chatId, Long.parseLong(oldActiveBuy), true, new ButtonForKeyboard("Продать все", "SELL_ALL_COMMAND"));
                 utilsService.sendDeleteMessageAnswer(chatId, messageId);
                 appUser.setSellUserState(SELL_CHANGE_COUNT);
                 appUser.setActiveBuy(symbol + ":" + cost+":"+stockQuote.getShortName()+":"+oldActiveBuy);
                 appUserDAO.save(appUser);
             } else {
-                utilsService.sendEditMessageAnswerWithInlineKeyboard("Чат-бот не знаком с такой ценной бумаги"+EmojiParser.parseToUnicode(":unamused:")+ "\n Убедитесь, что вы хотите продать именно "+cmd+"\n И введите правильный ключ акции, если же окажется, что вас запрос верен, напишите нам в поддержку"+EmojiParser.parseToUnicode(":email:")+ "\n Мы обязательно поможем"+EmojiParser.parseToUnicode(":revolving_hearts:"), chatId, Long.parseLong(oldActiveBuy), true, new ButtonForKeyboard("Список ваших акций", "LIST_OWN_STOCKS"));
+                utilsService.sendEditMessageAnswerWithInlineKeyboard("Чат-бот не знаком с такой ценной бумаги"+EmojiParser.parseToUnicode(":unamused:")+ "\nУбедитесь, что вы хотите продать именно "+cmd+"\nИ введите правильный ключ акции, если же окажется, что вас запрос верен, напишите нам в поддержку"+EmojiParser.parseToUnicode(":email:")+ "\nМы обязательно поможем"+EmojiParser.parseToUnicode(":revolving_hearts:"), chatId, Long.parseLong(oldActiveBuy), true, new ButtonForKeyboard("Список ваших акций", "LIST_OWN_STOCKS"));
                 utilsService.sendDeleteMessageAnswer(chatId, messageId);
             }
         } else {
-            utilsService.sendEditMessageAnswer("Такой акции нет в вашем инвестиционном портфеле "+EmojiParser.parseToUnicode(":unamused:")+ " \n"+EmojiParser.parseToUnicode(":large_orange_diamond:")+ "Ваш портфель: \n "+appUserStockService.getInfoAboutBag(appUser), chatId, Long.parseLong(oldActiveBuy));
+            utilsService.sendEditMessageAnswer("Такой акции нет в вашем инвестиционном портфеле "+EmojiParser.parseToUnicode(":unamused:")+ " \n"+EmojiParser.parseToUnicode(":large_orange_diamond:")+ "Ваш портфель: \n"+appUserStockService.getInfoAboutBag(appUser), chatId, Long.parseLong(oldActiveBuy));
             utilsService.sendDeleteMessageAnswer(chatId, messageId);
         }
 
@@ -260,14 +261,14 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
             utilsService.sendDeleteMessageAnswer(chatId, messageId);
             log.info("Успешная продажа! Пользователь: "+appUser.getUserName());
         } else if (cmd.equalsIgnoreCase("НЕТ")) {
-             info = "Сделка отменена"+EmojiParser.parseToUnicode(":x:")+ "\n Если захотите опять что-то купить введите команду /sell";
+             info = "Сделка отменена"+EmojiParser.parseToUnicode(":x:")+ "\nЕсли захотите опять что-то купить введите команду /sell";
             //info = "Сделка отменена. Если захотите опять что-то продать введите команду /sell";
             utilsService.sendEditMessageAnswerWithInlineKeyboard(info, chatId, Long.parseLong(messadeIdFrom), true, new ButtonForKeyboard("Sell", "SELL_COMMAND"));
             utilsService.sendDeleteMessageAnswer(chatId, messageId);
             appUser.setSellUserState(NOT_SELL);
             appUserDAO.save(appUser);
         } else {
-            info = "Неверное значение"+EmojiParser.parseToUnicode(":x:")+ "\n Если вы подтверждаете продажу введите 'Да'("+EmojiParser.parseToUnicode(":white_check_mark:")+"), если отменяете 'Нет'("+EmojiParser.parseToUnicode(":x:")+"). \n Если хотите отменить продажу выберите /cancel";
+            info = "Неверное значение"+EmojiParser.parseToUnicode(":x:")+ "\nЕсли вы подтверждаете продажу введите 'Да'("+EmojiParser.parseToUnicode(":white_check_mark:")+"), если отменяете 'Нет'("+EmojiParser.parseToUnicode(":x:")+"). \nЕсли хотите отменить продажу выберите /cancel";
             utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode(info), chatId, Long.parseLong(utilsService.parseStringFromBD(appUser.getActiveBuy(), 3)), true, new ButtonForKeyboard(EmojiParser.parseToUnicode("Да("+":white_check_mark:"+")"), "YES_BUTTON_SELL"), new ButtonForKeyboard(EmojiParser.parseToUnicode("Нет("+":x:"+")"), "NO_BUTTON_SELL"), new ButtonForKeyboard("Отменить"+EmojiParser.parseToUnicode(":leftwards_arrow_with_hook:"), "CANCEL") );
             utilsService.sendDeleteMessageAnswer(chatId, messageId);
         }
@@ -282,7 +283,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         //TODO обработать исключения метода снизу
         appUserStockService.sellUserStock(appUser, utilsService.parseStringFromBD(activeSell, 0), count);
         //String info = walletMain.topUpWallet(countFromUser.multiply(purchace), appUser);
-        String neInfo = EmojiParser.parseToUnicode(":white_check_mark:")+" Успешная покупка: "+utilsService.parseStringFromBD(activeSell, 2)+"("+utilsService.parseStringFromBD(activeSell, 0)+") "+count+" акций "+EmojiParser.parseToUnicode(":white_check_mark:")+"\n \n "+walletMain.topUpWallet(purchace.multiply(countFromUser), appUser, false);
+        String neInfo = EmojiParser.parseToUnicode(":white_check_mark:")+" Успешная покупка: "+utilsService.parseStringFromBD(activeSell, 2)+"("+utilsService.parseStringFromBD(activeSell, 0)+") "+count+" акций "+EmojiParser.parseToUnicode(":white_check_mark:")+"\n \n"+walletMain.topUpWallet(purchace.multiply(countFromUser), appUser, false);
         appUser.setSellUserState(NOT_SELL);
         appUserDAO.save(appUser);
         return neInfo;

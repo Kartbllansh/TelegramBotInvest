@@ -24,7 +24,7 @@ public class BigMessage {
             "\n" +
             EmojiParser.parseToUnicode(":small_orange_diamond:")+"/sell - эта команда аналогична команде /buy, но выполняет обратную функцию, позволяя вам продавать ваши инвестиционные активы.\n" +
             "\n" +
-            EmojiParser.parseToUnicode(":small_orange_diamond:")+"/show_bag - использование этой команды позволяет вам просматривать общий обзор вашего инвестиционного портфеля. Пример такого отчета приведен ниже:\n" +
+            EmojiParser.parseToUnicode(":small_orange_diamond:")+"/show_bag - использование этой команды позволяет вам просматривать общий обзор вашего инвестиционного портфеля. \n \nПример такого отчета приведен ниже:\n" +
             "\n" +
             "Ваш инвестиционный портфель"+EmojiParser.parseToUnicode(":school_satchel:")+"\n" +
             "\n" +
@@ -41,10 +41,10 @@ public class BigMessage {
             EmojiParser.parseToUnicode(":small_orange_diamond:")+"/wallet - эта команда предназначена для управления вашим кошельком и финансовыми операциями.\n" +
             "\n" +
             EmojiParser.parseToUnicode(":small_orange_diamond:")+"Остальные доступные команды можно найти в левом нижнем меню." +
-            "\n P.S Сейчас, первым делом, советуем вам пополнить баланс";
+            "\n P.S Сейчас, первым делом, советуем вам пополнить баланс командой /wallet";
 
     public static final String HELP_MESSAGE = "Список доступных команд"+EmojiParser.parseToUnicode(":page_facing_up:")+" \n \n" +
-            EmojiParser.parseToUnicode(":large_blue_diamond:")+" /cancel - отмена выполнения текущей команды;\n " +
+            EmojiParser.parseToUnicode(":large_blue_diamond:")+" /cancel - отмена выполнения текущей команды;\n" +
             EmojiParser.parseToUnicode(":large_blue_diamond:")+" /registration - регистрация пользователя;\n" +
             EmojiParser.parseToUnicode(":large_blue_diamond:")+" /wallet - получить информацию о вашем кошельке \n" +
             EmojiParser.parseToUnicode(":large_blue_diamond:")+" /buy - покупка ценной бумаги; \n" +
@@ -52,15 +52,19 @@ public class BigMessage {
             EmojiParser.parseToUnicode(":large_blue_diamond:")+" /show_bag - посмотреть портфель; \n"+
             EmojiParser.parseToUnicode(":large_blue_diamond:")+" /support - если возникли проблемы, пишите; \n"+
             EmojiParser.parseToUnicode(":large_blue_diamond:")+" /development - будущие разработки; \n";
-    public static final String START_MESSAGE = "Добро пожаловать в мир виртуальной торговли нашего бота! \n Здесь ты можешь развивать свои навыки инвестирования," +
+    public static final String START_MESSAGE = "Добро пожаловать в мир виртуальной торговли нашего бота! \nЗдесь ты можешь развивать свои навыки инвестирования," +
             " не рискуя реальными средствами. " +
-            "\n \n"+EmojiParser.parseToUnicode(":bank: ")+" Биржи доступные для тренировки: \n " +
+            "\n \n"+EmojiParser.parseToUnicode(":bank: ")+" Биржи доступные для тренировки: \n" +
             EmojiParser.parseToUnicode(":large_blue_diamond:")+" Московская биржа \n" +
-             EmojiParser.parseToUnicode(":large_blue_diamond:")+" Остальные в разработке \n \n " +
+             EmojiParser.parseToUnicode(":large_blue_diamond:")+" Остальные в разработке \n \n" +
             "Не забывай, что все операции проводятся с виртуальными средствами, так что ты можешь экспериментировать и учиться без риска потери реальных денег"+EmojiParser.parseToUnicode(":money_with_wings:")+"\n" +
             "\n" +
-            "На данный момент цена акций изменяется раз в месяц. Мы работает там тем, чтобы получать актуальную цену чаще. \n \n" +
+            EmojiParser.parseToUnicode(":exclamation:")+"На данный момент цена акций изменяется раз в месяц. Мы работает над тем, чтобы получать актуальную цену чаще."+EmojiParser.parseToUnicode(":exclamation:")+ "\n \n" +
             "Если у тебя возникнут вопросы или нужна помощь, не стесняйся обращаться к команде поддержки через команду /support. ";
 
-    public static final String DEVELOPMENT_MESSAGE = " Команда в разработке :)";
+    public static final String DEVELOPMENT_MESSAGE = " Команда в разработке :) \n \nЛадно, все, все, пошутили \nВ разработке: \n" +
+            EmojiParser.parseToUnicode(":large_blue_diamond:")+" Добавление бирж NYSE и NASDAQ" +
+            EmojiParser.parseToUnicode(":large_blue_diamond:")+" Обновление цены несколько раз в день" +
+            EmojiParser.parseToUnicode(":large_blue_diamond:")+" Добавление соревновательной части боту" +
+            "\nЕсли у вас есть идеи, пишите @Kartbllansh !Мы обязательно рассмотрим вашу идею!";
 }

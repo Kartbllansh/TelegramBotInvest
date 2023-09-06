@@ -161,7 +161,7 @@ public class AppUserStockServiceImpl implements AppUserStockService {
               allSumma =  allSumma.add(countFactNow);
                stringBuilder.append(EmojiParser.parseToUnicode(":large_blue_diamond: ")).append(userStock.getStockQuote().getShortName()).append("(")
                        .append(userStock.getStockQuote().getSecId()).append(")")
-                       .append(" - ").append(userStock.getCountStock()).append(" акций \n").append("Доход").append(EmojiParser.parseToUnicode(":money_with_wings:")).append(":   ").append(inCome).append(" | ")
+                       .append(" - ").append(userStock.getCountStock()).append(" акций \n").append("Цена покупки/Цена сейчас  -  ").append(userStock.getPrice()).append("/").append(userStock.getStockQuote().getPrevLegalClosePrice()).append("\n").append("Доход").append(EmojiParser.parseToUnicode(":money_with_wings:")).append(":   ").append(inCome).append(" | ")
                        .append(incomeWithProcent).append("%").append("\n").append("Время покупок и продаж").append(EmojiParser.parseToUnicode(":hourglass:")).append(": \n").append(userStock.getNoticeBuyOrSell()).append("\n")
                        .append("_________________________ \n");
             }

@@ -57,7 +57,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         listOfCommand.add(new BotCommand("/show_bag", "просмотр инвестиционного портфеля"));
         listOfCommand.add(new BotCommand("/wallet", "команды для работы с кошельком"));
         listOfCommand.add(new BotCommand("/cancel", "отмена активной команды"));
-        listOfCommand.add(new BotCommand("/registration", "подтверждение почты"));
+        //listOfCommand.add(new BotCommand("/registration", "подтверждение почты"));
     listOfCommand.add(new BotCommand("/learning", "как пользоваться ботом"));
         listOfCommand.add(new BotCommand("/support", "техническая поддержка"));
         listOfCommand.add(new BotCommand("/development", "будущие обновления"));

@@ -212,7 +212,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
             /*Long someResult = createTable.checkAboutCountSell(count, "telegramuser_"+appUser.getTelegramUserId(), codeStocks);*/
             int someResult = appUserStockService.checkAboutCountSell(appUser, (int) count, codeStocks);
             if(someResult>=0) {
-                info = EmojiParser.parseToUnicode(":yellow_circle:")+" Продажа " + count + " акций " + utilsService.parseStringFromBD(temporaryValue, 2)+"("+utilsService.parseStringFromBD(temporaryValue, 0)+")";
+                info =" Продажа " + count + " акций " + utilsService.parseStringFromBD(temporaryValue, 2)+"("+utilsService.parseStringFromBD(temporaryValue, 0)+")";
                 utilsService.sendEditMessageAnswerWithInlineKeyboard(EmojiParser.parseToUnicode(info+" \nПодтверждение"+EmojiParser.parseToUnicode(":white_large_square:")+ "\nЕсли вы подтверждаете продажу введите 'Да'("+EmojiParser.parseToUnicode(":white_check_mark:")+"), если отменяете 'Нет'("+EmojiParser.parseToUnicode(":x:")+")"), chatId, Long.parseLong(utilsService.parseStringFromBD(temporaryValue, 3 )), true, new ButtonForKeyboard(EmojiParser.parseToUnicode("Да("+":white_check_mark:"+")"), "YES_BUTTON_SELL"), new ButtonForKeyboard(EmojiParser.parseToUnicode("Нет("+":x:"+")"), "NO_BUTTON_SELL"));
                 //utilsService.sendEditMessageAnswerWithInlineKeyboard(info+"Подтверждение! Если вы подтверждаете продажу введите Да, если отменяете Нет", chatId, Long.parseLong(utilsService.parseStringFromBD(temporaryValue, 3)), true, new ButtonForKeyboard("Да", "YES_BUTTON_SELL"), new ButtonForKeyboard("Нет", "NO_BUTTON_SELL"));
                 utilsService.sendDeleteMessageAnswer(chatId, messageId);
@@ -283,7 +283,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
         //TODO обработать исключения метода снизу
         appUserStockService.sellUserStock(appUser, utilsService.parseStringFromBD(activeSell, 0), count);
         //String info = walletMain.topUpWallet(countFromUser.multiply(purchace), appUser);
-        String neInfo = EmojiParser.parseToUnicode(":white_check_mark:")+" Успешная покупка: "+utilsService.parseStringFromBD(activeSell, 2)+"("+utilsService.parseStringFromBD(activeSell, 0)+") "+count+" акций "+EmojiParser.parseToUnicode(":white_check_mark:")+"\n \n"+walletMain.topUpWallet(purchace.multiply(countFromUser), appUser, false);
+        String neInfo = EmojiParser.parseToUnicode(":white_check_mark:")+" Успешная продажа: "+utilsService.parseStringFromBD(activeSell, 2)+"("+utilsService.parseStringFromBD(activeSell, 0)+") "+count+" акций "+EmojiParser.parseToUnicode(":white_check_mark:")+"\n \n"+walletMain.topUpWallet(purchace.multiply(countFromUser), appUser, false);
         appUser.setSellUserState(NOT_SELL);
         appUserDAO.save(appUser);
         return neInfo;

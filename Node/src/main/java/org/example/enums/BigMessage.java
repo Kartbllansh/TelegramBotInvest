@@ -63,8 +63,8 @@ public class BigMessage {
             "Если у тебя возникнут вопросы или нужна помощь, не стесняйся обращаться к команде поддержки через команду /support. ";
 
     public static final String DEVELOPMENT_MESSAGE = " Команда в разработке :) \n \nЛадно, все, все, пошутили \nВ разработке: \n" +
-            EmojiParser.parseToUnicode(":large_blue_diamond:")+" Добавление бирж NYSE и NASDAQ" +
-            EmojiParser.parseToUnicode(":large_blue_diamond:")+" Обновление цены несколько раз в день" +
-            EmojiParser.parseToUnicode(":large_blue_diamond:")+" Добавление соревновательной части боту" +
+            EmojiParser.parseToUnicode(":large_blue_diamond:")+" Добавление бирж NYSE и NASDAQ \n" +
+            EmojiParser.parseToUnicode(":large_blue_diamond:")+" Обновление цены несколько раз в день \n" +
+            EmojiParser.parseToUnicode(":large_blue_diamond:")+" Добавление соревновательной части боту \n" +
             "\nЕсли у вас есть идеи, пишите @Kartbllansh !Мы обязательно рассмотрим вашу идею!";
 }

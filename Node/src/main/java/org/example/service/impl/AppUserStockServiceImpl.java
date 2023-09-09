@@ -154,23 +154,23 @@ public class AppUserStockServiceImpl implements AppUserStockService {
 
 
             for(UserStock userStock : userStocks){
-                BigDecimal countBuy = userStock.getPrice().multiply(BigDecimal.valueOf(userStock.getCountStock()));
+                BigDecimal countBuy = userStock.getPrice().multiply(BigDecimal.valueOf(userStock.getCountStock())).setScale(2, RoundingMode.HALF_UP);
                 BigDecimal countFactNow = userStock.getStockQuote().getPrevLegalClosePrice().multiply(BigDecimal.valueOf(userStock.getCountStock()));
                 BigDecimal inCome = countFactNow.subtract(countBuy);
                 BigDecimal incomeWithProcent = inCome.divide(countBuy, 2, RoundingMode.HALF_UP);
               allSumma =  allSumma.add(countFactNow);
                stringBuilder.append(EmojiParser.parseToUnicode(":large_blue_diamond: ")).append(userStock.getStockQuote().getShortName()).append("(")
                        .append(userStock.getStockQuote().getSecId()).append(")")
-                       .append(" - ").append(userStock.getCountStock()).append(" акций \n").append("Цена покупки/Цена сейчас  -  ").append(userStock.getPrice()).append("/").append(userStock.getStockQuote().getPrevLegalClosePrice()).append("\n").append("Доход").append(EmojiParser.parseToUnicode(":money_with_wings:")).append(":   ").append(inCome).append(" | ")
-                       .append(incomeWithProcent).append("%").append("\n").append("Время покупок и продаж").append(EmojiParser.parseToUnicode(":hourglass:")).append(": \n").append(userStock.getNoticeBuyOrSell()).append("\n")
+                       .append(" - ").append(userStock.getCountStock()).append(" акций \n").append("Цена покупки/Цена сейчас  -  ").append(userStock.getPrice().stripTrailingZeros()).append("/").append(userStock.getStockQuote().getPrevLegalClosePrice().stripTrailingZeros()).append("\n").append("Доход").append(EmojiParser.parseToUnicode(":money_with_wings:")).append(":   ").append(inCome.stripTrailingZeros()).append(" | ")
+                       .append(incomeWithProcent.stripTrailingZeros()).append("%").append("\n").append("Время покупок и продаж").append(EmojiParser.parseToUnicode(":hourglass:")).append(": \n").append(userStock.getNoticeBuyOrSell()).append("\n")
                        .append("_________________________ \n");
             }
         }
             BigDecimal s = allSumma.add(appUser.getWalletMoney());
             BigDecimal inComeAll = s.subtract(appUser.getTopUpAmount());
             BigDecimal inComeWithProcent = inComeAll.divide(appUser.getTopUpAmount(),  2, RoundingMode.HALF_UP);
-            stringBuilder.append("На кошельке: ").append(appUser.getWalletMoney()).append("₽ \n").append("Стоимость всех активов: ")
-                    .append(allSumma).append("₽ \n").append("Пополнения за все время: ").append(appUser.getTopUpAmount()).append("₽ \n").append("Прибыль за все время").append(EmojiParser.parseToUnicode(":chart:")).append(":   ").append(inComeAll).append("₽ | ").append(inComeWithProcent).append("%");
+            stringBuilder.append("На кошельке: ").append(appUser.getWalletMoney().stripTrailingZeros()).append("₽ \n").append("Стоимость всех активов: ")
+                    .append(allSumma.stripTrailingZeros()).append("₽ \n").append("Пополнения за все время: ").append(appUser.getTopUpAmount().stripTrailingZeros()).append("₽ \n").append("Прибыль за все время").append(EmojiParser.parseToUnicode(":chart:")).append(":   ").append(inComeAll.stripTrailingZeros()).append("₽ | ").append(inComeWithProcent).append("%");
             return stringBuilder.toString();
 
         }

@@ -38,19 +38,23 @@ public class UtilsServiceImpl implements UtilsService {
 
     @Override
     public String cancelProcess(AppUser appUser) {
+        String info = null;
         if(!appUser.getBuyUserState().equals(NOT_BUY)){
+            info = "Команда /buy отменена"+ EmojiParser.parseToUnicode(":leftwards_arrow_with_hook:");
             appUser.setBuyUserState(NOT_BUY);
         }
         if (!appUser.getSellUserState().equals(NOT_SELL)){
+            info = "Команда /sell отменена"+ EmojiParser.parseToUnicode(":leftwards_arrow_with_hook:");
             appUser.setSellUserState(NOT_SELL);
         }
         if(!appUser.getWalletUserState().equals(NOT_WALLET)){
+            info = "Команда /wallet отменена"+ EmojiParser.parseToUnicode(":leftwards_arrow_with_hook:");
             appUser.setWalletUserState(NOT_WALLET);
         }
         appUser.setState(BASIC_STATE);
         appUserDAO.save(appUser);
        log.info("Активирована команда /cancel. Пользователь: "+appUser.getUserName());
-        return "Команда отменена"+ EmojiParser.parseToUnicode(":leftwards_arrow_with_hook:");
+        return info;
     }
 
     @Override

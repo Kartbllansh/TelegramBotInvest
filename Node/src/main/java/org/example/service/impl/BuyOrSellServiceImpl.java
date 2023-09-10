@@ -205,10 +205,11 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
     private void sellChangeCount(AppUser appUser, String cmd, Long chatId, long messageId){
         String temporaryValue = appUser.getActiveBuy();
         String info = "";
+        String codeStocks =utilsService.parseStringFromBD(temporaryValue, 0);
         if (cmd.trim().matches("\\d+")){
             long count = Long.parseLong(cmd);
 //TODO убрать возможность купить 0
-            String codeStocks =utilsService.parseStringFromBD(temporaryValue, 0);
+
             /*Long someResult = createTable.checkAboutCountSell(count, "telegramuser_"+appUser.getTelegramUserId(), codeStocks);*/
             int someResult = appUserStockService.checkAboutCountSell(appUser, (int) count, codeStocks);
             if(someResult>=0) {
@@ -224,7 +225,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
                 utilsService.sendDeleteMessageAnswer(chatId, messageId);
             }
         } else {
-            info = "Введено неправильно значение"+EmojiParser.parseToUnicode(":warning:")+ "\nБот ожидает число "+EmojiParser.parseToUnicode(":1234:");
+            info = "Введено неправильно значение"+EmojiParser.parseToUnicode(":warning:")+ "\nБот ожидает число "+EmojiParser.parseToUnicode(":1234:")+"\nСейчас у вас "+appUserStockService.countOfTheBag(appUser, codeStocks)+" акций "+utilsService.parseStringFromBD(temporaryValue, 2);
             utilsService.sendEditMessageAnswer(info, chatId, Long.parseLong(utilsService.parseStringFromBD(temporaryValue, 3)));
             utilsService.sendDeleteMessageAnswer(chatId, messageId);
         }
@@ -246,7 +247,7 @@ public class BuyOrSellServiceImpl implements BuyOrSellService {
                 utilsService.sendDeleteMessageAnswer(chatId, messageId);
             }
         } else {
-            utilsService.sendEditMessageAnswer("Такой акции нет в вашем инвестиционном портфеле "+EmojiParser.parseToUnicode(":unamused:")+ " \n"+EmojiParser.parseToUnicode(":large_orange_diamond:")+ "Ваш портфель: \n"+appUserStockService.getInfoAboutBag(appUser), chatId, Long.parseLong(oldActiveBuy));
+            utilsService.sendEditMessageAnswerWithInlineKeyboard("Такой акции нет в вашем инвестиционном портфеле "+EmojiParser.parseToUnicode(":unamused:")+ " \n"+EmojiParser.parseToUnicode(":large_orange_diamond:")+ "Список ваших активов перечислен в предыдущем сообщении"+EmojiParser.parseToUnicode(":arrow_heading_up:")+"\n\nВведите правильный 'ticket' компании", chatId, Long.parseLong(oldActiveBuy), false, new ButtonForKeyboard("Отменить"+EmojiParser.parseToUnicode(":leftwards_arrow_with_hook:"), "CANCEL"));
             utilsService.sendDeleteMessageAnswer(chatId, messageId);
         }
 
